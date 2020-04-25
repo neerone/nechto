@@ -7,7 +7,7 @@ import {discardCard} from 'server/helpers/discardCard';
 import {EEventID} from 'shared/enum/cards';
 
 export const getNextChainReactionPlayer = ({game, currentPlayer}:  {game: Game, currentPlayer: Player}) => {
-	const nextPlayer = game.getPlayerByPosition({playerId: currentPlayer.id, isNext: true});
+	const nextPlayer = currentPlayer.getNextPlayer();
 	if (nextPlayer.state === EPlayerState.door) return getNextChainReactionPlayer({game, currentPlayer: nextPlayer});
 	if (nextPlayer === currentPlayer) return null;
 	return nextPlayer;

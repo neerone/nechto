@@ -60,7 +60,7 @@ export class Player {
 			if (context && context.type === ETurnContextType.trade && context.defensePlayer) {
 				playerToTrade = context.defensePlayer
 			} else {
-				playerToTrade = this.game.getPlayerByPosition({playerId: this.id, isNext: true});
+				playerToTrade = this.getNextPlayer();
 			}
 		    if (playerToTrade.state === EPlayerState.door && !this.game.turnContext) {
 				this.game.addLog(`Игрок ${this.nickname} не меняется из-за заколоченной двери`);

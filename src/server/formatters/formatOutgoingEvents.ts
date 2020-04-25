@@ -7,7 +7,7 @@ import INotification from 'shared/interfaces/notification';
 import {formatHand} from 'server/formatters/formatHand';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {IFormatTradeContext} from 'shared/interfaces/common';
-import {ETurnState} from 'shared/enum/player';
+import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {getNextChainReactionPlayer} from 'server/helpers/cardActions/panic/chainReaction';
 
 function formatEvent(type, payload) {
@@ -67,10 +67,12 @@ const formatTradeContext = (game: Game) : IFormatTradeContext[] => {
 		case ETurnContextType.chainReaction:
 			return reduce(game.playersList, (acc, pId) => {
 				const player = game.players[pId];
-				if (player.turnState === ETurnState.inOffenseTrade) {
+				if (player.turnState === ETurnState.inOffenseTrade && player.state !== EPlayerState.door) {
+
+					const defensePlayer = getNextChainReactionPlayer({currentPlayer: player, game})
 					acc.push({
 						offensePlayerId: pId,
-						defensePlayerId: getNextChainReactionPlayer({currentPlayer: player, game}),
+						defensePlayerId: defensePlayer.id,
 						isCardPicked: false,
 						type: game.turnContext.type,
 					})

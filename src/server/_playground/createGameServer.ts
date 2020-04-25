@@ -5,6 +5,7 @@ import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 
 export const createMockGameServer = (): [GameServer, Game, ...Player[]] => {
+	//const gameServer = new GameServer();
 	gameServer.isMock = true;
 	gameServer.initialize(createMockSocketServer());
 	const neeronePlayer = createPlayer();

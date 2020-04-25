@@ -160,7 +160,7 @@ export class Player {
 	}
 	getRandomPlayableCard = () => {
 		const randomCard = shuffle(this.hand)[0];
-		if (randomCard.id === EEventID.thing) return this.getRandomCard();
+		if (randomCard.id === EEventID.thing) return this.getRandomPlayableCard();
 		return randomCard;
 	}
 }

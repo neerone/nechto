@@ -12,7 +12,7 @@ import {seductionTradeFinish} from 'server/helpers/cardActions/offense/seduction
 export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Player, cardUniqueId: string}) => {
   const tradingCard = player.getCardByUniqueId(cardUniqueId);
   if (tradingCard.type !== ECardType.event) {
-    throw new Error(`Попытка обменяться НЕ картой эвента ${tradingCard}`);
+    throw new Error(`Попытка обменяться НЕ картой эвента ${JSON.stringify(tradingCard)}`);
   }
   const context = game.turnContext;
   if (!context || context.type !== ETurnContextType.trade) {

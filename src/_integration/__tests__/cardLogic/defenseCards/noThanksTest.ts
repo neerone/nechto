@@ -7,6 +7,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('nothanks test',  () => {
@@ -35,6 +36,7 @@ describe('nothanks test',  () => {
 
 		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: barricade.uniqueId}));
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		let analysis = find(offensePlayer.hand, {id: EEventID.analysis});
 		const analysisId = analysis.uniqueId
 		testPlayerAction(gameServer, game, {
@@ -49,6 +51,7 @@ describe('nothanks test',  () => {
 		expect(offensePlayer.turnState).toBe(ETurnState.idle);
 
 		expect(defensePlayer.turnState).toBe(ETurnState.inDefenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		testPlayerAction(gameServer, game, {
 			player:defensePlayer,
 			cardUniqueId: noThanksCard.uniqueId,

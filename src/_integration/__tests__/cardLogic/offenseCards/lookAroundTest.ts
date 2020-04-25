@@ -7,6 +7,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('analysis test',  () => {
@@ -34,6 +35,7 @@ describe('analysis test',  () => {
 		expect(game.playersList[game.playersList.length -1]).toBe(nextPlayer.id)
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(offensePlayer.hand.length).toBe(4);
 
 		expect(checkAllDeckCards(game, false)).toBe(true);

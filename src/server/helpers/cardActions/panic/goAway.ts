@@ -8,6 +8,7 @@ import {ETurnState} from 'shared/enum/player';
 import {discardCard} from 'server/helpers/discardCard';
 
 export const goAwayAct = ({game, player} : {game: Game, player: Player}) => {
+	game.addLog(`Паника "убирайся прочь": игрок ${player.nickname} меняется местами с любым игроком не на карантине.`)
 	player.changeTurnState(ETurnState.inCardActionProgress);
 	const allPlayersExeptCurrent = player.getAllPlayablePlayersExceptCurrent();
 	console.log('PLAYER NOTIFIED!!!', ENotification.playerSelect, player.nickname)

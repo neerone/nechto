@@ -121,19 +121,19 @@ export function mockGameProcess(player) {
 		//], againstCardId: EEventID.flamethrower})
 
 
-		//testOffenseCard({player, cards: [
-		//	getCard(EEventID.positionswap),
-		//	getCard(EEventID.seduction),
-		//	getCard(EEventID.quarantine),
-		//	getCard(EEventID.noFire),
-		//]})
+		testOffenseCard({player, cards: [
+			getCard(EEventID.flamethrower),
+			getCard(EEventID.seduction),
+			getCard(EEventID.quarantine),
+			getCard(EEventID.noFire),
+		]})
 
 		//testAxeCard({player, cards: [
 		//	getCard(EEventID.axe),
 		//	getCard(EEventID.barricade),
 		//]})
 
-		testPanic({player, card: getPanic(EPanicID.chainReaction)})
+		//testPanic({player, card: getPanic(EPanicID.chainReaction)})
 
 
 	}, 500)

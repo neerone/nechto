@@ -5,6 +5,7 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 describe('axe test',  () => {
 
@@ -66,6 +67,7 @@ describe('axe test',  () => {
 
 
 		expect(defensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(offensePlayer.hand.length).toBe(4);
 
 
@@ -106,6 +108,7 @@ describe('axe test',  () => {
 		});
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(offensePlayer.hand.length).toBe(4);
 		expect(offensePlayer.quarantine).toBe(0);
 

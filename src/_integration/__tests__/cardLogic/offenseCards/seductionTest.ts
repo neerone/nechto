@@ -7,6 +7,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('seduction test',  () => {
@@ -35,6 +36,7 @@ describe('seduction test',  () => {
 			actionType: EPlayerActionType.playerSelect
 		});
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
 		testPlayerAction(gameServer, game, {
 			player:offensePlayer,

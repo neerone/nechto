@@ -10,6 +10,7 @@ import {checkAllDeckCards, printPlayersStatuses} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 
@@ -55,6 +56,7 @@ describe('one two test',  () => {
 		expect(initialOffensePosition).toBe(afterDefensePosition);
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
 
 		expect(checkAllDeckCards(game, false)).toBe(true);

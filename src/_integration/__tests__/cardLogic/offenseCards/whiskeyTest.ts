@@ -9,6 +9,7 @@ import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('whiskey test',  () => {
@@ -50,6 +51,7 @@ describe('whiskey test',  () => {
 
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(offensePlayer.hand.length).toBe(4);
 
 		expect(checkAllDeckCards(game, false)).toBe(true);

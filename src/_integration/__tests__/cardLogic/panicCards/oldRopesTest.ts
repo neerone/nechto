@@ -19,6 +19,7 @@ describe('oldRopes test',  () => {
 		expect(APlayer.quarantine).toBe(0);
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(game.turnContext.type).toBe(ETurnContextType.trade);
 		expect(checkAllDeckCards(game, false)).toBe(true);
 

@@ -56,7 +56,7 @@ export const seductionTradeFinish = ({game} : {game: Game}) => {
 	});
 	const offensePlayer = game.turnContext.offensePlayer;
 	const defensePlayer = game.turnContext.defensePlayer;
-	defensePlayer.changeTurnState(ETurnState.idle)
 	game.turnContext = null;
+	defensePlayer.changeTurnState(ETurnState.idle)
 	game.endTurn(offensePlayer.id);
 };

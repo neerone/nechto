@@ -19,7 +19,7 @@ export const getPlayerByStep = ({game, currentPlayer, isNext, step}: {game:Game,
 
 export const oneTwoAct = ({game, player}: {game:Game, player:Player}) => {
 	player.changeTurnState(ETurnState.inCardActionProgress);
-
+	game.addLog(`Паника: раз-два: игрок ${player.nickname} меняется местами с третьим игроком по часовой или против часовой стрелке`);
 	const left = getPlayerByStep({game, currentPlayer:player, isNext: true, step:2});
 	const right = getPlayerByStep({game, currentPlayer:player, isNext: false, step:2});
 
@@ -52,6 +52,6 @@ export const oneTwoPlayerSelect = ({game, selectedPlayerId, player}: {game:Game,
 	const selectedPlayer = find(game.players, {id:selectedPlayerId});
 	game.addLog(`Игрок ${player.nickname} меняется местами с ${selectedPlayer.nickname}`);
 	game.swapPlayers(selectedPlayerId, player.id);
-	player.changeTurnState(ETurnState.inOffenseTrade);
 	game.turnContext = null;
+	player.changeTurnState(ETurnState.inOffenseTrade);
 };

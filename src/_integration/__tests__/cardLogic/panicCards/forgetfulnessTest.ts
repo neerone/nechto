@@ -78,9 +78,8 @@ describe('forgetfulness test',  () => {
 			expect(discardedCardIds).not.toContain(handCard.uniqueId)
 		})
 
-		expect(game.turnContext.type).toBe(ETurnContextType.trade);
-
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
 		expect(checkAllDeckCards(game, false)).toBe(true);
 

@@ -7,6 +7,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {testPlayerAction, testPlayerActionDecision} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('leavemealone test',  () => {
@@ -72,6 +73,7 @@ describe('leavemealone test',  () => {
 		expect(initialOffensePosition).toBe(afterOffensePosition);
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(defensePlayer.turnState).toBe(ETurnState.idle);
 
 		expect(defensePlayer.hand).not.toContainEqual(expect.objectContaining({ uniqueId: leaveMeAlone.uniqueId }));
@@ -144,6 +146,7 @@ describe('leavemealone test',  () => {
 		expect(initialOffensePosition).toBe(afterOffensePosition);
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(defensePlayer.turnState).toBe(ETurnState.idle);
 
 		expect(defensePlayer.hand).not.toContainEqual(expect.objectContaining({ uniqueId: leaveMeAlone.uniqueId }));
@@ -217,6 +220,7 @@ describe('leavemealone test',  () => {
 		expect(initialOffensePosition).toBe(afterDefensePosition);
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(defensePlayer.turnState).toBe(ETurnState.idle);
 
 		expect(defensePlayer.hand).toContainEqual(expect.objectContaining({ uniqueId: leaveMeAlone.uniqueId }));

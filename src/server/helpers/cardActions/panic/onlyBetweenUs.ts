@@ -9,7 +9,7 @@ import {ICardEvent} from 'shared/interfaces/cards';
 
 export const onlyBetweenUsAct = ({game, player}: {game:Game, player:Player}) => {
 	player.changeTurnState(ETurnState.inCardActionProgress);
-
+	game.addLog(`Паника: только между насми. Игрок ${player.nickname} показывает карты соседу на выбор`)
 	const neighbours = player.getPlayabeNeighbours();
 	if (neighbours.length === 0 ) {
 		game.addLog('Игрок не показывает никому карты, т.к нет играбельных соседей')

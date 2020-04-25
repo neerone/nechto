@@ -5,6 +5,7 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 describe('barricade test',  () => {
 
@@ -81,6 +82,7 @@ describe('barricade test',  () => {
 
 		//Оффенс игрок не меняется картами потому что дальше дверь
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(offensePlayer.hand.length).toBe(4);
 
 		//Т.к у defense теперь ход, у него 5 карт

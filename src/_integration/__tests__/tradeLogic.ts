@@ -9,6 +9,7 @@ import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('trade logic',  () => {
@@ -31,6 +32,7 @@ describe('trade logic',  () => {
 			actionType: EPlayerActionType.cardDiscard
 		});
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
 		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
@@ -82,6 +84,7 @@ describe('trade logic',  () => {
 			actionType: EPlayerActionType.cardDiscard
 		});
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
 
 		expect(nextPlayer.isInjured).toBe(false);

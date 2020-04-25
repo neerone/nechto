@@ -9,6 +9,7 @@ import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
 import {testPlayerAction} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('goAway test',  () => {
@@ -47,7 +48,7 @@ describe('goAway test',  () => {
 			actionType: EPlayerActionType.playerSelect
 		});
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
-
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
 		const afterDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const afterOffensePosition = game.playersList.indexOf(offensePlayer.id);
@@ -58,6 +59,7 @@ describe('goAway test',  () => {
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		expect(defensePlayer.turnState).toBe(ETurnState.idle);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
 		expect(offensePlayer.hand.length).toBe(4);
 		expect(defensePlayer.hand.length).toBe(4);

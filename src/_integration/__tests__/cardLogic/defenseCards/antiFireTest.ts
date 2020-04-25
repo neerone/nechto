@@ -7,6 +7,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {testPlayerAction, testPlayerActionDecision} from '_integration/validators';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
 describe('antifire test',  () => {
@@ -62,6 +63,7 @@ describe('antifire test',  () => {
 		});
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		expect(defensePlayer.turnState).toBe(ETurnState.idle);
 
 		expect(defensePlayer.hand).not.toContainEqual(expect.objectContaining({ uniqueId: noFire.uniqueId }));
@@ -125,7 +127,7 @@ describe('antifire test',  () => {
 		expect(game.playersList).not.toContain(defensePlayer.id);
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
-
+		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		const nextPlayer = game.getPlayerByPosition({playerId:offensePlayer.id, isNext: true});
 
 		expect(nextPlayer.turnState).toBe(ETurnState.idle);

@@ -27,7 +27,7 @@ export const youCallThisPartyAct = ({game, player} : {game: Game, player: Player
 			}
 		}
 	})
-	game.addLog('Игроки попарно поменялись местами. Все карантины и двери сброшены.')
+	game.addLog('И это вы называете вечеринкой? Игроки попарно поменялись местами. Все карантины и двери сброшены.')
 	player.changeTurnState(ETurnState.inOffenseTrade)
 };
 

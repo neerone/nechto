@@ -18,11 +18,6 @@ export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Play
 		return !!cardTrade;
 	});
 
-	console.log('NOTIFY DISCARDED CARDS', {
-		type: ENotification.selectCard,
-		cards: filteredCards,
-		text:'Выбери одну из свои карт, чтобы поменять её на карту из колоды'
-	})
 
 	return {
 		type: ENotification.selectCard,
@@ -32,7 +27,7 @@ export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Play
 };
 
 export const forgetfullnessAct = ({game, player}: {game:Game, player:Player}) => {
-	game.addLog('Игрок меняет три карты с руки на три из колоды');
+	game.addLog('Паника! Забывчивость: Игрок меняет три карты с руки на три из колоды');
 	player.changeTurnState(ETurnState.inCardActionProgress);
 
 

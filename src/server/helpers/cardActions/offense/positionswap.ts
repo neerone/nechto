@@ -69,15 +69,18 @@ export const positionswapFinish = ({game, player, action}: {game:Game, player:Pl
 	}
 	console.log('position swap finish!!')
 	const {offensePlayer, defensePlayer} = game.turnContext;
-	offensePlayer.changeTurnState(ETurnState.inOffenseTrade);
+	game.turnContext = null;
+
 	const leaveMeAloneCard = find(player.hand, {id:EEventID.leaveMeAlone});
 	if (action === 'swap' || !leaveMeAloneCard) {
 		game.addLog(`Игроки ${offensePlayer.nickname} и ${defensePlayer.nickname} меняются местами`);
 		game.swapPlayers(offensePlayer.id, defensePlayer.id);
+		offensePlayer.changeTurnState(ETurnState.inOffenseTrade);
 		return;
 	}
 	game.addLog(`Игрок ${defensePlayer.nickname} применил "Мне и здесь неплохо" и остался на месте`);
 	discardCard({game, player, cardUniqueId: leaveMeAloneCard.uniqueId});
 	game.grabEventCardFromDeck({player});
+	offensePlayer.changeTurnState(ETurnState.inOffenseTrade);
 
 }

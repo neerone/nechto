@@ -6,6 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('tenacity test',  () => {
@@ -22,7 +23,7 @@ describe('tenacity test',  () => {
 		let tenacity = offensePlayer.hand[0];
 
 		expect(tenacity).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: tenacity.uniqueId,
 			actionType: EPlayerActionType.cardAct
@@ -37,7 +38,7 @@ describe('tenacity test',  () => {
 		})
 
 		const [_, {cards: [firstTenacityCard]}] = tenacityCards;
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: firstTenacityCard.uniqueId,
 			actionType: EPlayerActionType.cardSelect

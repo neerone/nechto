@@ -8,6 +8,7 @@ import {checkAllDeckCards, printPlayersStatuses} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('goAway test',  () => {
@@ -40,7 +41,7 @@ describe('goAway test',  () => {
 		expect(offensePlayer.turnState).toBe(ETurnState.inCardActionProgress);
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: defensePlayer.id,
 			actionType: EPlayerActionType.playerSelect

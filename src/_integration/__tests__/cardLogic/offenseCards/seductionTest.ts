@@ -6,6 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('seduction test',  () => {
@@ -23,19 +24,19 @@ describe('seduction test',  () => {
 		let miss = offensePlayer.hand[1];
 
 		expect(seduction).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: seduction.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: BPlayer.id,
 			actionType: EPlayerActionType.playerSelect
 		});
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			actionType: EPlayerActionType.cardTrade,
 			cardUniqueId: miss.uniqueId,
@@ -45,7 +46,7 @@ describe('seduction test',  () => {
 
 		const firstBPlayerCard = BPlayer.hand[0];
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:BPlayer,
 			actionType: EPlayerActionType.cardTrade,
 			cardUniqueId: firstBPlayerCard.uniqueId,

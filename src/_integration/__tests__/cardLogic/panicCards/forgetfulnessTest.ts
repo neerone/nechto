@@ -5,13 +5,10 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {each, isEqual, find, findLast} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {ETurnContextType} from 'shared/enum/turnContextType';
-import {Player} from 'server/models/Player';
-import {ICardEvent} from 'shared/interfaces/cards';
-import {getNextChainReactionPlayer} from 'server/helpers/cardActions/panic/chainReaction';
 import {checkAllDeckCards} from '_integration/helpers';
-import {formatCardActions} from 'server/formatters/formatCardActions';
 import {notifyPlayerDiscardCards} from 'server/helpers/cardActions/panic/forgetfulness';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction} from '_integration/validators';
 
 
 const getLastForgetfullnessNotificaitonCards = (offensePlayer) => {
@@ -43,7 +40,7 @@ describe('forgetfulness test',  () => {
 
 		const firstCard = forgetfulnessNotification.cards[0];
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: firstCard.uniqueId,
 			actionType: EPlayerActionType.cardSelect
@@ -57,7 +54,7 @@ describe('forgetfulness test',  () => {
 
 		const secondCard = forgetfulnessNotification.cards[0];
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: secondCard.uniqueId,
 			actionType: EPlayerActionType.cardSelect
@@ -70,7 +67,7 @@ describe('forgetfulness test',  () => {
 
 		const thirdCard = forgetfulnessNotification.cards[0];
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: thirdCard.uniqueId,
 			actionType: EPlayerActionType.cardSelect

@@ -6,6 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction, testPlayerActionDecision} from '_integration/validators';
 
 
 describe('antifire test',  () => {
@@ -27,12 +28,12 @@ describe('antifire test',  () => {
 		let flamethrower = find(offensePlayer.hand, {id: EEventID.flamethrower});
 
 		expect(flamethrower).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: flamethrower.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: defensePlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -54,7 +55,8 @@ describe('antifire test',  () => {
 			})])
 		);
 
-		gameServer.actionDecision({
+
+		testPlayerActionDecision(gameServer, game, {
 			player:defensePlayer,
 			action: 'noFire',
 		});
@@ -88,12 +90,12 @@ describe('antifire test',  () => {
 		let flamethrower = find(offensePlayer.hand, {id: EEventID.flamethrower});
 
 		expect(flamethrower).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: flamethrower.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: defensePlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -115,7 +117,7 @@ describe('antifire test',  () => {
 			})])
 		);
 
-		gameServer.actionDecision({
+		testPlayerActionDecision(gameServer, game, {
 			player:defensePlayer,
 			action: 'burn',
 		});

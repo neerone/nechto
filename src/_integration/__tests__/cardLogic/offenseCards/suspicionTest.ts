@@ -6,6 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('suspicion test',  () => {
@@ -22,12 +23,12 @@ describe('suspicion test',  () => {
 		let suspicion = offensePlayer.hand[0];
 
 		expect(suspicion).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: suspicion.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: nextPlayer.id,
 			actionType: EPlayerActionType.playerSelect

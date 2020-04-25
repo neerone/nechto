@@ -4,7 +4,7 @@ import {ETurnState} from 'shared/enum/player';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ENotification} from 'shared/enum/notifications';
 import {clone, find} from 'lodash';
-import {formatCardActions} from 'server/formatters/formatCardActions';
+import {getCardActions} from 'server/formatters/formatCardActions';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {discardCard} from 'server/helpers/discardCard';
 import {ETurnContextType} from 'shared/enum/turnContextType';
@@ -13,10 +13,17 @@ export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Play
 	const clonedPlayer = clone(player);
 	clonedPlayer.turnState = ETurnState.inCardAction;
 	const filteredCards = clonedPlayer.hand.filter(card => {
-		const cardActions = formatCardActions(game, clonedPlayer, card);
+		const cardActions = getCardActions(game, clonedPlayer, card);
 		const cardTrade = find(cardActions, { menuType: EPlayerActionType.cardDiscard});
 		return !!cardTrade;
 	});
+
+	console.log('NOTIFY DISCARDED CARDS', {
+		type: ENotification.selectCard,
+		cards: filteredCards,
+		text:'Выбери одну из свои карт, чтобы поменять её на карту из колоды'
+	})
+
 	return {
 		type: ENotification.selectCard,
 		cards: filteredCards,

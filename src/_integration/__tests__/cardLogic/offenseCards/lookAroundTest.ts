@@ -6,6 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('analysis test',  () => {
@@ -22,7 +23,7 @@ describe('analysis test',  () => {
 		let lookaround = offensePlayer.hand[0];
 
 		expect(lookaround).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: lookaround.uniqueId,
 			actionType: EPlayerActionType.cardAct

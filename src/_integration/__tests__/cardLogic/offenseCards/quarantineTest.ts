@@ -6,6 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('quarantine test',  () => {
@@ -22,12 +23,12 @@ describe('quarantine test',  () => {
 		let quarantine = offensePlayer.hand[0];
 
 		expect(quarantine).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: quarantine.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: offensePlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -56,12 +57,12 @@ describe('quarantine test',  () => {
 		let quarantine = offensePlayer.hand[0];
 
 		expect(quarantine).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: quarantine.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: nextPlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -77,7 +78,7 @@ describe('quarantine test',  () => {
 	});
 
 	it('quarantine card prev', () => {
-		const [gameServer, game, offensePlayer, nextPlayer, b, prevPlayer] = createMockGameServer();
+		const [gameServer, game, offensePlayer, nextPlayer, b, c, prevPlayer] = createMockGameServer();
 		offensePlayer.hand.splice(0,1);
 		offensePlayer.hand.splice(0,1, getCard(EEventID.quarantine));
 		expect(offensePlayer.hand[0].id).toBe(EEventID.quarantine);
@@ -88,12 +89,15 @@ describe('quarantine test',  () => {
 		let quarantine = offensePlayer.hand[0];
 
 		expect(quarantine).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: quarantine.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+
+		console.log('PREV PLAYER ID', prevPlayer.id)
+
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: prevPlayer.id,
 			actionType: EPlayerActionType.playerSelect

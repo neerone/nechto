@@ -6,6 +6,7 @@ import {ICardEvent} from 'shared/interfaces/cards';
 import {shuffle} from 'server/helpers/util';
 import {EEventID} from 'shared/enum/cards';
 import {ETurnContextType} from 'shared/enum/turnContextType';
+import {getCardActions} from 'server/formatters/formatCardActions';
 
 export class Player {
 	id = null;
@@ -160,7 +161,9 @@ export class Player {
 	}
 	getRandomPlayableCard = () => {
 		const randomCard = shuffle(this.hand)[0];
-		if (randomCard.id === EEventID.thing) return this.getRandomPlayableCard();
-		return randomCard;
+		if (getCardActions(this.game, this, randomCard).length > 0) {
+			return randomCard;
+		}
+		return this.getRandomPlayableCard();
 	}
 }

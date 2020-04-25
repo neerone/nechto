@@ -4,6 +4,7 @@ import {createMockGameServer} from 'server/_playground/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
+import {testPlayerAction} from '_integration/validators';
 
 describe('axe test',  () => {
 
@@ -21,12 +22,12 @@ describe('axe test',  () => {
 		expect(offensePlayer.turnState).toBe(ETurnState.inCardAction);
 		let barricade = offensePlayer.hand[0];
 		expect(barricade).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: barricade.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: defensePlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -47,12 +48,12 @@ describe('axe test',  () => {
 
 		let axe = defensePlayer.hand[0];
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:defensePlayer,
 			cardUniqueId: axe.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:defensePlayer,
 			selectedPlayerId: door.id,
 			actionType: EPlayerActionType.playerSelect
@@ -93,12 +94,12 @@ describe('axe test',  () => {
 		expect(offensePlayer.turnState).toBe(ETurnState.inCardAction);
 		let axe = offensePlayer.hand[0];
 		expect(axe).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: axe.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: offensePlayer.id,
 			actionType: EPlayerActionType.playerSelect

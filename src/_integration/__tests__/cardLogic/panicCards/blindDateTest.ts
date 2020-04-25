@@ -8,6 +8,7 @@ import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('blindDate test',  () => {
@@ -23,7 +24,7 @@ describe('blindDate test',  () => {
 
 
 		const whiskey = offensePlayer.hand[0];
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: whiskey.uniqueId,
 			actionType: EPlayerActionType.cardSelect

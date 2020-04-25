@@ -6,6 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction, testPlayerActionDecision} from '_integration/validators';
 
 
 describe('leavemealone test',  () => {
@@ -29,12 +30,12 @@ describe('leavemealone test',  () => {
 		let positionswap = find(offensePlayer.hand, {id: EEventID.positionswap});
 
 		expect(positionswap).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: positionswap.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: defensePlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -59,7 +60,7 @@ describe('leavemealone test',  () => {
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
-		gameServer.actionDecision({
+		testPlayerActionDecision(gameServer, game, {
 			player:defensePlayer,
 			action: 'cancelSwap',
 		});
@@ -101,12 +102,12 @@ describe('leavemealone test',  () => {
 		let reelFishingRods = find(offensePlayer.hand, {id: EEventID.reelFishingRods});
 
 		expect(reelFishingRods).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: reelFishingRods.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: defensePlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -131,7 +132,7 @@ describe('leavemealone test',  () => {
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
-		gameServer.actionDecision({
+		testPlayerActionDecision(gameServer, game, {
 			player:defensePlayer,
 			action: 'cancelSwap',
 		});
@@ -173,12 +174,12 @@ describe('leavemealone test',  () => {
 		let positionswap = find(offensePlayer.hand, {id: EEventID.positionswap});
 
 		expect(positionswap).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: positionswap.uniqueId,
 			actionType: EPlayerActionType.cardAct
 		});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: defensePlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -203,7 +204,7 @@ describe('leavemealone test',  () => {
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
-		gameServer.actionDecision({
+		testPlayerActionDecision(gameServer, game, {
 			player:defensePlayer,
 			action: 'swap',
 		});

@@ -9,6 +9,7 @@ import {Player} from 'server/models/Player';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {getNextChainReactionPlayer} from 'server/helpers/cardActions/panic/chainReaction';
 import {checkAllDeckCards} from '_integration/helpers';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('chainReaction test',  () => {
@@ -40,7 +41,7 @@ describe('chainReaction test',  () => {
 			expect(game.turnContext.type).toBe(ETurnContextType.chainReaction);
 
 			//console.log('DIFF', difference((game.turnContext as any).playersPick, tradedCards));
-			gameServer.playerAction({
+			testPlayerAction(gameServer, game, {
 				player:pl,
 				cardUniqueId: card.uniqueId,
 				actionType: EPlayerActionType.cardTrade
@@ -99,7 +100,7 @@ describe('chainReaction test',  () => {
 			expect(game.turnContext.type).toBe(ETurnContextType.chainReaction);
 
 			//console.log('DIFF', difference((game.turnContext as any).playersPick, tradedCards));
-			gameServer.playerAction({
+			testPlayerAction(gameServer, game, {
 				player:pl,
 				cardUniqueId: card.uniqueId,
 				actionType: EPlayerActionType.cardTrade

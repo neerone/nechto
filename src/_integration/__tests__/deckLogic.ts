@@ -2,20 +2,21 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {ETurnState} from 'shared/enum/player';
 import {createMockGameServer} from 'server/_playground/createGameServer';
 import {checkAllDeckCards} from '_integration/helpers';
+import {testPlayerAction} from '_integration/validators';
 
 let counter = 0;
 
 const testPlayerLogic = (gameServer, game, player) => {
 	let randomCard = player.getRandomPlayableCard();
 	if (player.turnState === ETurnState.inDefenseTrade) {
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:player,
 			cardUniqueId: randomCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade
 		});
 	}
 	randomCard = player.getRandomPlayableCard();
-	gameServer.playerAction({
+	testPlayerAction(gameServer, game, {
 		player:player,
 		cardUniqueId: randomCard.uniqueId,
 		actionType: EPlayerActionType.cardDiscard
@@ -23,7 +24,7 @@ const testPlayerLogic = (gameServer, game, player) => {
 
 	expect(checkAllDeckCards(game, false)).toBe(true);
 	randomCard = player.getRandomPlayableCard();
-	gameServer.playerAction({
+	testPlayerAction(gameServer, game, {
 		player:player,
 		cardUniqueId: randomCard.uniqueId,
 		actionType: EPlayerActionType.cardTrade

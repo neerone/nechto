@@ -9,6 +9,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards, printPlayersStatuses} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
+import {testPlayerAction} from '_integration/validators';
 
 
 
@@ -41,7 +42,7 @@ describe('one two test',  () => {
 		const initialDefensePosition = game.playersList.indexOf(selectPlayersId[0]);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: selectPlayersId[0],
 			actionType: EPlayerActionType.playerSelect

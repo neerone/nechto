@@ -6,6 +6,7 @@ import {checkAllDeckCards, printNotifications} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ENotification} from 'shared/enum/notifications';
 import {EPlayerActionType} from 'shared/enum/playerActions';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('onlyBetweenUs test',  () => {
@@ -26,7 +27,7 @@ describe('onlyBetweenUs test',  () => {
 
 		const selectedPlayer = game.players[offensePlayer.getPlayabeNeighbours()[0]];
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: selectedPlayer.id,
 			actionType: EPlayerActionType.playerSelect

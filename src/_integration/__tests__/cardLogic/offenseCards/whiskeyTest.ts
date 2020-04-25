@@ -8,6 +8,7 @@ import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('whiskey test',  () => {
@@ -24,7 +25,7 @@ describe('whiskey test',  () => {
 		let whiskey = offensePlayer.hand[0];
 
 		expect(whiskey).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: whiskey.uniqueId,
 			actionType: EPlayerActionType.cardAct

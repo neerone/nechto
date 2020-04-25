@@ -7,6 +7,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards, printPlayersStatuses} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {ETurnContextType} from 'shared/enum/turnContextType';
+import {testPlayerAction} from '_integration/validators';
 
 
 const getLastFriendshipNotificaiton = (offensePlayer) => {
@@ -41,7 +42,7 @@ describe('friendship test',  () => {
 		expect(game.turnContext).not.toBe(undefined);
 		expect(game.turnContext.type).toBe(ETurnContextType.seduction);
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			selectedPlayerId: APlayer.id,
 			actionType: EPlayerActionType.playerSelect
@@ -52,7 +53,7 @@ describe('friendship test',  () => {
 		expect((game.turnContext as any).offensePlayer).toBe(offensePlayer);
 		expect((game.turnContext as any).defensePlayer).toBe(APlayer);
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: missCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade
@@ -62,7 +63,7 @@ describe('friendship test',  () => {
 		expect(APlayer.turnState).toBe(ETurnState.inDefenseTrade);
 
 		const randomDefenseCard = APlayer.getRandomPlayableCard();
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:APlayer,
 			cardUniqueId: randomDefenseCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade

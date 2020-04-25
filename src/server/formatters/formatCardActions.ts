@@ -32,7 +32,7 @@ const getTargetPlayer = (game:Game, player: Player): Player | null => {
 	return null;
 };
 
-export const formatCardActions = (game: Game, player: Player, card: ICardEvent): ICardEventMenuItem[] => {
+export const getCardActions = (game: Game, player: Player, card: ICardEvent): ICardEventMenuItem[] => {
 	let actions : ICardEventMenuItem[] = [];
 	if (!card.eventType) return actions;
 	if (card.id === EEventID.thing) return [];

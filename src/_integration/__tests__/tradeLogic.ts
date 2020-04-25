@@ -8,6 +8,7 @@ import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('trade logic',  () => {
@@ -24,14 +25,14 @@ describe('trade logic',  () => {
 
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inCardAction);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: discardCard.uniqueId,
 			actionType: EPlayerActionType.cardDiscard
 		});
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: tradeCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade
@@ -40,7 +41,7 @@ describe('trade logic',  () => {
 		const nextPlayer = offensePlayer.getNextPlayer();
 		const randomNextPlayerCard = nextPlayer.getRandomPlayableCard();
 		expect(nextPlayer.turnState).toBe(ETurnState.inDefenseTrade);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:nextPlayer,
 			cardUniqueId: randomNextPlayerCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade
@@ -75,7 +76,7 @@ describe('trade logic',  () => {
 
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inCardAction);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: discardCard.uniqueId,
 			actionType: EPlayerActionType.cardDiscard
@@ -85,7 +86,7 @@ describe('trade logic',  () => {
 
 		expect(nextPlayer.isInjured).toBe(false);
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: tradeCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade
@@ -93,7 +94,7 @@ describe('trade logic',  () => {
 
 		const randomNextPlayerCard = nextPlayer.getRandomPlayableCard();
 		expect(nextPlayer.turnState).toBe(ETurnState.inDefenseTrade);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:nextPlayer,
 			cardUniqueId: randomNextPlayerCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade

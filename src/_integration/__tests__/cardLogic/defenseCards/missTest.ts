@@ -6,6 +6,7 @@ import {find, map} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
+import {testPlayerAction} from '_integration/validators';
 
 
 describe('miss test',  () => {
@@ -25,7 +26,7 @@ describe('miss test',  () => {
 		let barricade = find(offensePlayer.hand, {id: EEventID.barricade});
 
 		expect(barricade).not.toBe(undefined);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: barricade.uniqueId,
 			actionType: EPlayerActionType.cardDiscard
@@ -35,7 +36,7 @@ describe('miss test',  () => {
 		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: barricade.uniqueId}));
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		let analysis = find(offensePlayer.hand, {id: EEventID.analysis});
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: analysis.uniqueId,
 			actionType: EPlayerActionType.cardTrade
@@ -46,7 +47,7 @@ describe('miss test',  () => {
 		expect(offensePlayer.turnState).toBe(ETurnState.idle);
 
 		expect(defensePlayer.turnState).toBe(ETurnState.inDefenseTrade);
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:defensePlayer,
 			cardUniqueId: missCard.uniqueId,
 			actionType: EPlayerActionType.cardAct
@@ -72,7 +73,7 @@ describe('miss test',  () => {
 		const firstCard = nextDefensePlayer.hand[0];
 		expect(firstCard).not.toBe(undefined);
 
-		gameServer.playerAction({
+		testPlayerAction(gameServer, game, {
 			player:nextDefensePlayer,
 			cardUniqueId: firstCard.uniqueId,
 			actionType: EPlayerActionType.cardTrade

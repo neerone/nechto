@@ -2,7 +2,7 @@ import {getPanic} from 'shared/constant/cards';
 import {EPanicID} from 'shared/enum/cards';
 import {createMockGameServer} from 'server/_playground/createGameServer';
 import {ETurnState} from 'shared/enum/player';
-import {checkAllDeckCards, printNotifications} from '_integration/helpers';
+import {checkAllDeckCards, expectOkayCard, printNotifications} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {EPlayerActionType} from 'shared/enum/playerActions';
@@ -16,12 +16,14 @@ describe('oops test',  () => {
 		game.deck.splice(0,1, getPanic(EPanicID.oops));
 		game.changeTurn(offensePlayer.id);
 
-		expect(APlayer.socket.spy.mock.calls).toContainEqual(
+		expectOkayCard(APlayer, expect.arrayContaining(offensePlayer.hand))
+/*		expect(APlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.okayCard,
 				cards: expect.arrayContaining(offensePlayer.hand)
 			})])
-		);
+		);*/
+
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		expect(game.turnContext.type).toBe(ETurnContextType.trade);
 		expect(checkAllDeckCards(game, false)).toBe(true);

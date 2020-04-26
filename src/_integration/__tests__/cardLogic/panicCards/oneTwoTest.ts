@@ -33,13 +33,18 @@ describe('one two test',  () => {
 
 
 		//У Offense player есть смена мест
-		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.arrayContaining(selectPlayersId)
 			})])
+		);*/
+		expect(offensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.playerSelect,
+				playersToSelect: expect.arrayContaining(selectPlayersId)
+			})
 		);
-
 		const initialDefensePosition = game.playersList.indexOf(selectPlayersId[0]);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 

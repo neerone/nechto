@@ -1,8 +1,8 @@
 import {getPanic} from 'shared/constant/cards';
-import {EPanicID} from 'shared/enum/cards';
+import {EEventID, EPanicID} from 'shared/enum/cards';
 import {createMockGameServer} from 'server/_playground/createGameServer';
 import {ETurnState} from 'shared/enum/player';
-import {checkAllDeckCards, printNotifications} from '_integration/helpers';
+import {checkAllDeckCards, expectOkayCard, printNotifications} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {EPlayerActionType} from 'shared/enum/playerActions';
@@ -18,13 +18,18 @@ describe('onlyBetweenUs test',  () => {
 		game.changeTurn(offensePlayer.id);
 
 
-		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.arrayContaining(offensePlayer.getPlayabeNeighbours())
 			})])
+		);*/
+		expect(offensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.playerSelect,
+				playersToSelect: expect.arrayContaining(offensePlayer.getPlayabeNeighbours())
+			})
 		);
-
 		const selectedPlayer = game.players[offensePlayer.getPlayabeNeighbours()[0]];
 
 		testPlayerAction(gameServer, game, {
@@ -33,13 +38,7 @@ describe('onlyBetweenUs test',  () => {
 			actionType: EPlayerActionType.playerSelect
 		});
 
-
-		expect(selectedPlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.okayCard,
-				cards: expect.arrayContaining(offensePlayer.hand)
-			})])
-		);
+		expectOkayCard(selectedPlayer, expect.arrayContaining(offensePlayer.hand))
 
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);

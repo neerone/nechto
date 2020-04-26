@@ -22,23 +22,39 @@ describe('goAway test',  () => {
 		game.changeTurn(offensePlayer.id);
 
 		//У Offense player нет возможности поменяться со всеми кроме карантина
-		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
+
+/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.arrayContaining([
 					defensePlayer.id, CPlayer.id
 				])
 			})])
+		);*/
+		expect(offensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.playerSelect,
+				playersToSelect: expect.arrayContaining([
+					defensePlayer.id, CPlayer.id
+				])
+			})
 		);
-		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.not.arrayContaining([
 					APlayer.id
 				])
 			})])
+		);*/
+		expect(offensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.playerSelect,
+				playersToSelect: expect.not.arrayContaining([
+					APlayer.id
+				])
+			})
 		);
-
 		expect(offensePlayer.turnState).toBe(ETurnState.inCardActionProgress);
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);

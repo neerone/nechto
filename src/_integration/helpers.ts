@@ -4,6 +4,8 @@ import {fullDeckObject, getCard} from 'shared/constant/cards';
 import {ICardAny} from 'shared/interfaces/cards';
 import {ECardType} from 'shared/enum/cards';
 import {EPlayerState} from 'shared/enum/player';
+import {ENotificationAction} from 'shared/enum/notifications';
+import {Player} from 'server/models/Player';
 
 export const checkAllDeckCards = (game: Game, withPanics = true) => {
 	const cardsOnHands = reduce(game.players, (acc, player) => {
@@ -59,4 +61,17 @@ export const printNotifications = player => {
 		console.log(event);
 		//console.log(pl.nickname, pl.turnState);
 	})
+}
+
+
+export const expectOkayCard = (player: Player, cards: any, text = null) => {
+	let containingObject:any = {};
+	if (text) containingObject.text = text;
+	if (cards) containingObject.cards = cards;
+	expect(player.socket.spy.mock.calls).toContainEqual(
+		expect.arrayContaining(['notification', expect.objectContaining({
+			type: ENotificationAction.okayCard,
+			...containingObject
+		})])
+	);
 }

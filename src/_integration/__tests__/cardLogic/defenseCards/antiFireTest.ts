@@ -47,15 +47,15 @@ describe('antifire test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
+		expect(defensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.actionDecision,
+				menu: expect.arrayContaining([
 					expect.objectContaining({action:'burn'}),
 					expect.objectContaining({action:'noFire'}),
 				])
-			})])
+			})
 		);
-
 
 		testPlayerActionDecision(gameServer, game, {
 			player:defensePlayer,
@@ -110,13 +110,14 @@ describe('antifire test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
+		expect(defensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.actionDecision,
+				menu: expect.arrayContaining([
 					expect.objectContaining({action:'burn'}),
 					expect.objectContaining({action:'noFire'}),
 				])
-			})])
+			})
 		);
 
 		testPlayerActionDecision(gameServer, game, {

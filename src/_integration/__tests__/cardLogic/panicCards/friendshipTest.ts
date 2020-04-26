@@ -11,14 +11,15 @@ import {testPlayerAction} from '_integration/validators';
 
 
 const getLastFriendshipNotificaiton = (offensePlayer) => {
-	const forgetfulnessNotification = findLast(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
+	return offensePlayer.currentAction;
+/*	const forgetfulnessNotification = findLast(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
 		if (type !== 'notification') return false;
 		if (event.type !== ENotificationAction.playerSelect) return false;
 		const {playersToSelect} = event;
 		if (playersToSelect) return true;
 		return false;
 	})
-	return forgetfulnessNotification[1]
+	return forgetfulnessNotification[1]*/
 }
 
 describe('friendship test',  () => {

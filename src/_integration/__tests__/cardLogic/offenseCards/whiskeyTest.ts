@@ -4,7 +4,7 @@ import {createMockGameServer} from 'server/_playground/createGameServer';
 import {ETurnState} from 'shared/enum/player';
 import {find, map} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
-import {checkAllDeckCards} from '_integration/helpers';
+import {checkAllDeckCards, expectOkayCard} from '_integration/helpers';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
@@ -35,7 +35,7 @@ describe('whiskey test',  () => {
 
 
 		//Игрок показывает все карты всем
-		expect(nextPlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(nextPlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(
 				[
 					'notification',
@@ -47,8 +47,19 @@ describe('whiskey test',  () => {
 					})
 				]
 			)
-		);
+		);*/
+		expectOkayCard(nextPlayer, expect.arrayContaining(
+			map(offensePlayer.hand, (card) => expect.objectContaining({id: card.id}))
+		))
 
+/*		expect(nextPlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.okayCard,
+				cards: expect.arrayContaining(
+					map(offensePlayer.hand, (card) => expect.objectContaining({id: card.id}))
+				)
+			})
+		);*/
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		expect(game.turnContext.type).toBe(ETurnContextType.trade)

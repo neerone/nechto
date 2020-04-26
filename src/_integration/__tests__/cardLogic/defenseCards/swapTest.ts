@@ -49,15 +49,23 @@ describe('leavemealone test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
 					expect.objectContaining({action:'swap'}),
 					expect.objectContaining({action:'cancelSwap'}),
 				])
 			})])
+		);*/
+		expect(defensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.actionDecision,
+				menu: expect.arrayContaining([
+					expect.objectContaining({action:'swap'}),
+					expect.objectContaining({action:'cancelSwap'}),
+				])
+			})
 		);
-
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
@@ -122,15 +130,23 @@ describe('leavemealone test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
 					expect.objectContaining({action:'swap'}),
 					expect.objectContaining({action:'cancelSwap'}),
 				])
 			})])
+		);*/
+		expect(defensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.actionDecision,
+				menu: expect.arrayContaining([
+					expect.objectContaining({action:'swap'}),
+					expect.objectContaining({action:'cancelSwap'}),
+				])
+			})
 		);
-
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
@@ -195,15 +211,23 @@ describe('leavemealone test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
 					expect.objectContaining({action:'swap'}),
 					expect.objectContaining({action:'cancelSwap'}),
 				])
 			})])
+		);*/
+		expect(defensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.actionDecision,
+				menu: expect.arrayContaining([
+					expect.objectContaining({action:'swap'}),
+					expect.objectContaining({action:'cancelSwap'}),
+				])
+			})
 		);
-
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 

@@ -29,15 +29,15 @@ describe('tenacity test',  () => {
 			actionType: EPlayerActionType.cardAct
 		});
 
-		const tenacityCards = find(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
+/*		const tenacityCards = find(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
 			if (type !== 'notification') return false;
 			if (event.type !== ENotificationAction.selectCard) return false;
 			const {cards} = event;
 			if (cards) return true;
 			return false;
-		})
+		})*/
 
-		const [_, {cards: [firstTenacityCard]}] = tenacityCards;
+		const {cards: [firstTenacityCard]} = offensePlayer.currentAction as any;
 		testPlayerAction(gameServer, game, {
 			player:offensePlayer,
 			cardUniqueId: firstTenacityCard.uniqueId,

@@ -4,7 +4,7 @@ import {createMockGameServer} from 'server/_playground/createGameServer';
 import {ETurnState} from 'shared/enum/player';
 import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
-import {checkAllDeckCards} from '_integration/helpers';
+import {checkAllDeckCards, expectOkayCard} from '_integration/helpers';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
@@ -45,7 +45,7 @@ describe('analysis test',  () => {
 
 
 		//Игрок показывает карты Гене
-		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
+/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
 				type: ENotificationAction.okayCard, cards: expect.arrayContaining([
 					expect.objectContaining({id: EEventID.fear}),
@@ -54,8 +54,24 @@ describe('analysis test',  () => {
 					expect.objectContaining({id: EEventID.leaveMeAlone}),
 				])
 			})])
-		);
-
+		);*/
+		expectOkayCard(offensePlayer, expect.arrayContaining([
+			expect.objectContaining({id: EEventID.fear}),
+			expect.objectContaining({id: EEventID.flamethrower}),
+			expect.objectContaining({id: EEventID.noFire}),
+			expect.objectContaining({id: EEventID.leaveMeAlone}),
+		]))
+/*		expect(offensePlayer.currentAction).toEqual(
+			expect.objectContaining({
+				type: ENotificationAction.okayCard,
+				cards: expect.arrayContaining([
+					expect.objectContaining({id: EEventID.fear}),
+					expect.objectContaining({id: EEventID.flamethrower}),
+					expect.objectContaining({id: EEventID.noFire}),
+					expect.objectContaining({id: EEventID.leaveMeAlone}),
+				])
+			})
+		);*/
 		//Не должно быть старой картой анализа, но должна быть новая
 		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: analysis.uniqueId}));
 

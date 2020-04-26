@@ -28,7 +28,7 @@ class App {
       const player = gameServer.initPlayer(socket);
       //gameServer.isMock = true;
       registerHandlers(player);
-      //mockGameProcess(player);
+      mockGameProcess(player);
     });
   }
 

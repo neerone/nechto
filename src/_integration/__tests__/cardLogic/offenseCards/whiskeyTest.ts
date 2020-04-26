@@ -35,19 +35,7 @@ describe('whiskey test',  () => {
 
 
 		//Игрок показывает все карты всем
-/*		expect(nextPlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(
-				[
-					'notification',
-					expect.objectContaining({
-						type: ENotificationAction.okayCard,
-						cards: expect.arrayContaining(
-							map(offensePlayer.hand, (card) => expect.objectContaining({id: card.id}))
-						)
-					})
-				]
-			)
-		);*/
+
 		expectOkayCard(nextPlayer, expect.arrayContaining(
 			map(offensePlayer.hand, (card) => expect.objectContaining({id: card.id}))
 		))

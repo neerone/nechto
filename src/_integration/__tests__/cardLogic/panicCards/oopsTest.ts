@@ -17,12 +17,6 @@ describe('oops test',  () => {
 		game.changeTurn(offensePlayer.id);
 
 		expectOkayCard(APlayer, expect.arrayContaining(offensePlayer.hand))
-/*		expect(APlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.okayCard,
-				cards: expect.arrayContaining(offensePlayer.hand)
-			})])
-		);*/
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		expect(game.turnContext.type).toBe(ETurnContextType.trade);

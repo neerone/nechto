@@ -61,7 +61,6 @@ export class Player {
 	processTurnState(turnState: ETurnState) {
 		switch (turnState) {
 			case ETurnState.inDefenseTrade:
-				console.log("TEEEEEEEEEEST IN DEFENSE TRADE", this.nickname);
 				return this.processNotificationAction({ type: ENotificationAction.defenseTradeCard, text: 'Выбери карту для обмена' });
 			case ETurnState.inOffenseTrade:
 				return this.processNotificationAction({ type: ENotificationAction.offenseTradeCard, text: 'Выбери карту для обмена' });

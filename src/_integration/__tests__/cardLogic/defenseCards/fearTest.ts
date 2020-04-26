@@ -59,26 +59,9 @@ describe('fear test',  () => {
 		});
 
 		//Игрок показывает карту нирону
-/*		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.okayCard, cards: expect.arrayContaining([
-					expect.objectContaining({id: EEventID.analysis})
-				])
-			})])
-		);*/
 		expectOkayCard(defensePlayer, expect.arrayContaining([
 			expect.objectContaining({id: EEventID.analysis})
 		]))
-/*
-		expect(defensePlayer.currentAction).toEqual(
-			expect.objectContaining({
-				type: ENotificationAction.okayCard,
-				cards: expect.arrayContaining([
-					expect.objectContaining({id: EEventID.analysis})
-				])
-			})
-		);
-*/
 
 
 		expect(defensePlayer.hand).not.toContainEqual(expect.objectContaining({ uniqueId: neeronesFear.uniqueId }));

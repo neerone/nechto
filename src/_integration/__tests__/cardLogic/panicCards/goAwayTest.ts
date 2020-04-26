@@ -23,14 +23,6 @@ describe('goAway test',  () => {
 
 		//У Offense player нет возможности поменяться со всеми кроме карантина
 
-/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.playerSelect,
-				playersToSelect: expect.arrayContaining([
-					defensePlayer.id, CPlayer.id
-				])
-			})])
-		);*/
 		expect(offensePlayer.currentAction).toEqual(
 			expect.objectContaining({
 				type: ENotificationAction.playerSelect,
@@ -39,14 +31,7 @@ describe('goAway test',  () => {
 				])
 			})
 		);
-/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.playerSelect,
-				playersToSelect: expect.not.arrayContaining([
-					APlayer.id
-				])
-			})])
-		);*/
+
 		expect(offensePlayer.currentAction).toEqual(
 			expect.objectContaining({
 				type: ENotificationAction.playerSelect,

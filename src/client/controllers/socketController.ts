@@ -14,12 +14,13 @@ function handleGlobalEvents(socket, root: RootController) {
 		root.gameController.players = players
 	});
 
-	const updateGame = ({tradeContext, players, playersList, deck, gameLog}) => {
+	const updateGame = ({tradeContext, players, playersList, deck, gameLog, currentAction}) => {
 		root.state = EAppState.game;
 		root.gameController.players = players;
 		root.gameController.playersList = playersList;
 		root.gameController.deck = deck;
 		root.gameController.tradeContext = tradeContext;
+		root.gameController.currentAction = currentAction;
 		root.gameController.gameLog = gameLog;
 	};
 

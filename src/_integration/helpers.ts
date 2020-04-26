@@ -59,7 +59,6 @@ export const printNotifications = player => {
 	each(player.socket.spy.mock.calls, ([type, event]) => {
 		if (type !== 'notification') return;
 		console.log(event);
-		//console.log(pl.nickname, pl.turnState);
 	})
 }
 

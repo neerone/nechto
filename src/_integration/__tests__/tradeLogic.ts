@@ -168,19 +168,8 @@ describe('trade logic',  () => {
 		expect(offensePlayer.hand.length).toBe(4);
 
 
-/*		expect(nextPlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.okayCard,
-				text: 'Нечто выйграло',
-			})])
-		);*/
 		expectOkayCard(nextPlayer, null, 'Нечто выйграло')
-/*		expect(nextPlayer.currentAction).toEqual(
-			expect.objectContaining({
-				type: ENotificationAction.okayCard,
-				text: 'Нечто выйграло',
-			})
-		);*/
+
 		expect(nextPlayer.turnState).toBe(ETurnState.inCardAction);
 		expect(nextPlayer.hand.length).toBe(5);
 

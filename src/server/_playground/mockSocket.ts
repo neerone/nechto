@@ -1,11 +1,14 @@
 import {Player} from 'server/models/Player';
 import {EPlayerState} from 'shared/enum/player';
 
-let isTest = true;
+//let isTest = true;
 class MockSocket {
 	spy: any
-	constructor() {
-		if (isTest) {
+	isTest: boolean
+	constructor(isTestTag) {
+		this.isTest = isTestTag;
+		if (isTestTag) {
+			console.log('IS TEST TAG', isTestTag)
 			const mockCallback = jest.fn();
 			this.spy = mockCallback
 		}
@@ -14,7 +17,7 @@ class MockSocket {
 		console.log('')
 	}
 	emit(eventType, payload) {
-		if (isTest) {
+		if (this.isTest) {
 			this.spy(eventType, payload)
 		}
 	}
@@ -33,12 +36,12 @@ class MockSocketServer {
 }
 
 export const createPlayer = (isTestTag = false) => {
-	const socket = new MockSocket();
+	const socket = new MockSocket(isTestTag);
 	return new Player({ socket });
 }
 
-export const createDoor = () => {
-	const socket = new MockSocket();
+export const createDoor = (isTestTag = false) => {
+	const socket = new MockSocket(isTestTag);
 	const door = new Player({ socket });
 	door.state = EPlayerState.door;
 	door.nickname = 'ДВЕРЬ';

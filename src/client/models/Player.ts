@@ -1,6 +1,7 @@
 import {observable} from "mobx";
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ICardEvent} from 'shared/interfaces/cards';
+import INotificationAction from 'shared/interfaces/notification';
 
 
 export default class Player {

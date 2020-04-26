@@ -17,13 +17,6 @@ describe('onlyBetweenUs test',  () => {
 		game.deck.splice(0,1, getPanic(EPanicID.onlyBetweenUs));
 		game.changeTurn(offensePlayer.id);
 
-
-/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.playerSelect,
-				playersToSelect: expect.arrayContaining(offensePlayer.getPlayabeNeighbours())
-			})])
-		);*/
 		expect(offensePlayer.currentAction).toEqual(
 			expect.objectContaining({
 				type: ENotificationAction.playerSelect,

@@ -39,7 +39,7 @@ const testPlayerLogic = (gameServer, game, player) => {
 
 describe('trade logic',  () => {
 	it('deck should be consistent', () => {
-		const [gameServer, game, APlayer, BPlayer, CPlayer, DPlayer, EPlayer] = createMockGameServer();
+		const [gameServer, game, APlayer, BPlayer, CPlayer, DPlayer, EPlayer] = createMockGameServer(true);
 		APlayer.hand.splice(0,1);
 		game.changeTurn(APlayer.id);
 		testPlayerLogic(gameServer, game, APlayer)

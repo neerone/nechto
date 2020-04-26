@@ -49,14 +49,6 @@ describe('leavemealone test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-/*		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
-					expect.objectContaining({action:'swap'}),
-					expect.objectContaining({action:'cancelSwap'}),
-				])
-			})])
-		);*/
 		expect(defensePlayer.currentAction).toEqual(
 			expect.objectContaining({
 				type: ENotificationAction.actionDecision,
@@ -130,14 +122,7 @@ describe('leavemealone test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-/*		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
-					expect.objectContaining({action:'swap'}),
-					expect.objectContaining({action:'cancelSwap'}),
-				])
-			})])
-		);*/
+
 		expect(defensePlayer.currentAction).toEqual(
 			expect.objectContaining({
 				type: ENotificationAction.actionDecision,
@@ -211,14 +196,6 @@ describe('leavemealone test',  () => {
 
 
 		//у defenseplayer'а есть возможность отказаться
-/*		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
-					expect.objectContaining({action:'swap'}),
-					expect.objectContaining({action:'cancelSwap'}),
-				])
-			})])
-		);*/
 		expect(defensePlayer.currentAction).toEqual(
 			expect.objectContaining({
 				type: ENotificationAction.actionDecision,

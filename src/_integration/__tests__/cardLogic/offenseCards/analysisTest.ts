@@ -45,33 +45,13 @@ describe('analysis test',  () => {
 
 
 		//Игрок показывает карты Гене
-/*		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
-			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotificationAction.okayCard, cards: expect.arrayContaining([
-					expect.objectContaining({id: EEventID.fear}),
-					expect.objectContaining({id: EEventID.flamethrower}),
-					expect.objectContaining({id: EEventID.noFire}),
-					expect.objectContaining({id: EEventID.leaveMeAlone}),
-				])
-			})])
-		);*/
 		expectOkayCard(offensePlayer, expect.arrayContaining([
 			expect.objectContaining({id: EEventID.fear}),
 			expect.objectContaining({id: EEventID.flamethrower}),
 			expect.objectContaining({id: EEventID.noFire}),
 			expect.objectContaining({id: EEventID.leaveMeAlone}),
 		]))
-/*		expect(offensePlayer.currentAction).toEqual(
-			expect.objectContaining({
-				type: ENotificationAction.okayCard,
-				cards: expect.arrayContaining([
-					expect.objectContaining({id: EEventID.fear}),
-					expect.objectContaining({id: EEventID.flamethrower}),
-					expect.objectContaining({id: EEventID.noFire}),
-					expect.objectContaining({id: EEventID.leaveMeAlone}),
-				])
-			})
-		);*/
+
 		//Не должно быть старой картой анализа, но должна быть новая
 		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: analysis.uniqueId}));
 

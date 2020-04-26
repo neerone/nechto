@@ -13,14 +13,6 @@ import {testPlayerAction} from '_integration/validators';
 
 const getLastForgetfullnessNotificaitonCards = (offensePlayer) => {
 	return offensePlayer.currentAction;
-/*	const forgetfulnessNotification = findLast(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
-		if (type !== 'notification') return false;
-		if (event.type !== ENotificationAction.selectCard) return false;
-		const {cards} = event;
-		if (cards) return true;
-		return false;
-	})
-	return forgetfulnessNotification[1]*/
 }
 
 

@@ -14,7 +14,7 @@ export const playerActionFromNotification = ({game, player, notificationAction}:
 		default:
 			return null
 	}
-}
+};
 
 export const processTurnContext = ({player, turnState}: {player:Player, turnState: ETurnState}) => {
 	if (turnState === ETurnState.inOffenseTrade) {
@@ -39,4 +39,4 @@ export const processTurnContext = ({player, turnState}: {player:Player, turnStat
 		    };
 	    }
 	}
-}
+};

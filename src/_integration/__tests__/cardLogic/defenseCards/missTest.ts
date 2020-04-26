@@ -8,6 +8,7 @@ import {checkAllDeckCards} from '_integration/helpers';
 import {ENotification} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
+import {getMissNextPlayer} from 'server/helpers/cardActions/defense/miss';
 
 
 describe('miss test',  () => {
@@ -59,7 +60,7 @@ describe('miss test',  () => {
 		expect(defensePlayer.hand).not.toContainEqual(expect.objectContaining({ uniqueId: missCard.uniqueId }));
 		//expect(offensePlayer.hand).toContainEqual(expect.objectContaining({uniqueId: analysis.uniqueId}));
 
-		const nextDefensePlayer = game.getPlayerByPosition({playerId: defensePlayer.id, isNext:true});
+		const nextDefensePlayer = getMissNextPlayer(game, defensePlayer);
 
 		expect(defensePlayer.turnState).toBe(ETurnState.idle);
 		expect(offensePlayer.turnState).toBe(ETurnState.idle);

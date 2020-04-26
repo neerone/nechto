@@ -1,5 +1,5 @@
 import React from 'react';
-import {clone, map} from 'lodash';
+import {clone, map, clamp} from 'lodash';
 import './styles.scss';
 import {observer} from "mobx-react-lite";
 import {animated, config, interpolate, useTransition} from 'react-spring';
@@ -73,7 +73,7 @@ const lineAnimation = ({newPlayerList, badgeRadius, offensePlayerId, defensePlay
 	const {y:newAY,x:newAX} = getCirclePoint(biggerBadgeRad, APlayerDegree, ax, ay);
 	const {y:arrowY,x:arrowX} = getCirclePoint(biggerBadgeRad, BPlayerDegree, bx, by);
 	const distanceBetweenArrow = getDistanceBetweenPoints(newAX,newAY,arrowX,arrowY);
-	const arrowHeight = distanceBetweenArrow * 0.35;
+	const arrowHeight = clamp(distanceBetweenArrow * 0.35, 3, 15);
 	const {y:newBY,x:newBX} = getCirclePoint(biggerBadgeRad + arrowHeight, BPlayerDegree, bx, by);
 
 	const {x: midX, y:midY} = midpoint(newAX, newAY, newBX, newBY);

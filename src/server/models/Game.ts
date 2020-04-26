@@ -191,7 +191,9 @@ export class Game {
       return;
     }
     this.players[playerId].isInjured = true;
-    const cleanPlayer = find(this.players, {state: EPlayerState.dummy, isInjured: false});
+    const cleanPlayer = find(this.players, (pl) => {
+      return pl.state === EPlayerState.dummy && !pl.isThing && !pl.isInjured
+    });
     if (!cleanPlayer) {
       this.notifyAllPlayers(formatPlayerNotification({
         player: cleanPlayer,

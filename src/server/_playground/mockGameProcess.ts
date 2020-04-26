@@ -39,6 +39,7 @@ const testAxeCard = ({player, cards}) => {
 const testDefenseCard = ({player, cards, againstCardId}) => {
 		const host = createPlayer()
 		const currentGame = gameServer.createGame({nickname: 'хост', player: host});
+		currentGame.isClockwise = true;
 		gameServer.connectGame({player: player, gameId: currentGame.id, nickname:'Вася1'});
 		gameServer.connectGame({player: createPlayer(), gameId: currentGame.id, nickname:'Петя2'});
 		gameServer.connectGame({player: createPlayer(), gameId: currentGame.id, nickname:'Генадий Игрогрив3'});
@@ -107,26 +108,26 @@ export function mockGameProcess(player) {
 	setTimeout(() => {
 		gameServer.isMock = true;
 
-		//testDefenseCard({player, cards: [
-		//	getCard(EEventID.injure),
-		//	getCard(EEventID.fear),
-		//	getCard(EEventID.noThanks),
-		//	getCard(EEventID.miss),
-		//], againstCardId: EEventID.barricade});
+		testDefenseCard({player, cards: [
+			getCard(EEventID.injure),
+			getCard(EEventID.fear),
+			getCard(EEventID.noThanks),
+			getCard(EEventID.miss),
+		], againstCardId: EEventID.barricade});
 
 
 		//testDefenseActionCard({player, cards: [
 		//	getCard(EEventID.leaveMeAlone),
 		//	getCard(EEventID.noFire),
-		//], againstCardId: EEventID.flamethrower})
+		//], againstCardId: EEventID.miss})
 
 
-		testOffenseCard({player, cards: [
-			getCard(EEventID.flamethrower),
-			getCard(EEventID.seduction),
-			getCard(EEventID.quarantine),
-			getCard(EEventID.noFire),
-		]})
+		//testOffenseCard({player, cards: [
+		//	getCard(EEventID.flamethrower),
+		//	getCard(EEventID.seduction),
+		//	getCard(EEventID.quarantine),
+		//	getCard(EEventID.noFire),
+		//]})
 
 		//testAxeCard({player, cards: [
 		//	getCard(EEventID.axe),

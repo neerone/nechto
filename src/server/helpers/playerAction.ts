@@ -105,6 +105,7 @@ export const selectPlayer = ({game, selectedPlayerId, player, actionContext} : {
 
 
 export const playerActionDecision = ({game, action, player} : {game: Game, player: Player, action: string}) => {
+	player.currentAction = null;
 	switch (action) {
 		case "cancelSwap":
 		case "swap":

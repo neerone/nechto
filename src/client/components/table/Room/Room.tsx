@@ -1,5 +1,5 @@
 import React from 'react';
-import {clone, map, clamp} from 'lodash';
+import {clamp, clone, map} from 'lodash';
 import './styles.scss';
 import {observer} from "mobx-react-lite";
 import {animated, config, interpolate, useTransition} from 'react-spring';
@@ -8,6 +8,7 @@ import GameController from 'client/controllers/gameController';
 import PlayerBadge from 'client/components/table/PlayerBadge/PlayerBadge';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ETurnContextType} from 'shared/enum/turnContextType';
+import {ENotificationAction} from 'shared/enum/notifications';
 
 interface IRoomProps {
 	controller: GameController
@@ -171,7 +172,12 @@ const Room = observer(({controller} : IRoomProps) => {
 
 
 
-
+	const canPlayerBeSelected = (player) => {
+		if (controller.currentAction && controller.currentAction.type === ENotificationAction.playerSelect) {
+			return controller.currentAction.playersToSelect.includes(player.id)
+		}
+		return false;
+	}
 
 	return (
 		<React.Fragment>
@@ -182,7 +188,7 @@ const Room = observer(({controller} : IRoomProps) => {
 					if (!player || !player.id) return null;
 					const {nickname, color, state} = player;
 					const inTurn = player.turnState !== ETurnState.idle;
-					const canBeSelected = controller.playersToSelect && controller.playersToSelect.includes(player.id);
+					const canBeSelected = canPlayerBeSelected(player);
 					const tradeLineCenterOffset = playerRoomHeight / 2;
 					return (
 						<React.Fragment key={key}>
@@ -226,7 +232,6 @@ const Room = observer(({controller} : IRoomProps) => {
 						case ETurnContextType.burn: { color = "#ff3c3c"; break; }
 						case ETurnContextType.positionswap: { color = "#3cd2ff"; break; }
 					}
-					console.log(arrowHeight)
 					return (
 						<React.Fragment key={key}>
 							<animated.path

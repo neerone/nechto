@@ -23,16 +23,16 @@ const testOffenseCard = ({player, cards}) => {
 const testAxeCard = ({player, cards}) => {
 		const host: Player = player;
 		const currentGame = gameServer.createGame({nickname: 'хост', player: host});
-		//gameServer.connectGame({player: createDoor(), gameId: currentGame.id, nickname:'ДВЕРЬ'});
 		gameServer.connectGame({player: createPlayer(), gameId: currentGame.id, nickname:'Петя2'});
 		gameServer.connectGame({player: createPlayer(), gameId: currentGame.id, nickname:'Генадий Игрогрив3'});
 		gameServer.connectGame({player: createPlayer(), gameId: currentGame.id, nickname:'Виталий4'});
+		gameServer.connectGame({player: createDoor(), gameId: currentGame.id, nickname:'ДВЕРЬ'});
 		gameServer.startGame({player});
 
 		//Подтасовываем карту
 		const pl = currentGame.players[player.id];
 		pl.hand.splice(0,cards.length, ...cards);
-		//host.quarantine = 3;
+		host.quarantine = 3;
 		currentGame.updateGame();
 }
 
@@ -90,10 +90,10 @@ const testPanic = ({player, card}: {player:Player, card: ICardPanic}) => {
 	quarantinedPlayer.quarantine =3;
 	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'1'});
 	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'2'});
-	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'3'});
+	gameServer.connectGame({player: quarantinedPlayer, gameId: game.id, nickname:'3'});
 	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'4'});
 	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'5'});
-	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'6'});
+	gameServer.connectGame({player: createDoor(), gameId: game.id, nickname:'6'});
 	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'7'});
 	gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'8'});
 	//gameServer.connectGame({player: createPlayer(), gameId: game.id, nickname:'9'});
@@ -108,25 +108,25 @@ export function mockGameProcess(player) {
 	setTimeout(() => {
 		gameServer.isMock = true;
 
-		testDefenseCard({player, cards: [
-			getCard(EEventID.injure),
-			getCard(EEventID.fear),
-			getCard(EEventID.noThanks),
-			getCard(EEventID.miss),
-		], againstCardId: EEventID.barricade});
+		//testDefenseCard({player, cards: [
+		//	getCard(EEventID.injure),
+		//	getCard(EEventID.fear),
+		//	getCard(EEventID.noThanks),
+		//	getCard(EEventID.miss),
+		//], againstCardId: EEventID.barricade});
 
 
 		//testDefenseActionCard({player, cards: [
 		//	getCard(EEventID.leaveMeAlone),
 		//	getCard(EEventID.noFire),
-		//], againstCardId: EEventID.miss})
+		//], againstCardId: EEventID.flamethrower})
 
 
 		//testOffenseCard({player, cards: [
-		//	getCard(EEventID.flamethrower),
+		//	getCard(EEventID.suspicion),
+		//	getCard(EEventID.tenacity),
+		//	getCard(EEventID.whiskey),
 		//	getCard(EEventID.seduction),
-		//	getCard(EEventID.quarantine),
-		//	getCard(EEventID.noFire),
 		//]})
 
 		//testAxeCard({player, cards: [
@@ -134,7 +134,7 @@ export function mockGameProcess(player) {
 		//	getCard(EEventID.barricade),
 		//]})
 
-		//testPanic({player, card: getPanic(EPanicID.chainReaction)})
+		testPanic({player, card: getPanic(EPanicID.youCallThisParty)})
 
 
 	}, 500)

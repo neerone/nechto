@@ -61,11 +61,13 @@ export class Player {
 	processTurnState(turnState: ETurnState) {
 		switch (turnState) {
 			case ETurnState.inDefenseTrade:
-				return this.processNotificationAction({ type: ENotificationAction.defenseTradeCard, text: 'Выбери карту для обмена' });
+				return this.processNotificationAction({ type: ENotificationAction.defenseTradeCard, text: 'Выбери карту для обмена или сыграй отказ' });
 			case ETurnState.inOffenseTrade:
 				return this.processNotificationAction({ type: ENotificationAction.offenseTradeCard, text: 'Выбери карту для обмена' });
 			case ETurnState.inCardAction:
-				return this.processNotificationAction({ type: ENotificationAction.turnCard, text: 'Скинь или сыграй карту' });
+				return this.processNotificationAction({ type: ENotificationAction.turnCard, text: 'Сбрось или сыграй карту' });
+			case ETurnState.idle:
+				return this.currentAction = null;
 			default:
 				return;
 		}

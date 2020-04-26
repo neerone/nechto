@@ -25,7 +25,7 @@ export const tenacityAct = ({card, game, player} : {card:ICardEvent, game: Game,
       notification: {
         type: ENotificationAction.selectCard,
         cards: [first, second, third],
-        text: `Выбери одну их этих карт`,
+        text: `Выбери одну их этих карт себе в колоду`,
       },
     }));
 };

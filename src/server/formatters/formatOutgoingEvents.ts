@@ -104,7 +104,8 @@ const formatUpdatePlayerPayload = ({ game, viewer }: {game: Game, viewer: Player
 		isClockwise:  game.isClockwise,
 		gameLog: game.gameLog,
 		tradeContext: formatTradeContext(game),
-		deck: formatDeck(game)
+		deck: formatDeck(game),
+		currentAction: viewer.currentAction,
 	}
 };
 
@@ -130,7 +131,6 @@ const formatPlayer = (game: Game, viewer: Player) => (player: Player) => {
 		//isThing: true,
 		isThing: isViewerThing || isViewerInjured ? player.isThing : null,
 		quarantine: player.quarantine,
-		notificationAction: player.currentAction,
 	}
 };
 

@@ -16,6 +16,11 @@ export const processTurnContext = ({player, turnState}: {player:Player, turnStat
 			player.game.endTurn(player.id);
 			return
 	    }
+	    if (player.quarantine > 0 && !player.game.turnContext) {
+			player.game.addLog(`Игрок ${player.nickname} не меняется из-за карантина`);
+			player.game.endTurn(player.id);
+			return
+	    }
 	    if (player.game.turnContext === null) {
 		    player.game.turnContext = {
 		      type: ETurnContextType.trade,

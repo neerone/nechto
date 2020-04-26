@@ -34,6 +34,7 @@ export const flamethrowerSelect = ({game, player, selectedPlayerId} : {game: Gam
 		throw new Error('Выбор огнемета произошел без контекста flamethrowerSelect');
 	}
 	const defensePlayer = game.players[selectedPlayerId];
+	player.currentAction = null;
 	game.turnContext = {
 		type: ETurnContextType.burn,
 		offensePlayer: player,

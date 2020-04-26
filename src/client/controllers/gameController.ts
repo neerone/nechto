@@ -26,6 +26,7 @@ export default class GameController {
 	@observable isLayoutSequential: boolean = false;
 	@observable tradeContext: IFormatTradeContext[] | null = null;
 	@observable currentAction: INotificationAction | null = null;
+
 	constructor(root: RootController) {
 		this.root = root;
 		this.socket = root.socketController;

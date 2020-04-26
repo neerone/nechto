@@ -3,7 +3,7 @@ import INotificationAction from 'shared/interfaces/notification';
 import RootController from 'client/controllers/rootController';
 import {EAppState, EGameState} from 'shared/enum/common';
 import {EServerEventType} from 'shared/enum/enumServerEvents';
-
+import {ENotificationAction} from 'shared/enum/notifications';
 
 
 function handleGlobalEvents(socket, root: RootController) {
@@ -21,6 +21,7 @@ function handleGlobalEvents(socket, root: RootController) {
 		root.gameController.deck = deck;
 		root.gameController.tradeContext = tradeContext;
 		root.gameController.currentAction = currentAction;
+		console.log(root.gameController.currentAction)
 		root.gameController.gameLog = gameLog;
 	};
 
@@ -36,7 +37,15 @@ function handleGlobalEvents(socket, root: RootController) {
 	});
 
 	socket.on(EServerEventType.notification, (notification: INotificationAction) => {
-		root.gameController.notifications.push(notification);
+		switch (notification.type) {
+			case ENotificationAction.info:
+			case ENotificationAction.actionDecision:
+			case ENotificationAction.okayCard:
+			case ENotificationAction.selectCard:
+				root.gameController.notifications.push(notification);
+			default:
+				return null
+		}
 	})
 }
 

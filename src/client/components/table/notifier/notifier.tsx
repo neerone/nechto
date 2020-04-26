@@ -67,6 +67,7 @@ const CardsViewer = ({cards, menu}: {cards: ICardAny[], menu: (a?:any) => React.
 
 const Notification = ({notification, controller}: {notification: INotificationAction, controller: GameController}) => {
 	let notificationContent: React.ReactNode = null;
+	console.log(notification)
 	switch (notification.type) {
 		case ENotificationAction.info:
 			notificationContent = <div></div>;
@@ -77,7 +78,8 @@ const Notification = ({notification, controller}: {notification: INotificationAc
 				<React.Fragment>
 					<CardsViewer
 						cards={notification.cards}
-						menu={() => null}/>
+						menu={() => null}
+					/>
 					<div className={"centeredNotificationRow"}>
 						<div
 							className={'okayNotificationButton'}
@@ -95,33 +97,8 @@ const Notification = ({notification, controller}: {notification: INotificationAc
 				cards={notification.cards ? notification.cards : []}
 				menu={menu}/>);
 			break;
-		case ENotificationAction.playerSelect:
-			notificationContent = (
-				<div className={"centeredNotificationRow"}>
-					<div
-						className={'okayNotificationButton'}
-						onClick={() => controller.activatePlayerSelectMode(notification)}
-					>
-						Okay
-					</div>
-				</div>
-			);
-			break;
-		case ENotificationAction.actionDecision:
-			notificationContent = (
-				<div className={"centeredNotificationRow column"}>
-					{map(notification.menu, ({text, action}) => {
-						return (<div
-							className={'okayNotificationButton'}
-							onClick={() => controller.actionDecision(action)}
-						>
-							{text}
-						</div>)
-					})}
-				</div>
-			);
-			break;
 	}
+	if (!notificationContent) return null;
 	return (
 		<div className={'notificationWrapper'}>
 			<span className={'notificationText'}>{notification.text}</span>
@@ -134,6 +111,7 @@ const Notification = ({notification, controller}: {notification: INotificationAc
 
 const Notifier = observer(({controller}: INotifierProps) => {
 	const notifications = controller.notifications;
+	console.log(notifications)
 	if (notifications.length === 0) return null;
 	const notification = notifications[0];
 	return <Notification notification={notification} controller={controller}/>;

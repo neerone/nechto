@@ -23,7 +23,7 @@ export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Play
 	return {
 		type: ENotificationAction.selectCard,
 		cards: filteredCards,
-		text:'Выбери одну из свои карт, чтобы поменять её на карту из колоды'
+		text:'Выбери одну из своих карт, чтобы поменять её на карту из колоды'
 	}
 };
 

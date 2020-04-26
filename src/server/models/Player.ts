@@ -90,7 +90,6 @@ export class Player {
 	changeTurnState = (newTurnState: ETurnState) => {
 		if (this.state === EPlayerState.door) return;
 		this.turnState = newTurnState
-		console.log('CHANGE TURN STATE', this.nickname, newTurnState)
 		this.processTurnState(newTurnState);
 		processTurnContext({player:this, turnState: newTurnState});
 	};

@@ -95,13 +95,11 @@ const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 		throw new Error(`Игрока с ID ${selectedPlayerId} не существует в игре`)
 	}
 
-	const lastSelectPlayerNotification = findLast(player.socket.spy.mock.calls, ([type, event]) => {
-		if (type !=='notification') return false;
-		if (event.type !== ENotificationAction.playerSelect) return false;
-		return true;
-	})
-	if (!lastSelectPlayerNotification) return false;
-	const [type, event] = lastSelectPlayerNotification;
+	const event = player.currentAction;
+	if (!player.currentAction || player.currentAction.type !== ENotificationAction.playerSelect) {
+		console.log('CARD ACTIONS WAS', event, player.nickname, player.turnState, selectedPlayerId)
+		return false;
+	}
 	if (!event.playersToSelect.includes(selectedPlayerId)) {
 		console.error(`В эвенте нету ID пользователя`, event, selectedPlayerId)
 	}
@@ -109,16 +107,10 @@ const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 };
 
 const isPlayerCanSelectCard = (game: Game, player: Player, cardUniqueId: string) => {
-	const lastSelectCardNotification = findLast(player.socket.spy.mock.calls, ([type, event]) => {
-		if (type !=='notification') return false;
-		if (event.type !== ENotificationAction.selectCard) return false;
-		return true;
-	})
-
-	if (!lastSelectCardNotification) {
+	if (!player.currentAction || player.currentAction.type !== ENotificationAction.selectCard) {
 		return false;
 	}
-	const [type, event] = lastSelectCardNotification;
+	const event = player.currentAction;
 	const selectedCard = find(event.cards, {uniqueId: cardUniqueId})
 	if (!selectedCard) {
 		console.error(`В предложенных картах нету ID выбранной`, event, cardUniqueId)
@@ -127,17 +119,11 @@ const isPlayerCanSelectCard = (game: Game, player: Player, cardUniqueId: string)
 };
 
 const isPlayerCanSelectDesicion = (game, player, action) => {
-	const lastDesicionNotification = findLast(player.socket.spy.mock.calls, ([type, event]) => {
-		if (type !=='notification') return false;
-		if (event.type !== ENotificationAction.actionDecision) return false;
-		return true;
-	})
-
-	if (!lastDesicionNotification) {
+	if (!player.currentAction || player.currentAction.type !== ENotificationAction.actionDecision) {
 		return false;
 	}
-	const [type, event] = lastDesicionNotification;
-	const selectedAction = find(event.menu, {action})
+	const event = player.currentAction;
+	const selectedAction = find(event.menu, {action});
 	if (!selectedAction) {
 		console.error(`В предложенных экшнах нету выбранного`, event, action)
 	}

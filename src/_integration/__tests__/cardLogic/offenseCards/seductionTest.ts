@@ -46,12 +46,12 @@ describe('seduction test',  () => {
 
 		expect(BPlayer.turnState).toBe(ETurnState.inDefenseTrade);
 
-		const firstBPlayerCard = BPlayer.hand[0];
+		const BPlayerCard = BPlayer.getRandomPlayableCard();
 
 		testPlayerAction(gameServer, game, {
 			player:BPlayer,
 			actionType: EPlayerActionType.cardTrade,
-			cardUniqueId: firstBPlayerCard.uniqueId,
+			cardUniqueId: BPlayerCard.uniqueId,
 		});
 
 		const nextPlayer = game.getPlayerByPosition({playerId:offensePlayer.id, isNext:true});

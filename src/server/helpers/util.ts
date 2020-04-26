@@ -1,6 +1,9 @@
 import {uniqueId} from 'lodash';
 
 export function shuffle<T extends any[]>(array: T): T {
+
+  if (array.length === 0 || array.length === 1) return array
+
   var currentIndex = array.length, temporaryValue, randomIndex;
 
   // While there remain elements to shuffle...

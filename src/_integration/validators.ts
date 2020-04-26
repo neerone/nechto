@@ -20,12 +20,14 @@ interface IActionDecisionPayload {
 	action:string,
 }
 
-const isPlayerCanDiscardCard = (game, player, cardUniqueId) => {
+const isPlayerCanDiscardCard = (game: Game, player: Player, cardUniqueId: string) => {
 	//Проверяем есть ли у него на руках такая карта
 	const selectedCard = find(player.hand, {uniqueId:cardUniqueId});
 	if (!selectedCard) {
 		throw new Error(`У игрока ${player.nickname} нету карту ${cardUniqueId}`)
 	}
+	if (player.currentAction.type !== ENotificationAction.turnCard) return false;
+
 	const cardActions = getCardActions(game, player, selectedCard);
 	const actAction = find(cardActions, { menuType: EPlayerActionType.cardDiscard });
 	switch (player.turnState) {
@@ -40,12 +42,13 @@ const isPlayerCanDiscardCard = (game, player, cardUniqueId) => {
 };
 
 
-const isPlayerCanActCard = (game, player, cardUniqueId) => {
+const isPlayerCanActCard = (game: Game, player: Player, cardUniqueId: string) => {
 	//Проверяем есть ли у него на руках такая карта
 	const selectedCard = find(player.hand, {uniqueId:cardUniqueId});
 	if (!selectedCard) {
 		throw new Error(`У игрока ${player.nickname} нету карту ${cardUniqueId}`)
 	}
+	if (player.currentAction.type !== ENotificationAction.turnCard && player.currentAction.type !== ENotificationAction.defenseTradeCard) return false;
 	const cardActions = getCardActions(game, player, selectedCard);
 	const actAction = find(cardActions, { menuType: EPlayerActionType.cardAct});
 	switch (player.turnState) {
@@ -60,18 +63,22 @@ const isPlayerCanActCard = (game, player, cardUniqueId) => {
 	}
 };
 
-const isPlayerCanTradeCard = (game, player, cardUniqueId) => {
+const isPlayerCanTradeCard = (game: Game, player: Player, cardUniqueId: string) => {
 	//Проверяем есть ли у него на руках такая карта
 	const selectedCard = find(player.hand, {uniqueId:cardUniqueId});
 	if (!selectedCard) {
 		throw new Error(`У игрока ${player.nickname} нету карту ${cardUniqueId}`)
 	}
-
 	const cardActions = getCardActions(game, player, selectedCard);
 	const actAction = find(cardActions, { menuType: EPlayerActionType.cardTrade});
 	switch (player.turnState) {
 		case ETurnState.inDefenseTrade:
 		case ETurnState.inOffenseTrade:
+			if (!player.currentAction || (player.currentAction.type !== ENotificationAction.defenseTradeCard
+				&& player.currentAction.type !== ENotificationAction.offenseTradeCard)) {
+				console.log('CARD ACTIONS WAS', cardActions, player.nickname, player.turnState, selectedCard.id)
+				return false;
+			}
 			if (!actAction) {
 				console.log('CARD ACTIONS WAS', cardActions, player.turnState, selectedCard.id)
 			}
@@ -101,7 +108,7 @@ const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 	return event.playersToSelect.includes(selectedPlayerId)
 };
 
-const isPlayerCanSelectCard = (game, player, cardUniqueId) => {
+const isPlayerCanSelectCard = (game: Game, player: Player, cardUniqueId: string) => {
 	const lastSelectCardNotification = findLast(player.socket.spy.mock.calls, ([type, event]) => {
 		if (type !=='notification') return false;
 		if (event.type !== ENotificationAction.selectCard) return false;

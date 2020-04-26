@@ -36,7 +36,7 @@ export const missAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
 
 
 
-	game.addLog(`${player.nickname}: используя карту "Мимо" отказывается от обмена с игроком ${context.offensePlayer.nickname}. Вместо него меняется ${nextPlayer.nickname}`);
+	game.addLog(`${player.nickname} использует карту "Мимо" и отказывается от обмена с игроком ${context.offensePlayer.nickname}. Вместо него меняется ${nextPlayer.nickname}`);
 	game.grabEventCardFromDeck({player});
 	player.changeTurnState(ETurnState.idle);
 

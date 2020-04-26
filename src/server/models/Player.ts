@@ -8,7 +8,7 @@ import {EEventID} from 'shared/enum/cards';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import INotificationAction from 'shared/interfaces/notification';
-import {playerActionFromNotification, processTurnContext} from 'server/helpers/playerHelpers';
+import {processTurnContext} from 'server/helpers/playerHelpers';
 import {ENotificationAction} from 'shared/enum/notifications';
 
 export class Player {
@@ -39,24 +39,34 @@ export class Player {
 
 	notify = (event) => {
 		if (event.type === 'notification') {
-			this.processNotification(event.payload as INotificationAction);
+			this.processNotificationAction(event.payload as INotificationAction);
 		}
 		if (!this.socket) return;
 		this.socket.emit(event.type, event.payload);
 	};
 
-	processNotification(notificationAction: INotificationAction) {
-		this.currentAction = playerActionFromNotification({game: this.game, player: this, notificationAction})
+	processNotificationAction(notificationAction: INotificationAction) {
+		switch (notificationAction.type) {
+			case ENotificationAction.actionDecision:
+			case ENotificationAction.playerSelect:
+			case ENotificationAction.selectCard:
+			case ENotificationAction.turnCard:
+			case ENotificationAction.defenseTradeCard:
+			case ENotificationAction.offenseTradeCard:
+				this.currentAction = notificationAction;
+				return
+		}
 	}
 
 	processTurnState(turnState: ETurnState) {
 		switch (turnState) {
 			case ETurnState.inDefenseTrade:
-				return this.processNotification({ type: ENotificationAction.defenseTradeCard, text: 'Выбери карту для обмена' });
+				console.log("TEEEEEEEEEEST IN DEFENSE TRADE", this.nickname);
+				return this.processNotificationAction({ type: ENotificationAction.defenseTradeCard, text: 'Выбери карту для обмена' });
 			case ETurnState.inOffenseTrade:
-				return this.processNotification({ type: ENotificationAction.offenseTradeCard, text: 'Выбери карту для обмена' });
+				return this.processNotificationAction({ type: ENotificationAction.offenseTradeCard, text: 'Выбери карту для обмена' });
 			case ETurnState.inCardAction:
-				return this.processNotification({ type: ENotificationAction.turnCard, text: 'Скинь или сыграй карту' });
+				return this.processNotificationAction({ type: ENotificationAction.turnCard, text: 'Скинь или сыграй карту' });
 			default:
 				return;
 		}
@@ -80,6 +90,7 @@ export class Player {
 	changeTurnState = (newTurnState: ETurnState) => {
 		if (this.state === EPlayerState.door) return;
 		this.turnState = newTurnState
+		console.log('CHANGE TURN STATE', this.nickname, newTurnState)
 		this.processTurnState(newTurnState);
 		processTurnContext({player:this, turnState: newTurnState});
 	};

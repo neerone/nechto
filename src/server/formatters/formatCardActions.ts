@@ -1,4 +1,4 @@
-import {filter} from 'lodash';
+import {filter, each} from 'lodash';
 import {ICardEventMenuItem} from 'shared/interfaces/cardMenu';
 import {ETurnState} from 'shared/enum/player';
 import {EEventID, EEventType} from 'shared/enum/cards';
@@ -9,8 +9,15 @@ import {Player} from 'server/models/Player';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
 const injuresCount = (player: Player) => {
-	const injures = filter(player.hand, { id: EEventID.injure});
-	return injures.length;
+	let injures = 0
+	each(player.hand, card => {
+		if (card.id === EEventID.injure) {
+			injures = injures+1
+		}
+	})
+	return  injures;
+	//const injures = filter(player.hand, { id: EEventID.injure});
+	//return injures.length;
 };
 
 const getTargetPlayer = (game:Game, player: Player): Player | null => {

@@ -26,11 +26,26 @@ interface INotificationActionPlayerSelect {
 	playersToSelect: string[],
 }
 
+interface INotificationActionDefenseTradeCard {
+	type: ENotificationAction.defenseTradeCard
+}
+
+interface INotificationActionOffenseTradeCard {
+	type: ENotificationAction.offenseTradeCard
+}
+
+interface INotificationActionTurnCard {
+	type: ENotificationAction.turnCard
+}
+
 type INotificationAction = INotificationActionCommon &
 	(INotificationActionDecision
 	| INotificationActionInfo
 	| INotificationActionOkayCard
 	| INotificationActionSelectCard
-	| INotificationActionPlayerSelect);
+	| INotificationActionPlayerSelect
+	| INotificationActionDefenseTradeCard
+	| INotificationActionOffenseTradeCard
+	| INotificationActionTurnCard);
 
 export default INotificationAction;

@@ -7,6 +7,9 @@ import {shuffle} from 'server/helpers/util';
 import {EEventID} from 'shared/enum/cards';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {getCardActions} from 'server/formatters/formatCardActions';
+import INotificationAction from 'shared/interfaces/notification';
+import {playerActionFromNotification, processTurnContext} from 'server/helpers/playerHelpers';
+import {ENotificationAction} from 'shared/enum/notifications';
 
 export class Player {
 	id = null;
@@ -23,6 +26,7 @@ export class Player {
 	isInjured: boolean = false;
 	isThing: boolean = false;
 	quarantine: number = 0;
+	currentAction: INotificationAction;
 
 	constructor({ socket, playerState = EPlayerState.dummy }) {
 		this.state = playerState;
@@ -32,10 +36,32 @@ export class Player {
 		this.id = _.uniqueId('player_');
 		this.socket = socket;
 	}
+
 	notify = (event) => {
+		if (event.type === 'notification') {
+			this.processNotification(event.payload as INotificationAction);
+		}
 		if (!this.socket) return;
 		this.socket.emit(event.type, event.payload);
 	};
+
+	processNotification(notificationAction: INotificationAction) {
+		this.currentAction = playerActionFromNotification({game: this.game, player: this, notificationAction})
+	}
+
+	processTurnState(turnState: ETurnState) {
+		switch (turnState) {
+			case ETurnState.inDefenseTrade:
+				return this.processNotification({ type: ENotificationAction.defenseTradeCard, text: 'Выбери карту для обмена' });
+			case ETurnState.inOffenseTrade:
+				return this.processNotification({ type: ENotificationAction.offenseTradeCard, text: 'Выбери карту для обмена' });
+			case ETurnState.inCardAction:
+				return this.processNotification({ type: ENotificationAction.turnCard, text: 'Скинь или сыграй карту' });
+			default:
+				return;
+		}
+	}
+
 	register = ({nickname, game}: {nickname:string, game: Game}) => {
 		this.nickname = nickname;
 		this.game = game;
@@ -54,28 +80,8 @@ export class Player {
 	changeTurnState = (newTurnState: ETurnState) => {
 		if (this.state === EPlayerState.door) return;
 		this.turnState = newTurnState
-		if (this.turnState === ETurnState.inOffenseTrade) {
-			const context = this.game.turnContext;
-			let playerToTrade: Player | null =  null;
-			if (context && context.type === ETurnContextType.trade && context.defensePlayer) {
-				playerToTrade = context.defensePlayer
-			} else {
-				playerToTrade = this.getNextPlayer();
-			}
-		    if (playerToTrade.state === EPlayerState.door && !this.game.turnContext) {
-				this.game.addLog(`Игрок ${this.nickname} не меняется из-за заколоченной двери`);
-				this.game.endTurn(this.id);
-				return
-		    }
-		    if (this.game.turnContext === null) {
-			    this.game.turnContext = {
-			      type: ETurnContextType.trade,
-			      defensePlayer: playerToTrade,
-			      offensePlayer: this,
-			      offenseCardId: null,
-			    };
-		    }
-		}
+		this.processTurnState(newTurnState);
+		processTurnContext({player:this, turnState: newTurnState});
 	};
 
 	getNeighbours = () => {

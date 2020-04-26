@@ -1,12 +1,12 @@
 import {getPanic} from 'shared/constant/cards';
 import {EEventID, EPanicID} from 'shared/enum/cards';
-import {createMockGameServer} from 'server/_playground/createGameServer';
+import {createMockGameServer} from '_integration/createGameServer';
 import {ETurnState} from 'shared/enum/player';
 import {checkAllDeckCards, expectOkayCard, printNotifications} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {EPlayerActionType} from 'shared/enum/playerActions';
-import {testPlayerAction} from '_integration/validators';
+import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 
 
 describe('onlyBetweenUs test',  () => {

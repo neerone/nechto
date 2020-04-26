@@ -1,12 +1,12 @@
 import {getCard} from 'shared/constant/cards';
 import {EEventID} from 'shared/enum/cards';
-import {createMockGameServer} from 'server/_playground/createGameServer';
+import {createMockGameServer} from '_integration/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotificationAction} from 'shared/enum/notifications';
-import {testPlayerAction} from '_integration/validators';
+import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 
 
 describe('quarantine test',  () => {

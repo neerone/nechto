@@ -36,6 +36,7 @@
     "server": "ts-node --project server.tsconfig.json -r tsconfig-paths/register ./src/server/index.ts",
     "build": "react-scripts build",
     "test": "yarn jest --bail --runInBand",
+    "testBrutforce": "ts-node --project server.tsconfig.json -r tsconfig-paths/register ./src/_integration/brutforce.ts",
     "testAll": "yarn jest",
     "testCacheClear": "yarn jest --clearCache",
     "eject": "react-scripts eject"

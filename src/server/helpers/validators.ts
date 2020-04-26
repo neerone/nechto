@@ -20,7 +20,7 @@ interface IActionDecisionPayload {
 	action:string,
 }
 
-const isPlayerCanDiscardCard = (game: Game, player: Player, cardUniqueId: string) => {
+export const isPlayerCanDiscardCard = (game: Game, player: Player, cardUniqueId: string) => {
 	//Проверяем есть ли у него на руках такая карта
 	const selectedCard = find(player.hand, {uniqueId:cardUniqueId});
 	if (!selectedCard) {
@@ -42,7 +42,7 @@ const isPlayerCanDiscardCard = (game: Game, player: Player, cardUniqueId: string
 };
 
 
-const isPlayerCanActCard = (game: Game, player: Player, cardUniqueId: string) => {
+export const isPlayerCanActCard = (game: Game, player: Player, cardUniqueId: string) => {
 	//Проверяем есть ли у него на руках такая карта
 	const selectedCard = find(player.hand, {uniqueId:cardUniqueId});
 	if (!selectedCard) {
@@ -63,7 +63,7 @@ const isPlayerCanActCard = (game: Game, player: Player, cardUniqueId: string) =>
 	}
 };
 
-const isPlayerCanTradeCard = (game: Game, player: Player, cardUniqueId: string) => {
+export const isPlayerCanTradeCard = (game: Game, player: Player, cardUniqueId: string) => {
 	//Проверяем есть ли у него на руках такая карта
 	const selectedCard = find(player.hand, {uniqueId:cardUniqueId});
 	if (!selectedCard) {
@@ -88,7 +88,7 @@ const isPlayerCanTradeCard = (game: Game, player: Player, cardUniqueId: string) 
 	}
 };
 
-const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
+export const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 	//Проверяем есть ли в игре игрок с таким ID
 	const selectedPlayer = find(game.players, {id:selectedPlayerId});
 	if (!selectedPlayer) {
@@ -106,7 +106,7 @@ const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 	return event.playersToSelect.includes(selectedPlayerId)
 };
 
-const isPlayerCanSelectCard = (game: Game, player: Player, cardUniqueId: string) => {
+export const isPlayerCanSelectCard = (game: Game, player: Player, cardUniqueId: string) => {
 	if (!player.currentAction || player.currentAction.type !== ENotificationAction.selectCard) {
 		return false;
 	}
@@ -118,7 +118,7 @@ const isPlayerCanSelectCard = (game: Game, player: Player, cardUniqueId: string)
 	return !!selectedCard
 };
 
-const isPlayerCanSelectDesicion = (game, player, action) => {
+export const isPlayerCanSelectDesicion = (game, player, action) => {
 	if (!player.currentAction || player.currentAction.type !== ENotificationAction.actionDecision) {
 		return false;
 	}
@@ -129,45 +129,3 @@ const isPlayerCanSelectDesicion = (game, player, action) => {
 	}
 	return !!selectedAction
 };
-
-export const testPlayerAction = (gameServer:GameServer, game: Game, payload: IActionPayload) => {
-	if (!payload.actionType) throw new Error('Произошел вызов экшна без type' + JSON.stringify(payload));
-	if (!payload.player) throw new Error('Произошел вызов экшна без player' + JSON.stringify(payload));
-
-	const {player, actionType} = payload;
-
-	switch (actionType) {
-		case EPlayerActionType.cardTrade: {
-			expect(isPlayerCanTradeCard(game, player, payload.cardUniqueId)).toBe(true)
-			break;
-		}
-		case EPlayerActionType.cardAct: {
-			expect(isPlayerCanActCard(game, player, payload.cardUniqueId)).toBe(true);
-			break;
-		}
-		case EPlayerActionType.cardDiscard: {
-			expect(isPlayerCanDiscardCard(game, player, payload.cardUniqueId)).toBe(true);
-			break;
-		}
-		case EPlayerActionType.playerSelect: {
-			expect(isPlayerCanSelectPlayer(game, player, payload.selectedPlayerId)).toBe(true);
-			break;
-		}
-		case EPlayerActionType.cardSelect: {
-			expect(isPlayerCanSelectCard(game, player, payload.cardUniqueId)).toBe(true);
-			break;
-		}
-	}
-
-	gameServer.playerAction(payload);
-}
-
-export const testPlayerActionDecision = (gameServer:GameServer, game: Game, payload: IActionDecisionPayload) => {
-	if (!payload.action) throw new Error('Произошел вызов экшна без action' + JSON.stringify(payload));
-	if (!payload.player) throw new Error('Произошел вызов экшна без player' + JSON.stringify(payload));
-
-	const {player, action} = payload;
-	expect(isPlayerCanSelectDesicion(game, player, payload.action)).toBe(true);
-	gameServer.actionDecision(payload);
-}
-

@@ -3,7 +3,7 @@ import http from "http";
 import socketIO from "socket.io";
 import { registerHandlers } from "server/handlers/handlers";
 import { gameServer } from "server/server/GameServer";
-import {mockGameProcess} from 'server/_playground/mockGameProcess';
+import {mockGameProcess} from '_integration/mockGameProcess';
 
 const port: number = 30;
 

@@ -1,15 +1,12 @@
 import {getCard} from 'shared/constant/cards';
 import {EEventID} from 'shared/enum/cards';
-import {createMockGameServer} from 'server/_playground/createGameServer';
+import {createMockGameServer} from '_integration/createGameServer';
 import {ETurnState} from 'shared/enum/player';
 import {find, map} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards, expectOkayCard} from '_integration/helpers';
-import {ENotificationAction} from 'shared/enum/notifications';
-import {Simulate} from 'react-dom/test-utils';
-import play = Simulate.play;
-import {testPlayerAction} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
+import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 
 
 describe('whiskey test',  () => {

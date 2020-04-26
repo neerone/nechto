@@ -1,5 +1,5 @@
 import {gameServer} from 'server/server/GameServer';
-import {createDoor, createPlayer} from 'server/_playground/mockSocket';
+import {createDoor, createPlayer} from '_integration/mockSocket';
 import {EEventID, EPanicID} from 'shared/enum/cards';
 import {getCard, getPanic} from 'shared/constant/cards';
 import {EPlayerActionType} from 'shared/enum/playerActions';

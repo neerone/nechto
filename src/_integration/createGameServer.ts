@@ -1,5 +1,5 @@
 import {GameServer, gameServer} from 'server/server/GameServer';
-import {createMockSocketServer, createPlayer} from 'server/_playground/mockSocket';
+import {createMockSocketServer, createPlayer} from '_integration/mockSocket';
 import {map} from 'lodash';
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';

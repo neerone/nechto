@@ -1,8 +1,8 @@
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {ETurnState} from 'shared/enum/player';
-import {createMockGameServer} from 'server/_playground/createGameServer';
+import {createMockGameServer} from '_integration/createGameServer';
 import {checkAllDeckCards} from '_integration/helpers';
-import {testPlayerAction} from '_integration/validators';
+import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 
 let counter = 0;
 

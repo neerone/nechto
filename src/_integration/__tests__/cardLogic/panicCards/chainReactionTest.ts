@@ -1,6 +1,6 @@
 import {getPanic} from 'shared/constant/cards';
 import {EPanicID} from 'shared/enum/cards';
-import {createMockGameServer} from 'server/_playground/createGameServer';
+import {createMockGameServer} from '_integration/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {each, isEqual} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
@@ -9,7 +9,7 @@ import {Player} from 'server/models/Player';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {getNextChainReactionPlayer} from 'server/helpers/cardActions/panic/chainReaction';
 import {checkAllDeckCards} from '_integration/helpers';
-import {testPlayerAction} from '_integration/validators';
+import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 
 
 describe('chainReaction test',  () => {

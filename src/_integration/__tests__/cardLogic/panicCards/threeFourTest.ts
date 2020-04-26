@@ -1,6 +1,6 @@
 import {getPanic} from 'shared/constant/cards';
 import {EPanicID} from 'shared/enum/cards';
-import {createMockGameServer} from 'server/_playground/createGameServer';
+import {createMockGameServer} from '_integration/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';

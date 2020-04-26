@@ -9,32 +9,32 @@ interface INotificationActionInfo {
 	type: ENotificationAction.info
 }
 
-interface INotificationActionDecision {
+export interface INotificationActionDecision {
 	type: ENotificationAction.actionDecision,
 	menu : {text: string, action: string}[]
 }
-interface INotificationActionOkayCard {
+export interface INotificationActionOkayCard {
 	type: ENotificationAction.okayCard,
 	cards: ICardEvent[] | ICardPanic[];
 }
-interface INotificationActionSelectCard {
+export interface INotificationActionSelectCard {
 	type: ENotificationAction.selectCard,
 	cards: ICardEvent[] | ICardPanic[];
 }
-interface INotificationActionPlayerSelect {
+export interface INotificationActionPlayerSelect {
 	type: ENotificationAction.playerSelect,
 	playersToSelect: string[],
 }
 
-interface INotificationActionDefenseTradeCard {
+export interface INotificationActionDefenseTradeCard {
 	type: ENotificationAction.defenseTradeCard
 }
 
-interface INotificationActionOffenseTradeCard {
+export interface INotificationActionOffenseTradeCard {
 	type: ENotificationAction.offenseTradeCard
 }
 
-interface INotificationActionTurnCard {
+export interface INotificationActionTurnCard {
 	type: ENotificationAction.turnCard
 }
 

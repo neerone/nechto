@@ -7,14 +7,14 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {checkAllDeckCards} from '_integration/helpers';
 import {notifyPlayerDiscardCards} from 'server/helpers/cardActions/panic/forgetfulness';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
 
 
 const getLastForgetfullnessNotificaitonCards = (offensePlayer) => {
 	const forgetfulnessNotification = findLast(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
 		if (type !== 'notification') return false;
-		if (event.type !== ENotification.selectCard) return false;
+		if (event.type !== ENotificationAction.selectCard) return false;
 		const {cards} = event;
 		if (cards) return true;
 		return false;

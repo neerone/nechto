@@ -4,7 +4,7 @@ import {createMockGameServer} from 'server/_playground/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import { filter } from 'lodash';
 
 

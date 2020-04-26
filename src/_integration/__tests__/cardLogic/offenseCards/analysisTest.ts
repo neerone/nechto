@@ -5,7 +5,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
@@ -47,7 +47,7 @@ describe('analysis test',  () => {
 		//Игрок показывает карты Гене
 		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.okayCard, cards: expect.arrayContaining([
+				type: ENotificationAction.okayCard, cards: expect.arrayContaining([
 					expect.objectContaining({id: EEventID.fear}),
 					expect.objectContaining({id: EEventID.flamethrower}),
 					expect.objectContaining({id: EEventID.noFire}),

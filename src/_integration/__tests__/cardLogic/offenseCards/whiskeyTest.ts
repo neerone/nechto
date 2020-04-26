@@ -5,7 +5,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find, map} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
 import {testPlayerAction} from '_integration/validators';
@@ -40,7 +40,7 @@ describe('whiskey test',  () => {
 				[
 					'notification',
 					expect.objectContaining({
-						type: ENotification.okayCard,
+						type: ENotificationAction.okayCard,
 						cards: expect.arrayContaining(
 							map(offensePlayer.hand, (card) => expect.objectContaining({id: card.id}))
 						)

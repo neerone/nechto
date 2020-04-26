@@ -5,7 +5,7 @@ import {Player} from 'server/models/Player';
 import {ETurnState} from 'shared/enum/player';
 import {find, findLast} from 'lodash';
 import {getCardActions} from 'server/formatters/formatCardActions';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 
 interface IActionPayload  {
 	player:Player,
@@ -90,7 +90,7 @@ const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 
 	const lastSelectPlayerNotification = findLast(player.socket.spy.mock.calls, ([type, event]) => {
 		if (type !=='notification') return false;
-		if (event.type !== ENotification.playerSelect) return false;
+		if (event.type !== ENotificationAction.playerSelect) return false;
 		return true;
 	})
 	if (!lastSelectPlayerNotification) return false;
@@ -104,7 +104,7 @@ const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 const isPlayerCanSelectCard = (game, player, cardUniqueId) => {
 	const lastSelectCardNotification = findLast(player.socket.spy.mock.calls, ([type, event]) => {
 		if (type !=='notification') return false;
-		if (event.type !== ENotification.selectCard) return false;
+		if (event.type !== ENotificationAction.selectCard) return false;
 		return true;
 	})
 
@@ -122,7 +122,7 @@ const isPlayerCanSelectCard = (game, player, cardUniqueId) => {
 const isPlayerCanSelectDesicion = (game, player, action) => {
 	const lastDesicionNotification = findLast(player.socket.spy.mock.calls, ([type, event]) => {
 		if (type !=='notification') return false;
-		if (event.type !== ENotification.actionDecision) return false;
+		if (event.type !== ENotificationAction.actionDecision) return false;
 		return true;
 	})
 

@@ -1,7 +1,7 @@
 import {computed, observable} from "mobx";
 import SocketController from 'client/controllers/socketController';
 import Player from 'client/models/Player';
-import INotification from 'shared/interfaces/notification';
+import INotificationAction from 'shared/interfaces/notification';
 import RootController from 'client/controllers/rootController';
 import {ECardType} from 'shared/enum/cards';
 import {EGameState} from 'shared/enum/common';
@@ -21,7 +21,7 @@ export default class GameController {
 	@observable playersList: string[] = [];
 	@observable gameLog: string[] = [];
 	@observable deck: {count: number, topCardType: ECardType} = {count: 0, topCardType: ECardType.event};
-	@observable notifications: INotification[] = [];
+	@observable notifications: INotificationAction[] = [];
 	@observable playersToSelect: string[] = [];
 	@observable isLayoutSequential: boolean = false;
 	@observable tradeContext: IFormatTradeContext[] | null = null;
@@ -57,13 +57,13 @@ export default class GameController {
 		this.notifications.splice(0, 1);
 	};
 
-	hideNotification = () => {
+	hidENotificationAction = () => {
 		this.notifications.splice(0, 1);
 	};
 
 	selectCard = (notification, cardUniqueId) => {
 		this.socket.sendToServer(EClientEventType.playerAction, {actionType: EPlayerActionType.cardSelect, actionContext: notification, cardUniqueId});
-		this.hideNotification();
+		this.hidENotificationAction();
 	};
 
 	selectPlayer = (playerId: string ) => {
@@ -74,7 +74,7 @@ export default class GameController {
 	actionDecision = (action: string ) => {
 		this.playersToSelect = [];
 		this.socket.sendToServer(EClientEventType.actionDecision, {actionType: EPlayerActionType.actionDecision, action});
-		this.hideNotification();
+		this.hidENotificationAction();
 	};
 	toggleRoomLayout = () => {
 		this.isLayoutSequential = !this.isLayoutSequential;

@@ -5,7 +5,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 

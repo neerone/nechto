@@ -1,6 +1,6 @@
 import {Player} from 'server/models/Player';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {getCard} from 'shared/constant/cards';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ECardType, EEventID} from 'shared/enum/cards';
@@ -54,7 +54,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   offensePlayer.notify(formatPlayerNotification({
     player: player,
     notification: {
-      type: ENotification.okayCard,
+      type: ENotificationAction.okayCard,
       cards: [defensePlayerCard],
       text: `Игрок ${player.nickname} дал эту карту`,
     },
@@ -68,7 +68,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   defensePlayer.notify(formatPlayerNotification({
     player: defensePlayer,
     notification: {
-      type: ENotification.okayCard,
+      type: ENotificationAction.okayCard,
       cards: [offensePlayerCard],
       text: `Игрок ${offensePlayer.nickname} дал эту карту`,
     },

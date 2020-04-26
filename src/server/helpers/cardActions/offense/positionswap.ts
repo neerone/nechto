@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
@@ -20,7 +20,7 @@ export const positionswapAct = ({card, game, player} : {card:ICardEvent, game: G
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.playerSelect,
+		type: ENotificationAction.playerSelect,
 		playersToSelect: player.getPlayabeNeighbours(),
 		text: 'Выбери с кем хочешь поменяться местами'
       },
@@ -53,7 +53,7 @@ export const positionswapSelect = ({game, player, selectedPlayerId} : {game: Gam
     defensePlayer.notify(formatPlayerNotification({
 		player: player,
 		notification: {
-			type: ENotification.actionDecision,
+			type: ENotificationAction.actionDecision,
 			text,
 			menu: decisionMenu
 		},

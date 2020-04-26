@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
@@ -21,7 +21,7 @@ export const axeAct = ({card, game, player} : {card:ICardEvent, game: Game, play
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.playerSelect,
+		type: ENotificationAction.playerSelect,
 		playersToSelect: axeTargets,
 		text: 'Выбри на что хочешь применить топор'
       },

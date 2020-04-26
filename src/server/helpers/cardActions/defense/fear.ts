@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {discardCard} from 'server/helpers/discardCard';
@@ -23,7 +23,7 @@ export const fearAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
 	player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
         cards: [getCard(context.offenseCardId)],
 		text: `${offensePlayer.nickname}: я хотел тебе эту дать`,
       },
@@ -32,7 +32,7 @@ export const fearAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
     game.notifyAllPlayersExeptPlayer(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
         cards: [getCard(EEventID.fear)],
 		text: `${player.nickname}: отказывается от обмена`,
       },

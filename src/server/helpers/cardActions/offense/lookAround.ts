@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
@@ -15,7 +15,7 @@ export const lookAroundAct = ({card, game, player} : {card:ICardEvent, game: Gam
     game.notifyAllPlayers(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
 		cards: [getCard(EEventID.lookaround)],
 		text: `${player.nickname} изменил направление хода`
       },

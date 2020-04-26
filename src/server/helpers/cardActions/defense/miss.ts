@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {discardCard} from 'server/helpers/discardCard';
@@ -45,7 +45,7 @@ export const missAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
     game.notifyAllPlayersExeptPlayer(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
         cards: [getCard(EEventID.miss)],
 		text: `${player.nickname}: отказывается от обмена и теперь ходит игрок ${nextPlayer.nickname}`,
       },

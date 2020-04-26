@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
@@ -18,7 +18,7 @@ export const suspicionAct = ({card, game, player} : {card:ICardEvent, game: Game
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.playerSelect,
+		type: ENotificationAction.playerSelect,
 		playersToSelect: player.getPlayabeNeighbours(),
 		text: 'Выбри на кого хочешь применить подозрение'
       },
@@ -35,7 +35,7 @@ export const suspicionSelect = ({game, player, selectedPlayerId} : {game: Game, 
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
 		text: `Ты подсмотрел у игрока ${playerToView.nickname} эту карту`,
 		cards: [cardToView]
       },

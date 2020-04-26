@@ -7,7 +7,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find, map, each, filter} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards, printPlayersStatuses} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import {testPlayerAction} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
@@ -35,7 +35,7 @@ describe('one two test',  () => {
 		//У Offense player есть смена мест
 		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.playerSelect,
+				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.arrayContaining(selectPlayersId)
 			})])
 		);

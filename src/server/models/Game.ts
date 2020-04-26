@@ -13,7 +13,7 @@ import {shuffle} from 'server/helpers/util';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {handCardsCount, thingCard} from 'shared/constant/cards';
 import {EPlayerActionType} from 'shared/enum/playerActions';
-import INotification from 'shared/interfaces/notification';
+import INotificationAction from 'shared/interfaces/notification';
 import {ICardAny, ICardEvent, ICardPanic} from 'shared/interfaces/cards';
 import {actCard, playerActionDecision, selectCard, selectPlayer} from 'server/helpers/playerAction';
 import {ITurnContext} from 'shared/interfaces/turnContext';
@@ -23,7 +23,7 @@ import {ECardType} from 'shared/enum/cards';
 import {panicAction} from 'server/helpers/panicActions';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {chainReactionTrade} from 'server/helpers/cardActions/panic/chainReaction';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {checkAllDeckCards} from '_integration/helpers';
 
 enum EGameState {
@@ -60,7 +60,7 @@ export class Game {
     })
   };
 
-  notifyPlayer = ({player, notification} : {player: Player, notification: INotification}) => {
+  notifyPlayer = ({player, notification} : {player: Player, notification: INotificationAction}) => {
     player.notify(formatPlayerNotification({ player, notification }));
   }
 
@@ -198,7 +198,7 @@ export class Game {
       this.notifyAllPlayers(formatPlayerNotification({
         player: cleanPlayer,
         notification: {
-          type: ENotification.okayCard,
+          type: ENotificationAction.okayCard,
           cards: [thingCard],
           text: 'Нечто выйграло'
         },

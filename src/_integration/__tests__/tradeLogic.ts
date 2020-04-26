@@ -5,7 +5,7 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {find, map, each, range} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
 import {testPlayerAction} from '_integration/validators';
@@ -170,7 +170,7 @@ describe('trade logic',  () => {
 
 		expect(nextPlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.okayCard,
+				type: ENotificationAction.okayCard,
 				text: 'Нечто выйграло',
 			})])
 		);

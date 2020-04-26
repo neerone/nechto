@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
@@ -20,7 +20,7 @@ export const quarantineAct = ({card, game, player} : {card:ICardEvent, game: Gam
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.playerSelect,
+		type: ENotificationAction.playerSelect,
 		playersToSelect: [...player.getPlayabeNeighbours(), player.id],
 		text: 'Выбри на кого хочешь применить карантин'
       },
@@ -37,7 +37,7 @@ export const quarantineSelect = ({game, player, selectedPlayerId} : {game: Game,
 	game.notifyAllPlayers(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
 		text: `Игрок ${selectedPlayer.nickname} теперь на карантине`,
 		cards: [getCard(EEventID.quarantine)]
       },

@@ -1,5 +1,5 @@
 import {SocketIOClient} from 'socket.io-client';
-import INotification from 'shared/interfaces/notification';
+import INotificationAction from 'shared/interfaces/notification';
 import RootController from 'client/controllers/rootController';
 import {EAppState, EGameState} from 'shared/enum/common';
 import {EServerEventType} from 'shared/enum/enumServerEvents';
@@ -34,7 +34,7 @@ function handleGlobalEvents(socket, root: RootController) {
 		root.launcherController.games = games;
 	});
 
-	socket.on(EServerEventType.notification, (notification: INotification) => {
+	socket.on(EServerEventType.notification, (notification: INotificationAction) => {
 		root.gameController.notifications.push(notification);
 	})
 }

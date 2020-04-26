@@ -4,7 +4,7 @@ import {createMockGameServer} from 'server/_playground/createGameServer';
 import {ETurnState} from 'shared/enum/player';
 import {checkAllDeckCards, printNotifications} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {testPlayerAction} from '_integration/validators';
 
@@ -20,7 +20,7 @@ describe('onlyBetweenUs test',  () => {
 
 		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.playerSelect,
+				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.arrayContaining(offensePlayer.getPlayabeNeighbours())
 			})])
 		);
@@ -36,7 +36,7 @@ describe('onlyBetweenUs test',  () => {
 
 		expect(selectedPlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.okayCard,
+				type: ENotificationAction.okayCard,
 				cards: expect.arrayContaining(offensePlayer.hand)
 			})])
 		);

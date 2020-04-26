@@ -2,7 +2,7 @@ import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {filter, find} from 'lodash';
 
@@ -36,7 +36,7 @@ export const oneTwoAct = ({game, player}: {game:Game, player:Player}) => {
 	player.notify(formatPlayerNotification({
 		player,
 		notification: {
-			type: ENotification.playerSelect,
+			type: ENotificationAction.playerSelect,
 			playersToSelect: selectPlayersId,
 			text:'Выбери игрока для смены мест'
 		}

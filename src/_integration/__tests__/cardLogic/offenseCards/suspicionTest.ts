@@ -5,7 +5,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
@@ -38,7 +38,7 @@ describe('suspicion test',  () => {
 
 		const suspicionNotification = find(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
 			if (type !== 'notification') return false;
-			if (event.type !== ENotification.okayCard) return false;
+			if (event.type !== ENotificationAction.okayCard) return false;
 			const {cards} = event;
 			if (cards) return true;
 			return false;

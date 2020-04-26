@@ -5,7 +5,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find, map, each} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards, printPlayersStatuses} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {Simulate} from 'react-dom/test-utils';
 import play = Simulate.play;
 import {testPlayerAction} from '_integration/validators';
@@ -24,7 +24,7 @@ describe('goAway test',  () => {
 		//У Offense player нет возможности поменяться со всеми кроме карантина
 		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.playerSelect,
+				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.arrayContaining([
 					defensePlayer.id, CPlayer.id
 				])
@@ -32,7 +32,7 @@ describe('goAway test',  () => {
 		);
 		expect(offensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.playerSelect,
+				type: ENotificationAction.playerSelect,
 				playersToSelect: expect.not.arrayContaining([
 					APlayer.id
 				])

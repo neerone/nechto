@@ -3,7 +3,7 @@ import {Player} from 'server/models/Player';
 import {Game} from 'server/models/Game';
 import {find, map, mapValues, reduce, remove, filter} from 'lodash';
 import {GameServer} from 'server/server/GameServer';
-import INotification from 'shared/interfaces/notification';
+import INotificationAction from 'shared/interfaces/notification';
 import {formatHand} from 'server/formatters/formatHand';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {IFormatTradeContext} from 'shared/interfaces/common';
@@ -164,6 +164,6 @@ export const formatLobbyState = (gameServer: GameServer) => {
 	})
 };
 
-export const formatPlayerNotification = ({player, notification} : {player: Player, notification: INotification}) => {
+export const formatPlayerNotification = ({player, notification} : {player: Player, notification: INotificationAction}) => {
 	return formatEvent(EServerEventType.notification, notification)
 }

@@ -2,38 +2,38 @@ import React from 'react';
 import {observer} from 'mobx-react-lite';
 import './styles.scss';
 import {map} from 'lodash';
-import INotification from 'shared/interfaces/notification';
+import INotificationAction from 'shared/interfaces/notification';
 import GameController from 'client/controllers/gameController';
 import {ICardAny} from 'shared/interfaces/cards';
 import Card from 'client/components/table/Card/Card';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 
 interface INotifierProps {
 	controller:  GameController;
 }
 
 
-const generateCardMenuByNotificationType = (controller: GameController, notification: INotification, cardUniqueId?: string) => {
+const generateCardMenuByNotificationType = (controller: GameController, notification: INotificationAction, cardUniqueId?: string) => {
 	let menu :any = null;
 	switch (notification.type) {
-		case ENotification.info:
+		case ENotificationAction.info:
 			menu = (<div
 				className={'notificationMenuItem'}
-				onClick={() => controller.hideNotification()}
+				onClick={() => controller.hidENotificationAction()}
 			>
 				Okay
 			</div>);
 			break;
-		case ENotification.okayCard:
+		case ENotificationAction.okayCard:
 			if (!notification.cards) return null;
 			menu = (<div
 				className={'notificationMenuItem'}
-				onClick={() => controller.hideNotification()}
+				onClick={() => controller.hidENotificationAction()}
 			>
 				Ок, понял
 			</div>);
 			break;
-		case ENotification.selectCard:
+		case ENotificationAction.selectCard:
 			menu = (<div
 				className={'notificationMenuItem'}
 				onClick={() => controller.selectCard(notification, cardUniqueId)}
@@ -41,7 +41,7 @@ const generateCardMenuByNotificationType = (controller: GameController, notifica
 				Выбрать
 			</div>);
 			break;
-		case ENotification.actionDecision:
+		case ENotificationAction.actionDecision:
 			menu = (
 				<div
 					className={'notificationMenuItem'}
@@ -65,13 +65,13 @@ const CardsViewer = ({cards, menu}: {cards: ICardAny[], menu: (a?:any) => React.
 	</div>
 };
 
-const Notification = ({notification, controller}: {notification: INotification, controller: GameController}) => {
+const Notification = ({notification, controller}: {notification: INotificationAction, controller: GameController}) => {
 	let notificationContent: React.ReactNode = null;
 	switch (notification.type) {
-		case ENotification.info:
+		case ENotificationAction.info:
 			notificationContent = <div></div>;
 			break;
-		case ENotification.okayCard:
+		case ENotificationAction.okayCard:
 			if (!notification.cards) return null;
 			notificationContent = (
 				<React.Fragment>
@@ -89,13 +89,13 @@ const Notification = ({notification, controller}: {notification: INotification, 
 				</React.Fragment>
 			);
 			break;
-		case ENotification.selectCard:
+		case ENotificationAction.selectCard:
 			const menu = (cardUniqueId) => generateCardMenuByNotificationType(controller, notification, cardUniqueId);
 			notificationContent = (<CardsViewer
 				cards={notification.cards ? notification.cards : []}
 				menu={menu}/>);
 			break;
-		case ENotification.playerSelect:
+		case ENotificationAction.playerSelect:
 			notificationContent = (
 				<div className={"centeredNotificationRow"}>
 					<div
@@ -107,7 +107,7 @@ const Notification = ({notification, controller}: {notification: INotification, 
 				</div>
 			);
 			break;
-		case ENotification.actionDecision:
+		case ENotificationAction.actionDecision:
 			notificationContent = (
 				<div className={"centeredNotificationRow column"}>
 					{map(notification.menu, ({text, action}) => {

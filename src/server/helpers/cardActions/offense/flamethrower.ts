@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
@@ -22,7 +22,7 @@ export const flamethrowerAct = ({card, game, player} : {card:ICardEvent, game: G
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.playerSelect,
+		type: ENotificationAction.playerSelect,
 		playersToSelect: player.getPlayabeNeighbours(),
 		text: 'Выбери кого ты хочешь сжечь'
       },
@@ -56,7 +56,7 @@ export const flamethrowerSelect = ({game, player, selectedPlayerId} : {game: Gam
     defensePlayer.notify(formatPlayerNotification({
 		player: player,
 		notification: {
-			type: ENotification.actionDecision,
+			type: ENotificationAction.actionDecision,
 			text,
 			menu: decisionMenu
 		},
@@ -74,7 +74,7 @@ export const flamethrowerFinish = ({game, player, action} : {game: Game, player:
 			game.notifyAllPlayers(formatPlayerNotification({
 		      player: player,
 		      notification: {
-				type: ENotification.okayCard,
+				type: ENotificationAction.okayCard,
 				cards: [getCard(EEventID.flamethrower)],
 				text: `Игрок ${defensePlayer.nickname} был заживо сожжен игроком ${offensePlayer.nickname} и выбывает из игры`,
 		      },
@@ -84,7 +84,7 @@ export const flamethrowerFinish = ({game, player, action} : {game: Game, player:
 				game.notifyAllPlayers(formatPlayerNotification({
 			      player: player,
 			      notification: {
-					type: ENotification.info,
+					type: ENotificationAction.info,
 					text: `Игра закончена! ${defensePlayer.nickname} не справился со своим коварным заданием... Люди победили.`,
 			      },
 			    }))
@@ -104,7 +104,7 @@ export const flamethrowerFinish = ({game, player, action} : {game: Game, player:
 			game.notifyAllPlayers(formatPlayerNotification({
 				player: player,
 				notification: {
-					type: ENotification.okayCard,
+					type: ENotificationAction.okayCard,
 					cards: [getCard(EEventID.noFire)],
 					text: `Игрок ${defensePlayer.nickname} использовал "Никакого шашлыка" и спасся от огнемета!`,
 				},

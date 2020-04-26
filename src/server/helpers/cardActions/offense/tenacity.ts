@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {each} from 'lodash';
@@ -23,7 +23,7 @@ export const tenacityAct = ({card, game, player} : {card:ICardEvent, game: Game,
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-        type: ENotification.selectCard,
+        type: ENotificationAction.selectCard,
         cards: [first, second, third],
         text: `Выбери одну их этих карт`,
       },

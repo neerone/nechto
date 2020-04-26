@@ -1,7 +1,7 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {ICardPanic} from 'shared/interfaces/cards';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {EPanicID} from 'shared/enum/cards';
 import {threeFourAct} from 'server/helpers/cardActions/panic/threeFour';
@@ -20,7 +20,7 @@ export const panicAction = ({game, player, panicCard}: {game:Game, player:Player
     game.notifyAllPlayers(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
         cards: [panicCard],
 		text: `${player.nickname} достает карту паники`
       },

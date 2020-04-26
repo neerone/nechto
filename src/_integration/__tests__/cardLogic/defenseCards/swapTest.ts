@@ -5,7 +5,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {testPlayerAction, testPlayerActionDecision} from '_integration/validators';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
@@ -51,7 +51,7 @@ describe('leavemealone test',  () => {
 		//у defenseplayer'а есть возможность отказаться
 		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.actionDecision, menu: expect.arrayContaining([
+				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
 					expect.objectContaining({action:'swap'}),
 					expect.objectContaining({action:'cancelSwap'}),
 				])
@@ -124,7 +124,7 @@ describe('leavemealone test',  () => {
 		//у defenseplayer'а есть возможность отказаться
 		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.actionDecision, menu: expect.arrayContaining([
+				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
 					expect.objectContaining({action:'swap'}),
 					expect.objectContaining({action:'cancelSwap'}),
 				])
@@ -197,7 +197,7 @@ describe('leavemealone test',  () => {
 		//у defenseplayer'а есть возможность отказаться
 		expect(defensePlayer.socket.spy.mock.calls).toContainEqual(
 			expect.arrayContaining(['notification', expect.objectContaining({
-				type: ENotification.actionDecision, menu: expect.arrayContaining([
+				type: ENotificationAction.actionDecision, menu: expect.arrayContaining([
 					expect.objectContaining({action:'swap'}),
 					expect.objectContaining({action:'cancelSwap'}),
 				])

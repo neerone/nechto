@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ETurnState} from 'shared/enum/player';
@@ -17,7 +17,7 @@ export const friendshipAct = ({game, player} : {game: Game, player: Player}) => 
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.playerSelect,
+		type: ENotificationAction.playerSelect,
 		playersToSelect: allPlayersExeptCurrent,
 		text: 'Выбри с кем хочешь поменяться картами'
       },

@@ -1,6 +1,6 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
@@ -17,7 +17,7 @@ export const analysisAct = ({card, game, player} : {card:ICardEvent, game: Game,
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.playerSelect,
+		type: ENotificationAction.playerSelect,
 		playersToSelect: player.getPlayabeNeighbours(),
 		text: 'Выбери кого хочешь проанализировать'
       },
@@ -36,7 +36,7 @@ export const analysisSelect = ({game, player, selectedPlayerId} : {game: Game, p
     player.notify(formatPlayerNotification({
       player: player,
       notification: {
-		type: ENotification.okayCard,
+		type: ENotificationAction.okayCard,
         cards: selectedPlayer.hand as ICardEvent[],
 		text: `${selectedPlayer.nickname}: На, смотри!`,
       },

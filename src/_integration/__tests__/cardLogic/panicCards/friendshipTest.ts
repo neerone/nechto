@@ -5,7 +5,7 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {find, findLast} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards, printPlayersStatuses} from '_integration/helpers';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {testPlayerAction} from '_integration/validators';
 
@@ -13,7 +13,7 @@ import {testPlayerAction} from '_integration/validators';
 const getLastFriendshipNotificaiton = (offensePlayer) => {
 	const forgetfulnessNotification = findLast(offensePlayer.socket.spy.mock.calls, ([type, event]) => {
 		if (type !== 'notification') return false;
-		if (event.type !== ENotification.playerSelect) return false;
+		if (event.type !== ENotificationAction.playerSelect) return false;
 		const {playersToSelect} = event;
 		if (playersToSelect) return true;
 		return false;

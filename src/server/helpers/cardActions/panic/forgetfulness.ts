@@ -2,14 +2,15 @@ import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {ETurnState} from 'shared/enum/player';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
-import {ENotification} from 'shared/enum/notifications';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {clone, find} from 'lodash';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {discardCard} from 'server/helpers/discardCard';
 import {ETurnContextType} from 'shared/enum/turnContextType';
+import INotificationAction from 'shared/interfaces/notification';
 
-export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Player}) => {
+export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Player}) : INotificationAction => {
 	const clonedPlayer = clone(player);
 	clonedPlayer.turnState = ETurnState.inCardAction;
 	const filteredCards = clonedPlayer.hand.filter(card => {
@@ -20,7 +21,7 @@ export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Play
 
 
 	return {
-		type: ENotification.selectCard,
+		type: ENotificationAction.selectCard,
 		cards: filteredCards,
 		text:'Выбери одну из свои карт, чтобы поменять её на карту из колоды'
 	}

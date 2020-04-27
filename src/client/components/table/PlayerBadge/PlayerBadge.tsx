@@ -28,7 +28,7 @@ const TurnBadge = () => {
 };
 
 const InjureBadge = () => {
-	return <div className={'injureBadge'}/>
+	return <div className={'infectBadge'}/>
 };
 const ThingBadge = () => {
 	return <div className={'thingBadge'}/>

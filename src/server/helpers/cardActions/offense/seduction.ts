@@ -5,11 +5,11 @@ import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {each} from 'lodash';
 
 export const seductionAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
-	discardCard({game, player, cardUniqueId: card.uniqueId});
+	player.discardCard(card.uniqueId);
 	player.changeTurnState(ETurnState.inCardActionProgress);
 	const allPlayersExeptCurrent = player.getAllPlayablePlayersExceptCurrent();
 	game.turnContext = {

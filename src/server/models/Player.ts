@@ -5,11 +5,11 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {shuffle} from 'server/helpers/util';
 import {EEventID} from 'shared/enum/cards';
-import {ETurnContextType} from 'shared/enum/turnContextType';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import INotificationAction from 'shared/interfaces/notification';
 import {processTurnContext} from 'server/helpers/playerHelpers';
 import {ENotificationAction} from 'shared/enum/notifications';
+import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 
 export class Player {
 	id = null;
@@ -67,10 +67,58 @@ export class Player {
 			case ETurnState.inCardAction:
 				return this.processNotificationAction({ type: ENotificationAction.turnCard, text: 'Сбрось или сыграй карту' });
 			case ETurnState.idle:
+			case ETurnState.dead:
 				return this.currentAction = null;
 			default:
 				return;
 		}
+	}
+	isAlive() {
+		if (this.state===EPlayerState.door) return false;
+		if (this.turnState===ETurnState.dead) return false;
+		return true;
+	}
+
+	isOverInfected() {
+		//Если у игрока на руке оказались все карты заражения, он умирает
+		if (this.hand.length < 4) return false;
+		const cleanCard = find(this.hand, card => card.id !== EEventID.infect);
+		if (!cleanCard) {
+			return true
+		}
+		return false;
+	}
+
+	getCard(card: ICardEvent) {
+		this.hand.push(card);
+		console.log(`Игрок ${this.nickname} получил карту ${card.id}`)
+		//this.checkOverInfect();
+	}
+
+	discardCard(cardUniqueId: string) {
+		const game = this.game;
+		if (!game.gameInProcess) return;
+		console.log('CARD UNIQUE ID', cardUniqueId)
+		const card = this.getCardByUniqueId(cardUniqueId);
+		//if (!card) return;
+/*		if (card.id === EEventID.thing) {
+			game.notifyAllPlayers(formatPlayerNotification({
+			  player: this,
+			  notification: {
+				type: ENotificationAction.info,
+				text: `Игра закончена! ${this.nickname} не справился со своим коварным заданием... Люди победили. Нечто сожжен`,
+			  },
+			}))
+			game.addLog(`Игра закончена! ${this.nickname} не справился со своим коварным заданием...Люди победили. Нечто сожжен`)
+			game.end();
+			return;
+		}*/
+
+		const discardCardIndex = findIndex(this.hand, (card) => card.uniqueId === cardUniqueId);
+		console.log(`Игрок ${this.nickname} убрал в колоду ${card.id}`)
+		this.game.discardedDeckPush(card);
+		this.hand.splice(discardCardIndex, 1);
+		//this.checkOverInfect();
 	}
 
 	register = ({nickname, game}: {nickname:string, game: Game}) => {
@@ -89,6 +137,7 @@ export class Player {
 	};
 
 	changeTurnState = (newTurnState: ETurnState) => {
+		if (!this.game.gameInProcess) return;
 		if (this.state === EPlayerState.door) return;
 		this.turnState = newTurnState
 		this.processTurnState(newTurnState);
@@ -167,8 +216,19 @@ export class Player {
 	};
 
 	getNextPlayer = () => {
+		if (!this.game) {
+			console.log('GAME Не задан у игрока', this.nickname)
+			throw new Error()
+		}
 		return this.game.getPlayerByPosition({playerId: this.id, isNext:true});
 	}
+
+	getNextAlivePlayer = () => {
+		const nextPlayer = this.getNextPlayer();
+		if (!nextPlayer.isAlive()) return nextPlayer.getNextAlivePlayer();
+		return nextPlayer
+	}
+
 	getPrevPlayer = () => {
 		return this.game.getPlayerByPosition({playerId: this.id, isNext:false});
 	}

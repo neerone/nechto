@@ -101,10 +101,10 @@ const events: {[key: string]: ICardEvent} = {
       "Поменяйтесь одной картой с любым игроком по вашему выбору если он не на карантине. Ваш ход заканчивается.",
     playersCount: [4,4,6,7,8,10,11],
   },
-  [EEventID.injure]: {
+  [EEventID.infect]: {
     type: ECardType.event,
-    id: EEventID.injure,
-    eventType: EEventType.injure,
+    id: EEventID.infect,
+    eventType: EEventType.infect,
     description:
       "Получив эту карту от другого игрока вы становитесь зараженым и обязаны держать её на руке до конца игры.",
     playersCount: [4,4,4,4,4,4,4,4,6,6,7,7,8,9,9,10,10,11,11,11],
@@ -275,6 +275,7 @@ each(fulldeck, card => {
 export const getCard = (cardId) : ICardEvent => {
   if (!fullDeckObject[cardId]) {
     console.error('Не удается найти карту ',  cardId)
+    throw new Error('Алярм')
   }
   return {...fullDeckObject[cardId], uniqueId: uniqueId('card_')}
 }

@@ -17,7 +17,7 @@ import {fearAct} from 'server/helpers/cardActions/defense/fear';
 import {missAct} from 'server/helpers/cardActions/defense/miss';
 import {noThanksAct} from 'server/helpers/cardActions/defense/noThanks';
 import {barricadeAct, barricadeSelect} from 'server/helpers/cardActions/offense/barricade';
-import {blindDateAct, blindDateSelect} from 'server/helpers/cardActions/panic/blindDate';
+import {blindDateSelect} from 'server/helpers/cardActions/panic/blindDate';
 import {oneTwoPlayerSelect} from 'server/helpers/cardActions/panic/oneTwo';
 import {onlyBetweenUsSelect} from 'server/helpers/cardActions/panic/onlyBetweenUs';
 import {forgetfullnessSelect} from 'server/helpers/cardActions/panic/forgetfulness';

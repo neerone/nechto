@@ -5,7 +5,7 @@ import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {EEventID} from 'shared/enum/cards';
 import {find} from 'lodash';
 
@@ -15,7 +15,7 @@ export const positionswapAct = ({card, game, player} : {card:ICardEvent, game: G
 		offensePlayer: player,
 		defensePlayer: null,
 	};
-	discardCard({game, player, cardUniqueId: card.uniqueId});
+	player.discardCard(card.uniqueId);
 	player.changeTurnState(ETurnState.inCardActionProgress);
     player.notify(formatPlayerNotification({
       player: player,
@@ -79,7 +79,9 @@ export const positionswapFinish = ({game, player, action}: {game:Game, player:Pl
 		return;
 	}
 	game.addLog(`Игрок ${defensePlayer.nickname} применил "Мне и здесь неплохо" и остался на месте`);
-	discardCard({game, player, cardUniqueId: leaveMeAloneCard.uniqueId});
+	//discardCard({game, player, cardUniqueId: leaveMeAloneCard.uniqueId});
+	player.discardCard(leaveMeAloneCard.uniqueId)
+
 	game.grabEventCardFromDeck({player});
 	offensePlayer.changeTurnState(ETurnState.inOffenseTrade);
 

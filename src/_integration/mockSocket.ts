@@ -8,7 +8,6 @@ class MockSocket {
 	constructor(isTestTag) {
 		this.isTest = isTestTag;
 		if (isTestTag) {
-			console.log('IS TEST TAG', isTestTag)
 			const mockCallback = jest.fn();
 			this.spy = mockCallback
 		}

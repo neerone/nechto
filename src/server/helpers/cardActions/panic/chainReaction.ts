@@ -3,7 +3,7 @@ import {Player} from 'server/models/Player';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {each, filter, find, remove} from 'lodash';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {EEventID} from 'shared/enum/cards';
 
 export const getNextChainReactionPlayer = ({game, currentPlayer}:  {game: Game, currentPlayer: Player}) => {
@@ -49,9 +49,9 @@ export const chainReactionTrade = ({game, player, cardUniqueId}: {game: Game, pl
 		each(game.turnContext.playersPick, ({player: pickPlayer, card: pickCard}) => {
 			const nextPlayer = getNextChainReactionPlayer({game, currentPlayer: pickPlayer});
 			if (!nextPlayer) return;
-			nextPlayer.hand.push(pickCard);
-			if (pickCard.id=== EEventID.injure) {
-				game.injurePlayer(nextPlayer.id);
+			nextPlayer.getCard(pickCard);
+			if (pickCard.id=== EEventID.infect) {
+				game.infectPlayer(nextPlayer.id);
 			}
 		})
 		game.endTurn(game.turnContext.startPlayer.id)

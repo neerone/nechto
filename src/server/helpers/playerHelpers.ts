@@ -3,6 +3,7 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
 export const processTurnContext = ({player, turnState}: {player:Player, turnState: ETurnState}) => {
+	if (!player.isAlive()) return;
 	if (turnState === ETurnState.inOffenseTrade) {
 		const context = player.game.turnContext;
 		let playerToTrade: Player | null =  null;
@@ -10,7 +11,10 @@ export const processTurnContext = ({player, turnState}: {player:Player, turnStat
 			playerToTrade = context.defensePlayer
 		} else {
 			playerToTrade = player.getNextPlayer();
+			console.log('PLAYER',player.nickname, 'PLAYER TO TRADE', playerToTrade.nickname, player.game.turnContext && player.game.turnContext.type);
 		}
+
+
 	    if (playerToTrade.state === EPlayerState.door && !player.game.turnContext) {
 			player.game.addLog(`Игрок ${player.nickname} не меняется из-за заколоченной двери`);
 			player.game.endTurn(player.id);
@@ -21,6 +25,12 @@ export const processTurnContext = ({player, turnState}: {player:Player, turnStat
 			player.game.endTurn(player.id);
 			return
 	    }
+	    if (playerToTrade === player) {
+			player.game.addLog(`Игрок не может поменяться сам с собой`);
+			player.game.endTurn(player.id);
+			return
+	    }
+
 	    if (player.game.turnContext === null) {
 		    player.game.turnContext = {
 		      type: ETurnContextType.trade,

@@ -4,12 +4,12 @@ import {ENotificationAction} from 'shared/enum/notifications';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
-import {discardCard} from 'server/helpers/discardCard';
 import {getCard} from 'shared/constant/cards';
 import {EEventID} from 'shared/enum/cards';
 
 export const lookAroundAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
-	discardCard({game, player, cardUniqueId: card.uniqueId});
+	//player.discardCard(card.uniqueId);
+	player.discardCard(card.uniqueId);
 	game.isClockwise = !game.isClockwise;
 	player.changeTurnState(ETurnState.inCardActionProgress);
     game.notifyAllPlayers(formatPlayerNotification({

@@ -27,7 +27,7 @@ export const gameStarter = (game: Game) => {
 	const shuffledDeck = shuffle(filteredDeck);
 
 	const [playableCards, otherCards] = reduce(shuffledDeck, ([events, other], card) => {
-		if (card.type === ECardType.event && card.id !== EEventID.injure && card.id !== EEventID.thing) {
+		if (card.type === ECardType.event && card.id !== EEventID.infect && card.id !== EEventID.thing) {
 			events.push(card);
 		} else {
 			if (gameServer.isMock && card.type === ECardType.panic) {
@@ -97,10 +97,10 @@ export const gameStarter = (game: Game) => {
 	//	if (!neerone) neerone = game.players[0];
 	//	//neerone.quarantine = 3;
 	//	neerone.hand.splice(0,4);
-	//	neerone.hand.push(getCard(EEventID.axe));
-	//	neerone.hand.push(getCard(EEventID.fear));
-	//	neerone.hand.push(getCard(EEventID.lookaround));
-	//	neerone.hand.push(getCard(EEventID.analysis));
+	//	neerone.getCard(getCard(EEventID.axe));
+	//	neerone.getCard(getCard(EEventID.fear));
+	//	neerone.getCard(getCard(EEventID.lookaround));
+	//	neerone.getCard(getCard(EEventID.analysis));
 //
 	//	game.deck.splice(0,1, getPanic(EPanicID.chainReaction));
 	//	//console.log(neerone);

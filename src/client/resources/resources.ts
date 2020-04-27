@@ -10,7 +10,7 @@ import lookaround from "client/resources/cards/lookaround.png";
 import whiskey from "client/resources/cards/whiskey.png";
 import barricade from "client/resources/cards/barricade.png";
 import seduction from "client/resources/cards/seduction.png";
-import injure from "client/resources/cards/injure.png";
+import infect from "client/resources/cards/infect.png";
 import quarantine from "client/resources/cards/quarantine.png";
 import noFire from "client/resources/cards/noFire.png";
 import analysis from "client/resources/cards/analysis.png";
@@ -46,7 +46,7 @@ lookaround,
 whiskey,
 barricade,
 seduction,
-injure,
+infect,
 quarantine,
 noFire,
 analysis,

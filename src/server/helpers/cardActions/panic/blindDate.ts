@@ -1,7 +1,7 @@
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {ETurnState} from 'shared/enum/player';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {notifyPlayerDiscardCards} from 'server/helpers/cardActions/panic/forgetfulness';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
@@ -22,9 +22,10 @@ export const blindDateAct = ({game, player}: {game:Game, player:Player}) => {
 
 export const blindDateSelect = ({game, cardUniqueId, player}: {game:Game, player: Player, cardUniqueId: string}) => {
 	console.log('BLIND DATE CARD UNIQUE', cardUniqueId)
-	discardCard({game, player, cardUniqueId: cardUniqueId});
+	//discardCard({game, player, cardUniqueId: cardUniqueId});
+	player.discardCard(cardUniqueId);
 	const first = game.pickFirstEventCard();
-	player.hand.push(first);
+	player.getCard(first);
 	game.turnContext = null;
 	game.endTurn(player.id);
 }

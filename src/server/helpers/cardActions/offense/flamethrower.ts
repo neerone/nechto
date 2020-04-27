@@ -5,7 +5,7 @@ import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {getCard} from 'shared/constant/cards';
 import {EEventID} from 'shared/enum/cards';
 import {each, find, map} from 'lodash';
@@ -17,7 +17,7 @@ export const flamethrowerAct = ({card, game, player} : {card:ICardEvent, game: G
 		defensePlayer: null,
 	};
 
-	discardCard({game, player, cardUniqueId: card.uniqueId});
+	player.discardCard(card.uniqueId);
 	player.changeTurnState(ETurnState.inCardActionProgress);
     player.notify(formatPlayerNotification({
       player: player,
@@ -72,32 +72,18 @@ export const flamethrowerFinish = ({game, player, action} : {game: Game, player:
 	const {defensePlayer, offensePlayer} = game.turnContext;
 	switch (action) {
 		case "burn": {
+			game.killPlayer(defensePlayer)
+
 			game.notifyAllPlayers(formatPlayerNotification({
-		      player: player,
-		      notification: {
+			  player: player,
+			  notification: {
 				type: ENotificationAction.okayCard,
 				cards: [getCard(EEventID.flamethrower)],
 				text: `Игрок ${defensePlayer.nickname} был заживо сожжен игроком ${offensePlayer.nickname} и выбывает из игры`,
-		      },
-		    }));
+			  },
+			}));
 			game.addLog(`Игрок ${defensePlayer.nickname} был заживо сожжен игроком ${offensePlayer.nickname} и выбывает из игры`);
-			if (defensePlayer.isThing) {
-				game.notifyAllPlayers(formatPlayerNotification({
-			      player: player,
-			      notification: {
-					type: ENotificationAction.info,
-					text: `Игра закончена! ${defensePlayer.nickname} не справился со своим коварным заданием... Люди победили.`,
-			      },
-			    }))
-				game.addLog(`Игра закончена! ${defensePlayer.nickname} не справился со своим коварным заданием...`)
-			}
-			game.playersList = game.playersList.filter(pId => pId !== defensePlayer.id);
-			player.changeTurnState(ETurnState.dead)
 
-			const discardCardIds = defensePlayer.hand.map(cardToDiscard => cardToDiscard.uniqueId)
-			each(discardCardIds, cardUniqueId => {
-				discardCard({player: defensePlayer, game, cardUniqueId})
-			});
 			break;
 		}
 		case "noFire": {
@@ -110,7 +96,8 @@ export const flamethrowerFinish = ({game, player, action} : {game: Game, player:
 					text: `Игрок ${defensePlayer.nickname} использовал "Никакого шашлыка" и спасся от огнемета!`,
 				},
 		    }));
-			discardCard({player: defensePlayer, cardUniqueId: noFireCard.uniqueId, game});
+			//discardCard({player: defensePlayer, cardUniqueId: noFireCard.uniqueId, game});
+			defensePlayer.discardCard(noFireCard.uniqueId)
 			game.grabEventCardFromDeck({player});
 			break;
 		}

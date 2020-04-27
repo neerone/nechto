@@ -63,13 +63,13 @@ describe('trade logic',  () => {
 
 	});
 
-	it('should injure by trading injure', () => {
+	it('should infect by trading infect', () => {
 		const [gameServer, game, offensePlayer] = createMockGameServer();
 		const nextPlayer = offensePlayer.getNextPlayer();
 		offensePlayer.isThing = true;
 		offensePlayer.hand.splice(0,1);
 		nextPlayer.isInjured = false;
-		offensePlayer.hand.splice(0,2, getCard(EEventID.analysis), getCard(EEventID.injure));
+		offensePlayer.hand.splice(0,2, getCard(EEventID.analysis), getCard(EEventID.infect));
 		const discardCard = offensePlayer.hand[0];
 		const tradeCard = offensePlayer.hand[1];
 
@@ -84,7 +84,7 @@ describe('trade logic',  () => {
 			actionType: EPlayerActionType.cardDiscard
 		});
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
-		expect(game.turnContext.type).toBe(ETurnContextType.trade)
+		expect(game.turnContext.type).toBe(ETurnContextType.trade);
 
 
 		expect(nextPlayer.isInjured).toBe(false);
@@ -117,7 +117,7 @@ describe('trade logic',  () => {
 
 	});
 
-	it('should game end if all injured', () => {
+	it('should game end if all infectd', () => {
 		const [gameServer, game, offensePlayer, nextPlayer, APlayer,BPlayer,CPlayer] = createMockGameServer();
 		APlayer.isInjured = true;
 		BPlayer.isInjured = true;
@@ -126,7 +126,7 @@ describe('trade logic',  () => {
 		offensePlayer.isThing = true;
 		offensePlayer.hand.splice(0,1);
 		nextPlayer.isInjured = false;
-		offensePlayer.hand.splice(0,2, getCard(EEventID.analysis), getCard(EEventID.injure));
+		offensePlayer.hand.splice(0,2, getCard(EEventID.analysis), getCard(EEventID.infect));
 		const discardCard = offensePlayer.hand[0];
 		const tradeCard = offensePlayer.hand[1];
 

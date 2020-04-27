@@ -32,7 +32,7 @@ export enum EEventID {
 	whiskey = 'whiskey',
 	barricade = 'barricade',
 	seduction = 'seduction',
-	injure = 'injure',
+	infect = 'infect',
 	quarantine = 'quarantine',
 	noFire = 'noFire',
 	analysis = 'analysis',
@@ -45,7 +45,7 @@ export enum EEventType {
 	playable = 'playable',
 	antiTrade = 'antiTrade',
 	antiSwap = 'antiSwap',
-	injure = 'injure',
+	infect = 'infect',
 	antiFire = 'antiFire',
 	axe = 'axe',
 }

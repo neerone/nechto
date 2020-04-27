@@ -6,7 +6,7 @@ import {ETurnContextType} from 'shared/enum/turnContextType';
 import {uniqueId} from 'lodash';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {checkAllDeckCards} from '_integration/helpers';
 
 export const barricadeAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
@@ -14,7 +14,7 @@ export const barricadeAct = ({card, game, player} : {card:ICardEvent, game: Game
 		type: ETurnContextType.barricadePersonSelect,
 		playerId: player.id,
 	};
-	discardCard({game, player, cardUniqueId: card.uniqueId});
+	player.discardCard(card.uniqueId);
 	player.changeTurnState(ETurnState.inCardActionProgress);
     player.notify(formatPlayerNotification({
       player: player,
@@ -32,6 +32,7 @@ export const barricadeSelect = ({game, player, selectedPlayerId} : {game: Game, 
 	}
 	game.turnContext = null;
 	const doorPlayer = new Player({socket: null, playerState: EPlayerState.door});
+	doorPlayer.game = game;
 	doorPlayer.id = uniqueId('dver_');
 	doorPlayer.nickname = 'Дверь';
 	game.players[doorPlayer.id]= doorPlayer;

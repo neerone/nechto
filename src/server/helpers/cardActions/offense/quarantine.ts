@@ -5,7 +5,7 @@ import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {getCard} from 'shared/constant/cards';
 import {EEventID} from 'shared/enum/cards';
 
@@ -15,7 +15,7 @@ export const quarantineAct = ({card, game, player} : {card:ICardEvent, game: Gam
 		playerId: player.id,
 	};
 
-	discardCard({game, player, cardUniqueId: card.uniqueId});
+	player.discardCard(card.uniqueId);
 	player.changeTurnState(ETurnState.inCardActionProgress);
     player.notify(formatPlayerNotification({
       player: player,
@@ -44,6 +44,7 @@ export const quarantineSelect = ({game, player, selectedPlayerId} : {game: Game,
     }));
 	game.addLog(`Игрок ${selectedPlayer.nickname} теперь на карантине`);
 	player.changeTurnState(ETurnState.idle);
-	const nextPlayer = game.getPlayerByPosition({playerId:player.id, isNext:true});
-	game.changeTurn(nextPlayer.id)
+	//const nextPlayer = player.getNextAlivePlayer();
+	game.endTurn(player.id)
+	//game.changeTurn(nextPlayer.id)
 };

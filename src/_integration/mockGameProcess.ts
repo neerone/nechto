@@ -109,7 +109,7 @@ export function mockGameProcess(player) {
 		gameServer.isMock = true;
 
 		//testDefenseCard({player, cards: [
-		//	getCard(EEventID.injure),
+		//	getCard(EEventID.infect),
 		//	getCard(EEventID.fear),
 		//	getCard(EEventID.noThanks),
 		//	getCard(EEventID.miss),

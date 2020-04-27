@@ -23,8 +23,9 @@ function getRandomItemFromArray<A extends any[]>(arr: A): ArrayElement<A> {
 
 let getFirstPlayableCardId = (game, player) => {
 	const playableCards = map(player.hand, card => {
-		return {uniqueId: card.uniqueId, menu: getCardActions(game, player, card)};
+		return {uniqueId: card.uniqueId, menu: getCardActions(game, player, card), type: card.id};
 	})
+	console.log(player.nickname, playableCards)
 	const sortPlayableCards = sortBy(playableCards, ({uniqueId,menu}) => {
 		return menu.length
 	});
@@ -103,33 +104,62 @@ const botPlayerTurnCardLogic = (gameServer: GameServer, player: Player, game: Ga
 };
 
 const botAct = (gameServer: GameServer, player: Player, game: Game) => {
-	if (!player.currentAction) return;
+	if (!player.currentAction) return false;
 	switch (player.currentAction.type) {
 		case ENotificationAction.selectCard:
-			return botSelectCardLogic(gameServer, player, game);
+			botSelectCardLogic(gameServer, player, game);
+			return true;
 		case ENotificationAction.offenseTradeCard:
 		case ENotificationAction.defenseTradeCard:
-			return botTradeCardLogic(gameServer, player, game);
+			botTradeCardLogic(gameServer, player, game);
+			return true;
 		case ENotificationAction.actionDecision:
-			return botActionDecisionLogic(gameServer, player, game);
+			botActionDecisionLogic(gameServer, player, game);
+			return true;
 		case ENotificationAction.playerSelect:
-			return botPlayerSelectLogic(gameServer, player, game);
+			botPlayerSelectLogic(gameServer, player, game);
+			return true;
 		case ENotificationAction.turnCard:
-			return botPlayerTurnCardLogic(gameServer, player, game);
+			botPlayerTurnCardLogic(gameServer, player, game);
+			return true;
 	}
+	return false;
 };
 
 const startBrutforce = () => {
 	const [gameServer, game] = createBrutforceServer();
 
-	while(true) {
+	let stop = false;
+	while(!stop) {
+		let actioniterated = false;
 		each(game.playersList, pId => {
 			const player = game.players[pId];
-			botAct(gameServer, player, game)
+			try {
+				const iterated = botAct(gameServer, player, game)
+				if (!actioniterated) actioniterated = iterated;
+				counter++;
+			} catch(e) {
+				printBruteforceReport(counter, game);
+				throw e;
+			}
 		})
+
+		if (!actioniterated) {
+			stop = true;
+			printBruteforceReport(counter, game);
+		}
 	}
 }
 
+const printBruteforceReport = (counter, game:Game) => {
+	console.log(`PLAYERS INFO over ${counter} iterations`)
+	each(game.playersList, pId => {
+		const player = game.players[pId];
+		console.log(`
+			PLAYER:  ${player.nickname} ${player.turnState.toUpperCase()} injured: ${player.isInjured} thing: ${player.isThing} 
+			HAND`, player.hand && player.hand.map(c => c.id));
+	})
+};
 
 startBrutforce();
 

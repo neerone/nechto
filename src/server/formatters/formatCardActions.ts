@@ -8,16 +8,16 @@ import {ICardEvent} from 'shared/interfaces/cards';
 import {Player} from 'server/models/Player';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
-const injuresCount = (player: Player) => {
-	let injures = 0
+const infectsCount = (player: Player) => {
+	let infects = 0
 	each(player.hand, card => {
-		if (card.id === EEventID.injure) {
-			injures = injures+1
+		if (card.id === EEventID.infect) {
+			infects = infects+1
 		}
 	})
-	return  injures;
-	//const injures = filter(player.hand, { id: EEventID.injure});
-	//return injures.length;
+	return  infects;
+	//const infects = filter(player.hand, { id: EEventID.infect});
+	//return infects.length;
 };
 
 const getTargetPlayer = (game:Game, player: Player): Player | null => {
@@ -41,6 +41,7 @@ const getTargetPlayer = (game:Game, player: Player): Player | null => {
 
 export const getCardActions = (game: Game, player: Player, card: ICardEvent): ICardEventMenuItem[] => {
 	let actions : ICardEventMenuItem[] = [];
+	if (!player.isAlive()) return [];
 	if (!card.eventType) return actions;
 	if (card.id === EEventID.thing) return [];
 
@@ -52,7 +53,7 @@ export const getCardActions = (game: Game, player: Player, card: ICardEvent): IC
 	const isTargetPlayerThing = targetPlayer && targetPlayer.isThing;
 
 	//у инжуры дроп только если не заражен ИЛИ карт заражения больше 1 или игрок нечто
-	const canDiscardInjure = !isCurrentPlayerInjured || injuresCount(player) > 1 || isCurrentPlayerThing;
+	const canDiscardInjure = !isCurrentPlayerInjured || infectsCount(player) > 1 || isCurrentPlayerThing;
 	const canTradeInjure = isCurrentPlayerThing || (isCurrentPlayerInjured && isTargetPlayerThing);
 
 
@@ -61,7 +62,7 @@ export const getCardActions = (game: Game, player: Player, card: ICardEvent): IC
 		case ETurnState.idle:
 			return actions;
 		case ETurnState.inCardAction:
-			if (card.id === EEventID.injure && !canDiscardInjure) {
+			if (card.id === EEventID.infect && !canDiscardInjure) {
 				return [];
 			}
 
@@ -74,14 +75,14 @@ export const getCardActions = (game: Game, player: Player, card: ICardEvent): IC
 			actions.push({ menuType: EPlayerActionType.cardDiscard});
 			return actions;
 		case ETurnState.inOffenseTrade:
-			if (card.eventType === EEventType.injure) {
+			if (card.eventType === EEventType.infect) {
 				if (canTradeInjure)	actions.push({ menuType: EPlayerActionType.cardTrade});
 				return actions;
 			}
 			actions.push({ menuType: EPlayerActionType.cardTrade});
 			return actions;
 		case ETurnState.inDefenseTrade:
-			if (card.id === EEventID.injure) {
+			if (card.id === EEventID.infect) {
 				if (canTradeInjure) {
 					actions.push({ menuType: EPlayerActionType.cardTrade});
 				}

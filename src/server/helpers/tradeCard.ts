@@ -16,6 +16,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   }
   const context = game.turnContext;
   if (!context || context.type !== ETurnContextType.trade) {
+    console.info('CONTEXT', context && context.type)
     throw new Error('Торговля произошла без контекста trade');
   }
   const isOffenseTrade = player.turnState === ETurnState.inOffenseTrade;
@@ -24,6 +25,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   if (isOffenseTrade) {
     remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
     playerToTrade.changeTurnState(ETurnState.inDefenseTrade);
+
     player.changeTurnState(ETurnState.idle);
     game.addLog(`Игрок ${player.nickname} передает карту для обмена игроку ${playerToTrade.nickname}`);
     game.turnContext = {
@@ -50,7 +52,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   const offensePlayerCard = getCard(context.offenseCardId);
   const defensePlayerCard = tradingCard;
   /* OFFENSE CARD PUSH */
-  offensePlayer.hand.push(defensePlayerCard);
+  offensePlayer.getCard(defensePlayerCard);
   offensePlayer.notify(formatPlayerNotification({
     player: player,
     notification: {
@@ -59,12 +61,12 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
       text: `Игрок ${player.nickname} дал эту карту`,
     },
   }));
-  if (defensePlayerCard.id=== EEventID.injure) {
-    game.injurePlayer(offensePlayer.id);
+  if (defensePlayerCard.id=== EEventID.infect) {
+    game.infectPlayer(offensePlayer.id);
   }
 
   /* DEFENSE CARD PUSH */
-  defensePlayer.hand.push(offensePlayerCard);
+  defensePlayer.getCard(offensePlayerCard);
   defensePlayer.notify(formatPlayerNotification({
     player: defensePlayer,
     notification: {
@@ -73,8 +75,8 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
       text: `Игрок ${offensePlayer.nickname} дал эту карту`,
     },
   }));
-  if (offensePlayerCard.id=== EEventID.injure) {
-    game.injurePlayer(defensePlayer.id);
+  if (offensePlayerCard.id=== EEventID.infect) {
+    game.infectPlayer(defensePlayer.id);
   }
   defensePlayer.changeTurnState(ETurnState.idle)
 

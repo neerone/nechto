@@ -6,7 +6,7 @@ import {ENotificationAction} from 'shared/enum/notifications';
 import {clone, find} from 'lodash';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import {EPlayerActionType} from 'shared/enum/playerActions';
-import {discardCard} from 'server/helpers/discardCard';
+
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import INotificationAction from 'shared/interfaces/notification';
 
@@ -49,7 +49,8 @@ export const forgetfullnessSelect = ({game, cardUniqueId, player}: {game:Game, p
 	if (!game.turnContext || game.turnContext.type !== ETurnContextType.forgetfullnessSelect) {
 		throw new Error('Забывчивость зафакапилась')
 	}
-	discardCard({game, player, cardUniqueId: cardUniqueId});
+	//discardCard({game, player, cardUniqueId: cardUniqueId});
+	player.discardCard(cardUniqueId)
 	game.turnContext.cards.push(cardUniqueId);
 
 	if (game.turnContext.cards.length < 3) {
@@ -63,9 +64,9 @@ export const forgetfullnessSelect = ({game, cardUniqueId, player}: {game:Game, p
 	const first = game.pickFirstEventCard();
 	const second = game.pickFirstEventCard();
 	const third = game.pickFirstEventCard();
-	player.hand.push(first);
-	player.hand.push(second);
-	player.hand.push(third);
+	player.getCard(first);
+	player.getCard(second);
+	player.getCard(third);
 	game.turnContext = null;
 	player.changeTurnState(ETurnState.inOffenseTrade)
 }

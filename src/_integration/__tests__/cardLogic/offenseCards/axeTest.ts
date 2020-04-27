@@ -34,7 +34,7 @@ describe('axe test',  () => {
 			actionType: EPlayerActionType.playerSelect
 		});
 		//Должна поставиться стена
-		const door = game.getPlayerByPosition({playerId: offensePlayer.id, isNext:true});
+		const door = offensePlayer.getNextPlayer();
 		expect(door.state).toBe(EPlayerState.door);
 		//Не должно быть старой картой barricade, но должна быть новая
 		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: barricade.uniqueId}));
@@ -73,7 +73,7 @@ describe('axe test',  () => {
 
 		//т.к теперь ходит нирон, у него 5 карт  на руке
 		expect(checkAllDeckCards(game, false)).toBe(true);
-
+		console.log("OK2")
 	});
 
 	it('axe should break the quarantine', () => {
@@ -113,7 +113,7 @@ describe('axe test',  () => {
 		expect(offensePlayer.quarantine).toBe(0);
 
 		expect(checkAllDeckCards(game, false)).toBe(true);
-
+		console.log("OK3")
 	});
 
 });

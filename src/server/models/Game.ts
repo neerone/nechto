@@ -276,15 +276,15 @@ export class Game {
     actionType,
     cardUniqueId,
     selectedPlayerId,
-    actionContext
+    action,
   }: {
     player:Player,
     actionType: EPlayerActionType,
     cardUniqueId: string,
     selectedPlayerId:string,
-    actionContext?:any
+    action? : string;
   }) {
-
+    if (!this.gameInProcess) return;
     if (cardUniqueId) {
       const card = find(player.hand, {uniqueId: cardUniqueId})
       console.log(`Player ${player.nickname} igraet ${actionType} kartoi ${cardUniqueId} - ${card && card.id}`);
@@ -307,24 +307,23 @@ export class Game {
         this.updateGame();
         return;
       case EPlayerActionType.cardAct:
-        actCard({game: this, player, cardUniqueId, actionContext});
+        actCard({game: this, player, cardUniqueId});
         this.updateGame();
         return;
       case EPlayerActionType.cardSelect:
-        selectCard({game: this, player, cardUniqueId, actionContext});
+        selectCard({game: this, player, cardUniqueId});
         this.updateGame();
         return;
       case EPlayerActionType.playerSelect:
-        selectPlayer({game: this, player, selectedPlayerId, actionContext});
+        selectPlayer({game: this, player, selectedPlayerId});
+        this.updateGame();
+        return;
+      case EPlayerActionType.playerSelect:
+        console.log(`Player ${player.nickname} выбирает action ${action}`)
+        playerActionDecision({game: this, player, action});
         this.updateGame();
         return;
     }
-  };
-
-  actionDecision = ({player, action}) => {
-    console.log(`Player ${player.nickname} выбирает action ${action}`)
-    playerActionDecision({game: this, player, action});
-    this.updateGame();
   };
 
   swapPlayers = (AId,BId) => {

@@ -6,7 +6,7 @@ import {find} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards} from '_integration/helpers';
 import {ENotificationAction} from 'shared/enum/notifications';
-import {testPlayerAction, testPlayerActionDecision} from '_integration/testPlayerActionsDecisions';
+import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
 
@@ -61,7 +61,8 @@ describe('leavemealone test',  () => {
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
-		testPlayerActionDecision(gameServer, game, {
+		testPlayerAction(gameServer, game, {
+			actionType: EPlayerActionType.actionDecision,
 			player:defensePlayer,
 			action: 'cancelSwap',
 		});
@@ -135,7 +136,8 @@ describe('leavemealone test',  () => {
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
-		testPlayerActionDecision(gameServer, game, {
+		testPlayerAction(gameServer, game, {
+			actionType: EPlayerActionType.actionDecision,
 			player:defensePlayer,
 			action: 'cancelSwap',
 		});
@@ -208,7 +210,8 @@ describe('leavemealone test',  () => {
 		const initialDefensePosition = game.playersList.indexOf(defensePlayer.id);
 		const initialOffensePosition = game.playersList.indexOf(offensePlayer.id);
 
-		testPlayerActionDecision(gameServer, game, {
+		testPlayerAction(gameServer, game, {
+			actionType: EPlayerActionType.actionDecision,
 			player:defensePlayer,
 			action: 'swap',
 		});

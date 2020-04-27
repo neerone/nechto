@@ -62,19 +62,19 @@ class GameServer {
     actionType,
     selectedPlayerId,
     cardUniqueId,
-    actionContext
+    action
   }: {
     player:Player,
     actionType: EPlayerActionType,
     cardUniqueId?: string,
     selectedPlayerId?:string,
-    actionContext?: any
+    action?: string
   }) {
-    player.game.cardAction({player, actionType, cardUniqueId, selectedPlayerId, actionContext})
+    player.game.cardAction({player, actionType, cardUniqueId, selectedPlayerId, action})
   }
-  actionDecision({player, action}) {
+/*  actionDecision({player, action}) {
     player.game.actionDecision({player, action})
-  }
+  }*/
 }
 
 const gameServer = new GameServer();

@@ -122,10 +122,10 @@ describe('trade logic',  () => {
 		APlayer.isInjured = true;
 		BPlayer.isInjured = true;
 		CPlayer.isInjured = true;
+		nextPlayer.isInjured = false;
 
 		offensePlayer.isThing = true;
 		offensePlayer.hand.splice(0,1);
-		nextPlayer.isInjured = false;
 		offensePlayer.hand.splice(0,2, getCard(EEventID.analysis), getCard(EEventID.infect));
 		const discardCard = offensePlayer.hand[0];
 		const tradeCard = offensePlayer.hand[1];

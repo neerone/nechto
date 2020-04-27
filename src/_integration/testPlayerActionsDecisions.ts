@@ -14,13 +14,9 @@ interface IActionPayload  {
 	actionType: EPlayerActionType,
 	cardUniqueId?: string,
 	selectedPlayerId?:string,
-	actionContext?: any
+	action?: any
 }
 
-interface IActionDecisionPayload {
-	player:Player,
-	action:string,
-}
 
 
 export const testPlayerAction = (gameServer:GameServer, game: Game, payload: IActionPayload) => {
@@ -50,17 +46,13 @@ export const testPlayerAction = (gameServer:GameServer, game: Game, payload: IAc
 			expect(isPlayerCanSelectCard(game, player, payload.cardUniqueId)).toBe(true);
 			break;
 		}
+		case EPlayerActionType.actionDecision: {
+			if (!payload.action) throw new Error('Произошел вызов экшна без action' + JSON.stringify(payload));
+			if (!payload.player) throw new Error('Произошел вызов экшна без player' + JSON.stringify(payload));
+			expect(isPlayerCanSelectDesicion(game, player, payload.action)).toBe(true);
+			break;
+		}
 	}
 
 	gameServer.playerAction(payload);
 }
-
-export const testPlayerActionDecision = (gameServer:GameServer, game: Game, payload: IActionDecisionPayload) => {
-	if (!payload.action) throw new Error('Произошел вызов экшна без action' + JSON.stringify(payload));
-	if (!payload.player) throw new Error('Произошел вызов экшна без player' + JSON.stringify(payload));
-
-	const {player, action} = payload;
-	expect(isPlayerCanSelectDesicion(game, player, payload.action)).toBe(true);
-	gameServer.actionDecision(payload);
-}
-

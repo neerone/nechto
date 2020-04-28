@@ -34,6 +34,7 @@ export const tenacitySelect = ({game, player, cardUniqueId} : {game: Game, playe
 	if (game.turnContext.type !== ETurnContextType.tenacityCardSelect) {
 		throw new Error('Выбор упорства произошел без контекста tenacityCardSelect');
 	}
+	game.addLog(`Игрок ${player.nickname} играет карту "Упорство"`);
 	each(game.turnContext.cards, (card) => {
 		if (card.uniqueId === cardUniqueId) {
 			player.getCard(card);
@@ -41,7 +42,6 @@ export const tenacitySelect = ({game, player, cardUniqueId} : {game: Game, playe
 			game.discardedDeckPush(card);
 		}
 	});
-	game.addLog(`Игрок ${player.nickname} играет карту "Упорство"`);
 	game.turnContext = null;
 	player.changeTurnState(ETurnState.inCardAction)
 };

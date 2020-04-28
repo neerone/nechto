@@ -2,42 +2,86 @@ import {Player} from 'server/models/Player';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
+const processDeathByOverinfection = (player:Player) => {
+	const game = player.game;
+	const nextPlayer = player.getNextAlivePlayer();
+	game.addLog(`Какое несчастье. ${player.nickname} умер от перезаражения. Вместо него теперь играет ${nextPlayer.nickname}`)
+	game.killPlayer(player);
+	if (game.turnContext && game.turnContext.type === ETurnContextType.trade) {
+		if (game.turnContext.defensePlayer === player) {
+			nextPlayer.changeTurnState(ETurnState.inDefenseTrade)
+		}
+		if (game.turnContext.offensePlayer === player) {
+			game.turnContext = null;
+			game.changeTurn(nextPlayer.nickname)
+		}
+	} else {
+		game.turnContext = null;
+		game.changeTurn(nextPlayer.id)
+	}
+
+
+
+}
+
+const processOffenseTrade = (player) => {
+	const context = player.game.turnContext;
+	let playerToTrade: Player | null =  null;
+	if (context && context.type === ETurnContextType.trade && context.defensePlayer) {
+		playerToTrade = context.defensePlayer
+	} else {
+		playerToTrade = player.getNextPlayer();
+		console.log('PLAYER',player.nickname, 'PLAYER TO TRADE', playerToTrade.nickname, player.game.turnContext && player.game.turnContext.type);
+	}
+
+
+    if (playerToTrade.state === EPlayerState.door && !player.game.turnContext) {
+		player.game.addLog(`Игрок ${player.nickname} не меняется из-за заколоченной двери`);
+		player.game.endTurn(player.id);
+		return
+    }
+    if ((player.quarantine > 0 || playerToTrade.quarantine > 0) && !player.game.turnContext) {
+		player.game.addLog(`Игрок ${player.nickname} не меняется из-за карантина`);
+		player.game.endTurn(player.id);
+		return
+    }
+    if (playerToTrade === player) {
+		player.game.addLog(`Игрок не может поменяться сам с собой`);
+		player.game.endTurn(player.id);
+		return
+    }
+
+    if (player.game.turnContext === null) {
+	    player.game.turnContext = {
+	      type: ETurnContextType.trade,
+	      defensePlayer: playerToTrade,
+	      offensePlayer: player,
+	      offenseCardId: null,
+	    };
+    }
+    return;
+}
+
+const processDefenseTrade = (player) => {
+	const game = player.game;
+	if (game.turnContext.type === ETurnContextType.trade) {
+	    player.game.turnContext.defensePlayer = player;
+	}
+}
+
 export const processTurnContext = ({player, turnState}: {player:Player, turnState: ETurnState}) => {
 	if (!player.isAlive()) return;
-	if (turnState === ETurnState.inOffenseTrade) {
-		const context = player.game.turnContext;
-		let playerToTrade: Player | null =  null;
-		if (context && context.type === ETurnContextType.trade && context.defensePlayer) {
-			playerToTrade = context.defensePlayer
-		} else {
-			playerToTrade = player.getNextPlayer();
-			console.log('PLAYER',player.nickname, 'PLAYER TO TRADE', playerToTrade.nickname, player.game.turnContext && player.game.turnContext.type);
+
+	const isOverInfected = player.isOverInfected();
+	if (isOverInfected && (turnState === ETurnState.inOffenseTrade || turnState === ETurnState.inDefenseTrade)) {
+		return processDeathByOverinfection(player);
+	}
+	switch (turnState) {
+		case ETurnState.inOffenseTrade: {
+			return processOffenseTrade(player);
 		}
-
-
-	    if (playerToTrade.state === EPlayerState.door && !player.game.turnContext) {
-			player.game.addLog(`Игрок ${player.nickname} не меняется из-за заколоченной двери`);
-			player.game.endTurn(player.id);
-			return
-	    }
-	    if (player.quarantine > 0 && !player.game.turnContext) {
-			player.game.addLog(`Игрок ${player.nickname} не меняется из-за карантина`);
-			player.game.endTurn(player.id);
-			return
-	    }
-	    if (playerToTrade === player) {
-			player.game.addLog(`Игрок не может поменяться сам с собой`);
-			player.game.endTurn(player.id);
-			return
-	    }
-
-	    if (player.game.turnContext === null) {
-		    player.game.turnContext = {
-		      type: ETurnContextType.trade,
-		      defensePlayer: playerToTrade,
-		      offensePlayer: player,
-		      offenseCardId: null,
-		    };
-	    }
+		case ETurnState.inDefenseTrade: {
+			return processDefenseTrade(player);
+		}
 	}
 };

@@ -60,8 +60,8 @@ describe('nothanks test',  () => {
 
 
 		expect(defensePlayer.hand).not.toContainEqual(expect.objectContaining({ uniqueId: noThanksCard.uniqueId }));
-		//У него не должно быть той карты анализа, но должна появиться новая
-		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: analysisId}));
+		//У игрока должна быть старая карта анализа
+		expect(offensePlayer.hand).toContainEqual(expect.objectContaining({uniqueId: analysisId}));
 		expect(offensePlayer.hand).toContainEqual(expect.objectContaining({id: EEventID.analysis}));
 
 		expect(defensePlayer.turnState).toBe(ETurnState.inCardAction);

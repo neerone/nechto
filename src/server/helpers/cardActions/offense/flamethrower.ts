@@ -73,7 +73,7 @@ export const flamethrowerFinish = ({game, player, action} : {game: Game, player:
 	switch (action) {
 		case "burn": {
 			game.killPlayer(defensePlayer)
-
+			if (!game.gameInProcess) return;
 			game.notifyAllPlayers(formatPlayerNotification({
 			  player: player,
 			  notification: {

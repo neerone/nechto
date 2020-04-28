@@ -65,16 +65,29 @@ export class Game {
   }
 
   killPlayer = (player) => {
+
+	if (player.isThing) {
+		this.notifyAllPlayers(formatPlayerNotification({
+		  player: player,
+		  notification: {
+			type: ENotificationAction.info,
+			text: `Игра закончена! ${player.nickname} не справился со своим коварным заданием...`,
+		  },
+		}));
+		this.addLog(`Игра закончена! ${player.nickname} не справился со своим коварным заданием...`)
+		this.end('Нечто проиграл');
+		return;
+	}
+
     const discardCardIds = player.hand.map(cardToDiscard => cardToDiscard.uniqueId);
     each(discardCardIds, cardUniqueId => {
         player.discardCard(cardUniqueId)
     });
-    this.endTurn(player.id);
     player.changeTurnState(ETurnState.dead)
     this.playersList = this.playersList.filter(pId => pId !== player.id);
     const alivePlayers = filter(clone(this.playersList), pId => this.players[pId].isAlive());
     if (alivePlayers.length === 1) {
-      this.end();
+      this.end('Победили люди');
     }
   }
 
@@ -100,16 +113,16 @@ export class Game {
     })
   };
 
-  addLog(log: string) {
-    console.info(log)
-    if (this.gameInProcess) {
+  addLog(log: string, force = false) {
+    if (this.gameInProcess || force) {
+      console.info(log)
       this.gameLog.push(log)
     }
   }
-  end = () => {
+  end = (lastMessage) => {
     //this.playersList = [];
     this.gameInProcess = false;
-    this.addLog('Игра закончена.')
+    this.addLog(lastMessage ? lastMessage : 'Игра закончена.', true)
   };
   start = () => {
     const players = this.players;

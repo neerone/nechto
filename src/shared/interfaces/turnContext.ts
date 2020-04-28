@@ -7,7 +7,8 @@ export interface ITurnContextTrade {
 	type: ETurnContextType.trade,
 	offensePlayer: Player,
 	defensePlayer: Player | null,
-	offenseCardId: EEventID | null,
+	offenseCard: ICardEvent | null,
+	defenseCard: ICardEvent | null,
 }
 
 export interface ITurnContextPositionSwap {

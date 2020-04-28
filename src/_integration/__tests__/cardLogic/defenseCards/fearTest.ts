@@ -65,8 +65,8 @@ describe('fear test',  () => {
 
 
 		expect(defensePlayer.hand).not.toContainEqual(expect.objectContaining({ uniqueId: neeronesFear.uniqueId }));
-		//Не должно быть старой картой анализа, но должна быть новая
-		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: analysisId}));
+		//У игрока должна быть старая карта анализа
+		expect(offensePlayer.hand).toContainEqual(expect.objectContaining({uniqueId: analysisId}));
 		expect(offensePlayer.hand).toContainEqual(expect.objectContaining({id: EEventID.analysis}));
 
 		expect(defensePlayer.turnState).toBe(ETurnState.inCardAction);

@@ -56,9 +56,8 @@ const botSelectCardLogic = (gameServer: GameServer, player: Player, game: Game) 
 
 const botTradeCardLogic = (gameServer: GameServer, player: Player, game: Game) => {
 	const preferredCard = getFirstPlayableCardId(game, player);
-	console.log(preferredCard)
 	const cardActions: ICardEventMenuItem[] = getCardActions(game, player, preferredCard);
-	console.log(cardActions)
+	console.log('Играем ' + preferredCard.id + ' ' + preferredCard.uniqueId, cardActions)
 	const currentAction = getRandomItemFromArray(cardActions);
 
 	return gameServer.playerAction({
@@ -154,7 +153,7 @@ const printBruteforceReport = (counter, game:Game) => {
 	each(game.playersList, pId => {
 		const player = game.players[pId];
 		console.log(`
-			PLAYER:  ${player.nickname} ${player.turnState.toUpperCase()} injured: ${player.isInjured} thing: ${player.isThing} 
+			PLAYER:  ${player.nickname} ${player.turnState.toUpperCase()} injured: ${player.isInjured} thing: ${player.isThing}  quarantine: ${player.quarantine} 
 			HAND`, player.hand && player.hand.map(c => c.id));
 	})
 };

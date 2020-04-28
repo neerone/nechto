@@ -78,6 +78,7 @@ describe('antifire test',  () => {
 
 	it('antifire burn', () => {
 		const [gameServer, game, defensePlayer] = createMockGameServer();
+		defensePlayer.isThing = false;
 		defensePlayer.hand.splice(0,1);
 		defensePlayer.hand.splice(0,1, getCard(EEventID.noFire));
 		expect(defensePlayer.hand[0].id).toBe(EEventID.noFire);
@@ -131,9 +132,7 @@ describe('antifire test',  () => {
 
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		expect(game.turnContext.type).toBe(ETurnContextType.trade)
-		const nextPlayer = game.getPlayerByPosition({playerId:offensePlayer.id, isNext: true});
 
-		expect(nextPlayer.turnState).toBe(ETurnState.inCardAction);
 
 		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: flamethrower.uniqueId}));
 		expect(checkAllDeckCards(game, false)).toBe(true);

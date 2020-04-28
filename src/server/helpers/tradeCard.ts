@@ -6,7 +6,7 @@ import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ECardType, EEventID} from 'shared/enum/cards';
 import {Game} from 'server/models/Game';
 import {ETurnContextType} from 'shared/enum/turnContextType';
-import { remove } from 'lodash';
+import { remove, filter } from 'lodash';
 import {seductionTradeFinish} from 'server/helpers/cardActions/offense/seduction';
 
 export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Player, cardUniqueId: string}) => {
@@ -23,7 +23,8 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   let playerToTrade: Player = context.defensePlayer;
 
   if (isOffenseTrade) {
-    remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
+    //remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
+    player.hand = filter(player.hand, (card) => card !== tradingCard);
     playerToTrade.changeTurnState(ETurnState.inDefenseTrade);
 
     player.changeTurnState(ETurnState.idle);
@@ -32,11 +33,13 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
       type: ETurnContextType.trade,
       defensePlayer: playerToTrade,
       offensePlayer: player,
-      offenseCardId: tradingCard.id,
+      offenseCard: tradingCard,
+      defenseCard: null,
     };
     return;
   }
-  remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
+  player.hand = filter(player.hand, (card) => card !== tradingCard);
+  //remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
   //isDefense trade
   if (context.type !== ETurnContextType.trade) {
     console.error('Нет выбранной карты для обмена у игрока', player.id);
@@ -49,7 +52,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
 
 
 
-  const offensePlayerCard = getCard(context.offenseCardId);
+  const offensePlayerCard = context.offenseCard;
   const defensePlayerCard = tradingCard;
   /* OFFENSE CARD PUSH */
   offensePlayer.getCard(defensePlayerCard);

@@ -39,7 +39,8 @@ export const seductionSelect = ({game, player, selectedPlayerId} : {game: Game, 
 		type: ETurnContextType.trade,
 		offensePlayer: player,
 		defensePlayer: playerToTrade,
-		offenseCardId: null,
+		offenseCard: null,
+		defenseCard: null,
 	};
     game.addLog(`Игрок ${player.nickname} предлагает обмен картами ${playerToTrade.nickname}`);
 	//playerToTrade.changeTurnState(ETurnState.inDefenseTrade);

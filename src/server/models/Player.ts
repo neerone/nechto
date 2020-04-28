@@ -73,6 +73,15 @@ export class Player {
 				return;
 		}
 	}
+
+	changeTurnState = (newTurnState: ETurnState) => {
+		if (!this.game.gameInProcess) return;
+		if (this.state === EPlayerState.door) return;
+		this.turnState = newTurnState
+		this.processTurnState(newTurnState);
+		processTurnContext({player:this, turnState: newTurnState});
+	};
+
 	isAlive() {
 		if (this.state===EPlayerState.door) return false;
 		if (this.turnState===ETurnState.dead) return false;
@@ -81,6 +90,7 @@ export class Player {
 
 	isOverInfected() {
 		//Если у игрока на руке оказались все карты заражения, он умирает
+		if (this.isThing) return false;
 		if (this.hand.length < 4) return false;
 		const cleanCard = find(this.hand, card => card.id !== EEventID.infect);
 		if (!cleanCard) {
@@ -136,13 +146,7 @@ export class Player {
 		this.isOnline = false;
 	};
 
-	changeTurnState = (newTurnState: ETurnState) => {
-		if (!this.game.gameInProcess) return;
-		if (this.state === EPlayerState.door) return;
-		this.turnState = newTurnState
-		this.processTurnState(newTurnState);
-		processTurnContext({player:this, turnState: newTurnState});
-	};
+
 
 	getNeighbours = () => {
 		const game = this.game;

@@ -18,14 +18,14 @@ export const fearAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
 	game.addLog(`${player.nickname}: используя карту Страх отказывается от обмена с игроком ${context.offensePlayer.nickname}`);
 	game.grabEventCardFromDeck({player});
 	const offensePlayer = context.offensePlayer;
-	offensePlayer.getCard(getCard(context.offenseCardId));
+	offensePlayer.getCard(context.offenseCard);
 
 
 	player.notify(formatPlayerNotification({
       player: player,
       notification: {
 		type: ENotificationAction.okayCard,
-        cards: [getCard(context.offenseCardId)],
+        cards: [context.offenseCard],
 		text: `${offensePlayer.nickname}: я хотел тебе эту дать`,
       },
     }));

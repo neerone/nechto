@@ -113,6 +113,7 @@ export class Game {
   };
   start = () => {
     const players = this.players;
+    console.log('============================================================');
     this.addLog('Игра началась');
     gameStarter(this);
     this.notifyAllPlayers(formatStartGameEvent({players}))
@@ -318,7 +319,7 @@ export class Game {
         selectPlayer({game: this, player, selectedPlayerId});
         this.updateGame();
         return;
-      case EPlayerActionType.playerSelect:
+      case EPlayerActionType.actionDecision:
         console.log(`Player ${player.nickname} выбирает action ${action}`)
         playerActionDecision({game: this, player, action});
         this.updateGame();

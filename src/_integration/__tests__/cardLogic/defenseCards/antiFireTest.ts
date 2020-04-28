@@ -133,7 +133,7 @@ describe('antifire test',  () => {
 		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 		const nextPlayer = game.getPlayerByPosition({playerId:offensePlayer.id, isNext: true});
 
-		expect(nextPlayer.turnState).toBe(ETurnState.idle);
+		expect(nextPlayer.turnState).toBe(ETurnState.inCardAction);
 
 		expect(offensePlayer.hand).not.toContainEqual(expect.objectContaining({uniqueId: flamethrower.uniqueId}));
 		expect(checkAllDeckCards(game, false)).toBe(true);

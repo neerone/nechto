@@ -1,13 +1,9 @@
-import {getCard, getPanic} from 'shared/constant/cards';
-import {EEventID, EPanicID} from 'shared/enum/cards';
+import {getCard} from 'shared/constant/cards';
+import {EEventID} from 'shared/enum/cards';
 import {createMockGameServer} from '_integration/createGameServer';
-import {EPlayerState, ETurnState} from 'shared/enum/player';
-import {find, map, each, range} from 'lodash';
+import {ETurnState} from 'shared/enum/player';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {checkAllDeckCards, expectOkayCard} from '_integration/helpers';
-import {ENotificationAction} from 'shared/enum/notifications';
-import {Simulate} from 'react-dom/test-utils';
-import play = Simulate.play;
 import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
@@ -169,12 +165,6 @@ describe('trade logic',  () => {
 
 
 		expectOkayCard(nextPlayer, null, 'Нечто выйграло')
-
-		expect(nextPlayer.turnState).toBe(ETurnState.inCardAction);
-		expect(nextPlayer.hand.length).toBe(5);
-
-
-		expect(checkAllDeckCards(game, false)).toBe(true);
 
 	});
 

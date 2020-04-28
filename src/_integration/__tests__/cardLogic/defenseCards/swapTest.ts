@@ -13,12 +13,13 @@ import {ETurnContextType} from 'shared/enum/turnContextType';
 describe('leavemealone test',  () => {
 
 	it('should cancel position swap', () => {
+
 		const [gameServer, game, defensePlayer] = createMockGameServer();
 		defensePlayer.hand.splice(0,1);
 		defensePlayer.hand.splice(0,1, getCard(EEventID.leaveMeAlone));
 		expect(defensePlayer.hand[0].id).toBe(EEventID.leaveMeAlone);
 
-		const offensePlayer = game.getPlayerByPosition({isNext: false, playerId: defensePlayer.id})
+		const offensePlayer = defensePlayer.getPrevPlayer();
 		offensePlayer.hand.splice(0,1, getCard(EEventID.positionswap));
 
 

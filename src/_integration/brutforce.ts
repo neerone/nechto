@@ -1,4 +1,3 @@
-import {createMockGameServer} from '_integration/createGameServer';
 import {each, find, map, sortBy} from 'lodash';
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
@@ -11,7 +10,6 @@ import {getCardActions} from 'server/formatters/formatCardActions';
 import {ICardEventMenuItem} from 'shared/interfaces/cardMenu';
 import {createBrutforceServer} from '_integration/createBrutforceServer';
 import {Simulate} from 'react-dom/test-utils';
-import play = Simulate.play;
 
 let counter = 0;
 type ArrayElement<A> = A extends readonly (infer T)[] ? T : never
@@ -75,7 +73,7 @@ const botActionDecisionLogic = (gameServer: GameServer, player: Player, game: Ga
 	if (action.type === ENotificationAction.actionDecision) {
 		const menu = action.menu;
 		const randomAction = getRandomItemFromArray(menu);
-		return gameServer.actionDecision({player, action: randomAction.action});
+		return gameServer.playerAction({actionType: EPlayerActionType.actionDecision, player, action: randomAction.action});
 	}
 };
 

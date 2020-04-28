@@ -32,6 +32,7 @@ export const missAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
 		game.addLog(`Игрок ${player.nickname} использовал карту "мимо", но т.к. целью стал игрок ${offensePlayer.nickname} ничего не происходит и ход передается дальше.`);
 		game.grabEventCardFromDeck({player});
 		game.endTurn(offensePlayer.id);
+
 		return
 	}
 	nextPlayer.changeTurnState(ETurnState.inDefenseTrade);

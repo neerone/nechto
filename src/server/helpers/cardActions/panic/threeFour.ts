@@ -4,10 +4,10 @@ import {filter} from 'lodash';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 
 export const threeFourAct = ({game, player}: {game:Game, player:Player}) => {
-	game.addLog('Все карты "Заколоченная дверь" сбрасываются');
+	game.addLog('Паника: Все карты "Заколоченная дверь" сбрасываются');
 	game.playersList = filter(game.playersList, pId => {
 		const pl = game.players[pId];
-		return pl.state === EPlayerState.dummy
+		return pl.isAlive();
 	});
 	player.changeTurnState(ETurnState.inOffenseTrade);
 };

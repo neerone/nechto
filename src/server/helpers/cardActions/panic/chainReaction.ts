@@ -28,7 +28,7 @@ export const chainReactionAct = ({game, player}: {game:Game, player:Player}) => 
 		startPlayer: player,
 	};
 	each(game.players, (p => {
-		if (p.state !== EPlayerState.door) {
+		if (p.isAlive()) {
 			 p.changeTurnState(ETurnState.inOffenseTrade)
 		}
 	}));

@@ -73,7 +73,7 @@ const botTradeCardLogic = (gameServer: GameServer, player: Player, game: Game) =
 	const currentAction = getRandomItemFromArray(cardActions);
 
 	checkLastAction(player, cardActions);
-	console.log(`${player.nickname}-${player.turnState} торгует ` + preferredCard.id + ' ' + preferredCard.uniqueId, cardActions, currentAction, game.turnContext && game.turnContext.type, `players count: ${JSON.stringify(game.playersList)}`)
+	console.log(`${player.nickname}-${player.turnState} торгует ${preferredCard.id} ${preferredCard.uniqueId}`, cardActions, currentAction, game.turnContext && game.turnContext.type, `players count: ${game.playersList.map(pId=> game.players[pId].nickname)}`)
 
 	return gameServer.playerAction({
 		player,

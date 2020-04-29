@@ -3,7 +3,7 @@ import {Player} from 'server/models/Player';
 import {ETurnState} from 'shared/enum/player';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ENotificationAction} from 'shared/enum/notifications';
-import {clone, find} from 'lodash';
+import {clone, each, find} from 'lodash';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 
@@ -29,6 +29,11 @@ export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Play
 
 export const forgetfullnessAct = ({game, player}: {game:Game, player:Player}) => {
 	game.addLog('Паника! Забывчивость: Игрок меняет три карты с руки на три из колоды');
+	each(game.players, player => {
+		if (player.isAlive()) {
+			player.changeTurnState(ETurnState.idle)
+		}
+	});
 	player.changeTurnState(ETurnState.inCardActionProgress);
 
 
@@ -36,6 +41,7 @@ export const forgetfullnessAct = ({game, player}: {game:Game, player:Player}) =>
 		player,
 		notification: notifyPlayerDiscardCards({game, player})
 	}));
+
 
 	game.turnContext = {
 		type: ETurnContextType.forgetfullnessSelect,

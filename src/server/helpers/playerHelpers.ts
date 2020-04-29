@@ -17,7 +17,8 @@ const processDeathByOverinfection = (player:Player) => {
 			game.turnContext = null;
 			game.changeTurn(nextPlayer.id)
 		}
-	} else {
+	}
+	if (!game.turnContext) {
 		game.turnContext = null;
 		game.changeTurn(nextPlayer.id)
 	}

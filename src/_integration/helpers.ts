@@ -30,7 +30,7 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 		return acc
 	}, [] as ICardAny[]);
 
-	const cardsShouldBe = filteredDeck.length;
+	const cardsShouldBe = filteredDeck.length+1;
 
 	each(game.discardedDeck, (cId) => {
 		if (!cId) {
@@ -43,8 +43,10 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 		}
 	});
 	if (cardsShouldBe !== fullCardsLength) {
-		console.error(`CARDS: ${fullCardsLength}, BUT SHOULD BE: ${cardsShouldBe}`)
+		console.error(`CARDS: ${fullCardsLength}, BUT SHOULD BE: ${cardsShouldBe}`, ' players ', playersCount)
 		throw new Error('Incorrect cards')
+	} else {
+		console.log('CARDS IS FINE', cardsShouldBe, ' players ', playersCount)
 	}
 	return cardsShouldBe === fullCardsLength;
 };

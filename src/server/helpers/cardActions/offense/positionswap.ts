@@ -78,6 +78,7 @@ export const positionswapFinish = ({game, player, action}: {game:Game, player:Pl
 		offensePlayer.changeTurnState(ETurnState.inOffenseTrade);
 		return;
 	}
+	//КЕЙС КОГДА ИГРОК ПРИМЕНИЛ КАРТУ LEAVEME ALONE
 	game.addLog(`Игрок ${defensePlayer.nickname} применил "Мне и здесь неплохо" и остался на месте`);
 	//discardCard({game, player, cardUniqueId: leaveMeAloneCard.uniqueId});
 	player.discardCard(leaveMeAloneCard.uniqueId)

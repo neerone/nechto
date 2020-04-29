@@ -1,4 +1,4 @@
-import {clone, each, filter, find, uniqueId} from "lodash";
+import {clone, each, filter, find, uniqueId, map} from "lodash";
 import {Player} from "server/models/Player";
 import {gameServer} from 'server/server/GameServer';
 import {
@@ -141,6 +141,7 @@ export class Game {
     console.log('============================================================');
     this.addLog('Игра началась');
     gameStarter(this);
+    checkAllDeckCards(this, !gameServer.isMock);
     this.notifyAllPlayers(formatStartGameEvent({players}))
     this.updateGame();
   };
@@ -212,6 +213,7 @@ export class Game {
     if (nextPlayer.state === EPlayerState.door) {
       return this.endTurn(nextPlayer.id);
     }
+    console.log(`Игрок ${endTurnPlayer.nickname} заканчивает ход`, map(endTurnPlayer.hand, card=> card.id))
     checkAllDeckCards(this, !gameServer.isMock);
     this.changeTurn(nextPlayer.id);
   }

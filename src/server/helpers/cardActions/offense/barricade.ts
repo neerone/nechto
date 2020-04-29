@@ -7,8 +7,6 @@ import {uniqueId} from 'lodash';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 
-import {checkAllDeckCards} from '_integration/helpers';
-
 export const barricadeAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
 	game.turnContext = {
 		type: ETurnContextType.barricadePersonSelect,

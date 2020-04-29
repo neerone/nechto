@@ -75,7 +75,7 @@ export class Game {
 		  },
 		}));
 		this.addLog(`Игра закончена! ${player.nickname} не справился со своим коварным заданием...`)
-		this.end('Нечто проиграл');
+		this.end('Нечто проиграло');
 		return;
 	}
 
@@ -89,11 +89,11 @@ export class Game {
 
     const cleanPlayers = filter(alivePlayers, pId => !this.players[pId].isInjured);
     if (cleanPlayers.length === 0) {
-      return this.end('Победило нечто');
+      return this.end('Нечто победило');
     }
 
     if (alivePlayers.length === 1) {
-      return this.end('Победили люди');
+      return this.end('Нечто проиграло');
     }
   }
 
@@ -209,10 +209,7 @@ export class Game {
     this.turnContext = null;
     const endTurnPlayer = this.players[playerId];
     endTurnPlayer.changeTurnState(ETurnState.idle);
-    const nextPlayer = this.getPlayerByPosition({playerId, isNext: true});
-    if (nextPlayer.state === EPlayerState.door) {
-      return this.endTurn(nextPlayer.id);
-    }
+    const nextPlayer = endTurnPlayer.getNextAlivePlayer();
     console.log(`Игрок ${endTurnPlayer.nickname} заканчивает ход`, map(endTurnPlayer.hand, card=> card.id))
     checkAllDeckCards(this, !gameServer.isMock);
     this.changeTurn(nextPlayer.id);
@@ -270,7 +267,7 @@ export class Game {
           text: 'Нечто выйграло'
         },
       }))
-      this.end('Нечто выйграло');
+      this.end('Нечто победило');
     }
   };
 

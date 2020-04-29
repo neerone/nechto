@@ -111,19 +111,6 @@ export class Player {
 		if (!game.gameInProcess) return;
 		console.log('CARD UNIQUE ID', cardUniqueId)
 		const card = this.getCardByUniqueId(cardUniqueId);
-		//if (!card) return;
-/*		if (card.id === EEventID.thing) {
-			game.notifyAllPlayers(formatPlayerNotification({
-			  player: this,
-			  notification: {
-				type: ENotificationAction.info,
-				text: `Игра закончена! ${this.nickname} не справился со своим коварным заданием... Люди победили. Нечто сожжен`,
-			  },
-			}))
-			game.addLog(`Игра закончена! ${this.nickname} не справился со своим коварным заданием...Люди победили. Нечто сожжен`)
-			game.end();
-			return;
-		}*/
 
 		const discardCardIndex = findIndex(this.hand, (card) => card.uniqueId === cardUniqueId);
 		console.log(`Игрок ${this.nickname} убрал в колоду ${card.id}`)

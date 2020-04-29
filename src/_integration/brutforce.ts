@@ -173,6 +173,10 @@ const startBrutforce = () => {
 }
 
 const printBruteforceReport = (counter, game:Game) => {
+	const lastLog = game.gameLog[game.gameLog.length-1];
+	if (lastLog !== 'Нечто победило' && lastLog !== 'Нечто проиграло') {
+		//throw new Error('Unexpected game end');
+	}
 	console.log(`PLAYERS INFO over ${counter} iterations - ${game.gameLog[game.gameLog.length-1]}`)
 	each(game.playersList, pId => {
 		const player = game.players[pId];

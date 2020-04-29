@@ -159,6 +159,10 @@ export class Game {
     if (!this.gameInProcess) return;
     this.turnPlayerId = playerId;
     const player = this.players[playerId];
+    console.log(`change turn player id ${playerId}`)
+    if (!player) {
+      console.log(this.players)
+    }
     if (player.state === EPlayerState.door || player.turnState === ETurnState.dead) {
       //Дверь и мертвец не может ходить
       const nextPlayer = player.getNextAlivePlayer();

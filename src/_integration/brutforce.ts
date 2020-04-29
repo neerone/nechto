@@ -11,7 +11,7 @@ import {ICardEventMenuItem} from 'shared/interfaces/cardMenu';
 import {createBrutforceServer} from '_integration/createBrutforceServer';
 import {Simulate} from 'react-dom/test-utils';
 
-let counter = 0;
+
 type ArrayElement<A> = A extends readonly (infer T)[] ? T : never
 
 function getRandomItemFromArray<A extends any[]>(arr: A): ArrayElement<A> {
@@ -139,32 +139,41 @@ const botAct = (gameServer: GameServer, player: Player, game: Game) => {
 };
 
 const startBrutforce = () => {
-	const [gameServer, game] = createBrutforceServer();
 
-	let stop = false;
-	while(!stop) {
-		let actioniterated = false;
-		each(game.playersList, pId => {
-			const player = game.players[pId];
-			try {
-				const iterated = botAct(gameServer, player, game)
-				if (!actioniterated) actioniterated = iterated;
-				counter++;
-			} catch(e) {
-				printBruteforceReport(counter, game);
-				throw e;
+	let counter = 0;
+	try {
+		while(true) {
+			const [gameServer, game] = createBrutforceServer();
+			let stop = false;
+			while(!stop) {
+				let actioniterated = false;
+				each(game.playersList, pId => {
+					const player = game.players[pId];
+					try {
+						const iterated = botAct(gameServer, player, game)
+						if (!actioniterated) actioniterated = iterated;
+						counter++;
+					} catch(e) {
+						printBruteforceReport(counter, game);
+						throw e;
+					}
+				})
+
+				if (!actioniterated) {
+					stop = true;
+					printBruteforceReport(counter, game);
+				}
 			}
-		})
-
-		if (!actioniterated) {
-			stop = true;
-			printBruteforceReport(counter, game);
 		}
+	} catch(e) {
+		throw e
 	}
+
+
 }
 
 const printBruteforceReport = (counter, game:Game) => {
-	console.log(`PLAYERS INFO over ${counter} iterations`)
+	console.log(`PLAYERS INFO over ${counter} iterations - ${game.gameLog[game.gameLog.length-1]}`)
 	each(game.playersList, pId => {
 		const player = game.players[pId];
 		console.log(`

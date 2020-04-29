@@ -13,7 +13,7 @@ const processDeathByOverinfection = (player:Player) => {
 		}
 		if (game.turnContext.offensePlayer === player) {
 			game.turnContext = null;
-			game.changeTurn(nextPlayer.nickname)
+			game.changeTurn(nextPlayer.id)
 		}
 	} else {
 		game.turnContext = null;

@@ -1,13 +1,11 @@
 import {Player} from 'server/models/Player';
-import {EPlayerState, ETurnState} from 'shared/enum/player';
+import {ETurnState} from 'shared/enum/player';
 import {ENotificationAction} from 'shared/enum/notifications';
-import {getCard} from 'shared/constant/cards';
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ECardType, EEventID} from 'shared/enum/cards';
 import {Game} from 'server/models/Game';
 import {ETurnContextType} from 'shared/enum/turnContextType';
-import { remove, filter } from 'lodash';
-import {seductionTradeFinish} from 'server/helpers/cardActions/offense/seduction';
+import {filter} from 'lodash';
 
 export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Player, cardUniqueId: string}) => {
   const tradingCard = player.getCardByUniqueId(cardUniqueId);
@@ -27,6 +25,11 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
     player.hand = filter(player.hand, (card) => card !== tradingCard);
     playerToTrade.changeTurnState(ETurnState.inDefenseTrade);
 
+    if (game.turnContext && game.turnContext.type === ETurnContextType.trade && game.turnContext.defensePlayer === player && game.turnContext.offensePlayer === player) {
+      console.log('Трейд против себя')
+      return
+    }
+
     player.changeTurnState(ETurnState.idle);
     game.addLog(`Игрок ${player.nickname} передает карту для обмена игроку ${playerToTrade.nickname}`);
     game.turnContext = {
@@ -38,6 +41,9 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
     };
     return;
   }
+
+
+
   player.hand = filter(player.hand, (card) => card !== tradingCard);
   //remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
   //isDefense trade
@@ -66,6 +72,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   }));
   if (defensePlayerCard.id=== EEventID.infect) {
     game.infectPlayer(offensePlayer.id);
+    if (!game.gameInProcess) return;
   }
 
   /* DEFENSE CARD PUSH */
@@ -80,6 +87,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   }));
   if (offensePlayerCard.id=== EEventID.infect) {
     game.infectPlayer(defensePlayer.id);
+    if (!game.gameInProcess) return;
   }
   defensePlayer.changeTurnState(ETurnState.idle)
 

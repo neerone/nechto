@@ -1,4 +1,4 @@
-import {each, find, map, sortBy} from 'lodash';
+import {each, find, map, sortBy, isEqual} from 'lodash';
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {ENotificationAction} from 'shared/enum/notifications';
@@ -42,7 +42,20 @@ let getFirstPlayableCardId = (game, player) => {
 *
 * */
 
+let lastAction = null;
+let actionCounter = 0;
 
+const checkLastAction = (player, actions) => {
+	if (isEqual(lastAction, [player, actions])) {
+		if (actionCounter > 10) {
+			throw new Error('TEST CYCLE LOOP');
+		}
+		actionCounter++;
+		return;
+	}
+	actionCounter =0;
+	lastAction = [player, actions];
+}
 
 const botSelectCardLogic = (gameServer: GameServer, player: Player, game: Game) => {
 	const action = player.currentAction as INotificationActionSelectCard;
@@ -57,8 +70,10 @@ const botSelectCardLogic = (gameServer: GameServer, player: Player, game: Game) 
 const botTradeCardLogic = (gameServer: GameServer, player: Player, game: Game) => {
 	const preferredCard = getFirstPlayableCardId(game, player);
 	const cardActions: ICardEventMenuItem[] = getCardActions(game, player, preferredCard);
-	console.log('Играем ' + preferredCard.id + ' ' + preferredCard.uniqueId, cardActions)
 	const currentAction = getRandomItemFromArray(cardActions);
+
+	checkLastAction(player, cardActions);
+	console.log(`${player.nickname}-${player.turnState} торгует ` + preferredCard.id + ' ' + preferredCard.uniqueId, cardActions, currentAction, game.turnContext && game.turnContext.type, `players count: ${JSON.stringify(game.playersList)}`)
 
 	return gameServer.playerAction({
 		player,

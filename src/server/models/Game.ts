@@ -1,4 +1,4 @@
-import {each, find, uniqueId, clone, filter} from "lodash";
+import {clone, each, filter, find, uniqueId} from "lodash";
 import {Player} from "server/models/Player";
 import {gameServer} from 'server/server/GameServer';
 import {
@@ -86,8 +86,14 @@ export class Game {
     player.changeTurnState(ETurnState.dead)
     this.playersList = this.playersList.filter(pId => pId !== player.id);
     const alivePlayers = filter(clone(this.playersList), pId => this.players[pId].isAlive());
+
+    const cleanPlayers = filter(alivePlayers, pId => !this.players[pId].isInjured);
+    if (cleanPlayers.length === 0) {
+      return this.end('Победило нечто');
+    }
+
     if (alivePlayers.length === 1) {
-      this.end('Победили люди');
+      return this.end('Победили люди');
     }
   }
 
@@ -119,11 +125,17 @@ export class Game {
       this.gameLog.push(log)
     }
   }
+
   end = (lastMessage) => {
     //this.playersList = [];
-    this.gameInProcess = false;
     this.addLog(lastMessage ? lastMessage : 'Игра закончена.', true)
+    each(this.playersList, (pId) => {
+      const pl = this.players[pId];
+      pl.changeTurnState(ETurnState.idle);
+    });
+    this.gameInProcess = false;
   };
+
   start = () => {
     const players = this.players;
     console.log('============================================================');
@@ -242,19 +254,21 @@ export class Game {
     }
     this.players[playerId].isInjured = true;
 
-    const cleanPlayer = find(this.players, (pl) => {
+    const cleanPlayerId = find(this.playersList, (pId) => {
+      const pl = this.players[pId];
       return pl.state === EPlayerState.dummy && !pl.isThing && !pl.isInjured
     });
-    if (!cleanPlayer) {
+    const notificationPlayer = this.players[playerId];
+    if (!cleanPlayerId) {
       this.notifyAllPlayers(formatPlayerNotification({
-        player: cleanPlayer,
+        player: notificationPlayer,
         notification: {
           type: ENotificationAction.okayCard,
           cards: [thingCard],
           text: 'Нечто выйграло'
         },
       }))
-      this.gameInProcess = false;
+      this.end('Нечто выйграло');
     }
   };
 

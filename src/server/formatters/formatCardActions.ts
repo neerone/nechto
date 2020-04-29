@@ -44,6 +44,7 @@ export const getCardActions = (game: Game, player: Player, card: ICardEvent): IC
 	if (!player.isAlive()) return [];
 	if (!card.eventType) return actions;
 	if (card.id === EEventID.thing) return [];
+	if (!game.gameInProcess) return [];
 
 	const isCurrentPlayerInjured = player.isInjured;
 	const isCurrentPlayerThing = player.isThing;

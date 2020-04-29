@@ -88,10 +88,11 @@ export class Player {
 		return true;
 	}
 
+
 	isOverInfected() {
 		//Если у игрока на руке оказались все карты заражения, он умирает
 		if (this.isThing) return false;
-		if (this.hand.length < 4) return false;
+		if (!this.hand.length) return false;
 		const cleanCard = find(this.hand, card => card.id !== EEventID.infect);
 		if (!cleanCard) {
 			return true

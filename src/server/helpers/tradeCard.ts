@@ -52,7 +52,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
     return;
   }
   let offensePlayer = context.offensePlayer;
-  let defensePlayer = context.defensePlayer;
+  //let defensePlayer = context.defensePlayer;
   offensePlayer.changeTurnState(ETurnState.idle);
   game.addLog(`Игроки ${player.nickname} и ${offensePlayer.nickname} обменялись картами`);
 
@@ -76,9 +76,9 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   }
 
   /* DEFENSE CARD PUSH */
-  defensePlayer.getCard(offensePlayerCard);
-  defensePlayer.notify(formatPlayerNotification({
-    player: defensePlayer,
+  player.getCard(offensePlayerCard);
+  player.notify(formatPlayerNotification({
+    player: player,
     notification: {
       type: ENotificationAction.okayCard,
       cards: [offensePlayerCard],
@@ -86,10 +86,10 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
     },
   }));
   if (offensePlayerCard.id=== EEventID.infect) {
-    game.infectPlayer(defensePlayer.id);
+    game.infectPlayer(player.id);
     if (!game.gameInProcess) return;
   }
-  defensePlayer.changeTurnState(ETurnState.idle)
+  player.changeTurnState(ETurnState.idle)
 
   //if (game.turnContext && game.turnContext.type === ETurnContextType.seduction) {
   //  return seductionTradeFinish({game})

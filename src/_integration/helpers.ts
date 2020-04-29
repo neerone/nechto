@@ -44,6 +44,7 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 	});
 	if (cardsShouldBe !== fullCardsLength) {
 		console.error(`CARDS: ${fullCardsLength}, BUT SHOULD BE: ${cardsShouldBe}`)
+		throw new Error('Incorrect cards')
 	}
 	return cardsShouldBe === fullCardsLength;
 };

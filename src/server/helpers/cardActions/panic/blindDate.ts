@@ -7,7 +7,7 @@ import {notifyPlayerDiscardCards} from 'server/helpers/cardActions/panic/forgetf
 import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 
 export const blindDateAct = ({game, player}: {game:Game, player:Player}) => {
-	game.addLog(`Паника: свидание вслепую. Игрок ${player.nickname} одну карту с руки на карту из колоды`);
+	game.addLog(`Паника: свидание вслепую. Игрок ${player.nickname} меняет одну карту с руки на карту из колоды`);
 	player.changeTurnState(ETurnState.inCardActionProgress);
 	player.notify(formatPlayerNotification({
 		player,

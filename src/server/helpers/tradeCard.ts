@@ -12,6 +12,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
   if (tradingCard.type !== ECardType.event) {
     throw new Error(`Попытка обменяться НЕ картой эвента ${JSON.stringify(tradingCard)}`);
   }
+  console.log('CARD TRADE!!')
   const context = game.turnContext;
   if (!context || context.type !== ETurnContextType.trade) {
     console.info('CONTEXT', context && context.type)

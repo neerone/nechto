@@ -1,4 +1,4 @@
-import {each, find, map, sortBy, isEqual} from 'lodash';
+import {each, find, isEqual, map, sortBy} from 'lodash';
 import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {ENotificationAction} from 'shared/enum/notifications';
@@ -9,7 +9,7 @@ import {EPlayerActionType} from 'shared/enum/playerActions';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import {ICardEventMenuItem} from 'shared/interfaces/cardMenu';
 import {createBrutforceServer} from '_integration/createBrutforceServer';
-import {Simulate} from 'react-dom/test-utils';
+import {EPlayerState} from 'shared/enum/player';
 
 
 type ArrayElement<A> = A extends readonly (infer T)[] ? T : never
@@ -28,7 +28,7 @@ let getFirstPlayableCardId = (game, player) => {
 		return menu.length
 	});
 	if (!sortPlayableCards[sortPlayableCards.length - 1]) {
-		throw new Error('Игроку нечем ходить');
+		throw new Error(`Игроку нечем ходить ${player.nickname}`);
 	}
 	const preferredCard = find(player.hand, {uniqueId: sortPlayableCards[sortPlayableCards.length - 1].uniqueId})
 	return preferredCard;
@@ -117,6 +117,7 @@ const botPlayerTurnCardLogic = (gameServer: GameServer, player: Player, game: Ga
 
 const botAct = (gameServer: GameServer, player: Player, game: Game) => {
 	if (!player.currentAction) return false;
+	if (player.state === EPlayerState.door) return false;
 	switch (player.currentAction.type) {
 		case ENotificationAction.selectCard:
 			botSelectCardLogic(gameServer, player, game);
@@ -182,7 +183,7 @@ const printBruteforceReport = (counter, game:Game) => {
 		const player = game.players[pId];
 		console.log(`
 			PLAYER:  ${player.nickname} ${player.turnState.toUpperCase()} injured: ${player.isInjured} thing: ${player.isThing}  quarantine: ${player.quarantine} 
-			HAND`, player.hand && player.hand.map(c => c.id));
+			HAND`, player.hand && player.hand.map(c => c ? c.id : 'НЕ НАЙДЕНО'));
 	})
 };
 

@@ -9,6 +9,9 @@ export const goAwayAct = ({game, player} : {game: Game, player: Player}) => {
 	game.addLog(`Паника "убирайся прочь": игрок ${player.nickname} меняется местами с любым игроком не на карантине.`)
 	player.changeTurnState(ETurnState.inCardActionProgress);
 	const allPlayersExeptCurrent = player.getAllPlayablePlayersExceptCurrent();
+	if (allPlayersExeptCurrent.length === 0) {
+		return game.endTurn(player.id)
+	}
 	game.turnContext = {
 		type: ETurnContextType.oneTwoPersonSelect,
 		playerId: player.id,

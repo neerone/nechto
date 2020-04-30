@@ -7,6 +7,7 @@ import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {getCard} from 'shared/constant/cards';
 import {EEventID} from 'shared/enum/cards';
+import {ETurnState} from 'shared/enum/player';
 
 export const fearAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
 	const context = game.turnContext;
@@ -14,6 +15,7 @@ export const fearAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
 		throw  new Error('Fear использован вне контекста торговли')
 	}
 	//player.discardCard(card.uniqueId);
+	player.changeTurnState(ETurnState.idle);
 	player.discardCard(card.uniqueId);
 	game.addLog(`${player.nickname}: используя карту Страх отказывается от обмена с игроком ${context.offensePlayer.nickname}`);
 	game.grabEventCardFromDeck({player});

@@ -141,6 +141,7 @@ export class Game {
     console.log('============================================================');
     this.addLog('Игра началась');
     gameStarter(this);
+    this.changeTurn(this.playersList[0]);
     checkAllDeckCards(this, !gameServer.isMock);
     this.notifyAllPlayers(formatStartGameEvent({players}))
     this.updateGame();
@@ -152,24 +153,28 @@ export class Game {
   };
 
   makePanic = (player: Player, panicCard: ICardPanic) => {
-    panicAction({player, game: this, panicCard});
     this.discardedDeckPush(panicCard);
+    panicAction({player, game: this, panicCard});
     this.updateGame();
   };
-  resetPlayerStates = () => {
-    this.turnPlayerId = null;
+  resetGameState = () => {
+    this.turnContext = null;
     each(this.players, p => {
       p.changeTurnState(ETurnState.idle);
     })
   };
   discardedDeckPush(card) {
+    console.log('DISCARDED CARD', card)
     if (!card) {
       throw new Error('Попытка задискардить undefined')
     }
     this.discardedDeck.push(card)
   }
   changeTurn(playerId: string) {
+    console.log('NEXT PL. D', playerId)
     if (!this.gameInProcess) return;
+    this.resetGameState()
+    console.log('NEXT PL. D2', playerId)
     this.turnPlayerId = playerId;
     const player = this.players[playerId];
     console.log(`change turn player id ${playerId}`)
@@ -211,6 +216,7 @@ export class Game {
     endTurnPlayer.changeTurnState(ETurnState.idle);
     const nextPlayer = endTurnPlayer.getNextAlivePlayer();
     console.log(`Игрок ${endTurnPlayer.nickname} заканчивает ход`, map(endTurnPlayer.hand, card=> card.id))
+    console.log(`След. игрок ${nextPlayer.nickname}`)
     checkAllDeckCards(this, !gameServer.isMock);
     this.changeTurn(nextPlayer.id);
   }

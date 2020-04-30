@@ -1,14 +1,52 @@
 import {Game} from 'server/models/Game';
-import {concat, each, reduce, filter} from 'lodash';
+import {concat, each, reduce, filter, clone, difference} from 'lodash';
 import {fullDeckObject, getCard} from 'shared/constant/cards';
 import {ICardAny} from 'shared/interfaces/cards';
 import {ECardType} from 'shared/enum/cards';
 import {EPlayerState} from 'shared/enum/player';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {Player} from 'server/models/Player';
+import {initialDeck} from 'server/helpers/gameStarter';
 
 export const checkAllDeckCards = (game: Game, withPanics = true) => {
+
+	const activePlayers = filter(game.players, p => p.state !== EPlayerState.door)
+
+	const playersCount = Object.keys(activePlayers).length;
+
 	const cardsOnHands = reduce(game.players, (acc, player) => {
+		if (player.state === EPlayerState.door) return acc;
+		return concat(acc, player.hand);
+	}, []);
+
+	let comparingDeck = clone(cardsOnHands);
+
+	comparingDeck = concat([], clone(comparingDeck), clone(game.deck), clone(game.discardedDeck));
+
+	if (comparingDeck.length !== initialDeck.length) {
+		console.error(`CARDS: ${comparingDeck.length}, BUT SHOULD BE: ${initialDeck.length}`, ' players ', playersCount)
+		let diff = difference(comparingDeck, initialDeck);
+		if (diff.length === 0) {
+			diff = difference(initialDeck, comparingDeck);
+		}
+		console.log(comparingDeck, initialDeck);
+		console.log('DECK DIFFERENCE', diff)
+
+		//each(diff, (diffCard) => {
+		//	const foundCards =  initialDeck.filter(c => c.id === diffCard.id);
+		//	console.log('FUUNDED SIMILAR CARDS', foundCards)
+		//})
+
+		throw new Error('Incorrect cards')
+	} else {
+		console.log('CARDS IS FINE', initialDeck.length, ' players ', playersCount)
+	}
+
+
+
+	return comparingDeck.length !== initialDeck.length
+
+/*	const cardsOnHands = reduce(game.players, (acc, player) => {
 		if (player.state ===EPlayerState.door) return acc;
 		return concat(acc, player.hand);
 	}, [])
@@ -48,7 +86,7 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 	} else {
 		console.log('CARDS IS FINE', cardsShouldBe, ' players ', playersCount)
 	}
-	return cardsShouldBe === fullCardsLength;
+	return cardsShouldBe === fullCardsLength;*/
 };
 
 export const printPlayersStatuses = game => {

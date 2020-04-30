@@ -1,11 +1,14 @@
 import {Game} from 'server/models/Game';
 import {fullDeckObject, getCard, getPanic, handCardsCount, thingCard} from 'shared/constant/cards';
-import {concat, each, find, range, reduce} from 'lodash';
+import {concat, each, find, range, reduce, clone} from 'lodash';
 import {ICardAny, ICardEvent} from 'shared/interfaces/cards';
 import {shuffle} from 'server/helpers/util';
 import * as chroma from 'chroma-js';
 import {gameServer} from 'server/server/GameServer';
 import {ECardType, EEventID, EPanicID} from 'shared/enum/cards';
+import {checkAllDeckCards} from '_integration/helpers';
+
+export let initialDeck = [];
 
 export const gameStarter = (game: Game) => {
 	const players = game.players;
@@ -77,7 +80,6 @@ export const gameStarter = (game: Game) => {
 			}
 		});
 	});
-	game.changeTurn(game.playersList[0]);
 
 	const playerColors = chroma.cubehelix()
 		.start(200)
@@ -86,11 +88,15 @@ export const gameStarter = (game: Game) => {
 		.scale()
 		.colors(playersIdsArray.length);
 
+	initialDeck = clone(game.deck);
+
 	each(playersIdsArray, (playerId, index) => {
 		const color = playerColors[index];
 		const secondColor = chroma.mix(color, '00a70c').hex();
+		initialDeck = concat([], clone(initialDeck), clone(game.players[playerId].hand))
 		game.players[playerId].color = `linear-gradient(${color}, ${secondColor})`
 	});
+
 
 	//if (gameServer.isMock) {
 	//	let neerone = find(game.players, {nickname: 'хост'});

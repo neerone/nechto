@@ -9,6 +9,9 @@ import {ETurnState} from 'shared/enum/player';
 export const friendshipAct = ({game, player} : {game: Game, player: Player}) => {
 	player.changeTurnState(ETurnState.inCardActionProgress);
 	const allPlayersExeptCurrent = player.getAllPlayablePlayersExceptCurrent();
+	if (allPlayersExeptCurrent.length === 0) {
+		return game.endTurn(player.id)
+	}
 	game.turnContext = {
 		type: ETurnContextType.seduction,
 		offensePlayer: player,

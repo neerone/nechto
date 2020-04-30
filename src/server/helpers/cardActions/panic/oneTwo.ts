@@ -49,6 +49,7 @@ export const oneTwoAct = ({game, player}: {game:Game, player:Player}) => {
 
 
 export const oneTwoPlayerSelect = ({game, selectedPlayerId, player}: {game:Game, player: Player, selectedPlayerId: string}) => {
+	console.log('SELECTED PLAYER ID', selectedPlayerId)
 	const selectedPlayer = find(game.players, {id:selectedPlayerId});
 	game.addLog(`Игрок ${player.nickname} меняется местами с ${selectedPlayer.nickname}`);
 	game.swapPlayers(selectedPlayerId, player.id);

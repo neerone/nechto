@@ -160,7 +160,9 @@ export class Game {
   resetGameState = () => {
     this.turnContext = null;
     each(this.players, p => {
-      p.changeTurnState(ETurnState.idle);
+      if (p.isAlive()) {
+        p.changeTurnState(ETurnState.idle);
+      }
     })
   };
   discardedDeckPush(card) {

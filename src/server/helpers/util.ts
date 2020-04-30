@@ -1,4 +1,4 @@
-import {uniqueId} from 'lodash';
+import {uniqueId, each} from 'lodash';
 
 export function shuffle<T extends any[]>(array: T): T {
 
@@ -26,6 +26,9 @@ const silent = true;
 export let debugCache = [];
 export function clearDebugCache() {
   debugCache = [];
+}
+export function printDebugCache() {
+  each(debugCache, log => {console.log(...log)})
 }
 export function debugLog(...log) {
   debugCache.push([...log]);

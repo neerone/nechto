@@ -3,7 +3,7 @@ import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {GameServer} from 'server/server/GameServer';
-import {clearDebugCache, debugCache, debugLog, shuffle} from 'server/helpers/util';
+import {clearDebugCache, debugCache, debugLog, printDebugCache, shuffle} from 'server/helpers/util';
 import {INotificationActionSelectCard} from 'shared/interfaces/notification';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {getCardActions} from 'server/formatters/formatCardActions';
@@ -142,6 +142,7 @@ const botAct = (gameServer: GameServer, player: Player, game: Game) => {
 const startBrutforce = () => {
 
 	let counter = 0;
+	let globalStop = false;
 	try {
 		while(true) {
 			const [gameServer, game] = createBrutforceServer();
@@ -154,14 +155,22 @@ const startBrutforce = () => {
 						const iterated = botAct(gameServer, player, game)
 						if (!actioniterated) actioniterated = iterated;
 					} catch(e) {
-						//each(game.gameLog, log => {console.log(log)})
-						each(debugCache, log => {console.log(...log)})
+						//clearDebugCache();
+						globalStop = true;
 						printBruteforceReport(counter, game);
 						throw e;
 					}
 				})
 
 				if (!actioniterated) {
+					const lastLog = game.gameLog[game.gameLog.length-1];
+					if (lastLog !== 'Нечто победило' && lastLog !== 'Нечто проиграло') {
+						printBruteforceReport(counter, game);
+						stop = true;
+						globalStop = true;
+						return;
+					}
+
 					clearDebugCache();
 					stop = true;
 					counter++;
@@ -179,16 +188,21 @@ const startBrutforce = () => {
 
 const printBruteforceReport = (counter, game:Game) => {
 	const lastLog = game.gameLog[game.gameLog.length-1];
-	if (lastLog !== 'Нечто победило' && lastLog !== 'Нечто проиграло') {
-		//throw new Error('Unexpected game end');
-	}
-	console.log(`PLAYERS INFO over ${counter} iterations - ${game.gameLog[game.gameLog.length-1]}`)
+	printDebugCache();
+	console.log(`PLAYERS INFO over ${counter} iterations - ${lastLog}`, lastLog === 'Нечто победило', lastLog === 'Нечто проиграло')
 	each(game.playersList, pId => {
 		const player = game.players[pId];
 		console.log(`
 			PLAYER:  ${player.nickname} ${player.turnState.toUpperCase()} injured: ${player.isInjured} thing: ${player.isThing}  quarantine: ${player.quarantine} 
 			HAND`, player.hand && player.hand.map(c => c ? c.id : 'НЕ НАЙДЕНО'));
 	})
+	//console.log(lastLog, lastLog ==='Нечто победило', lastLog === 'Нечто проиграло')
+	//if (lastLog === 'Нечто победило' || lastLog === 'Нечто проиграло') {
+//
+	//} else {
+	//
+	//	throw new Error('Unexpected game end');
+	//}
 };
 
 startBrutforce();

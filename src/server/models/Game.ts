@@ -166,7 +166,7 @@ export class Game {
     })
   };
   discardedDeckPush(card) {
-    debugLog('DISCARDED CARD', card)
+    //debugLog('DISCARDED CARD', card)
     if (!card) {
       throw new Error('Попытка задискардить undefined')
     }
@@ -191,7 +191,11 @@ export class Game {
     this.addLog(`Ходит игрок ${player.nickname}!`);
 
     //if (player.id !== this.turnPlayerId) { console.error('Попытка взять карту не в свой ход'); return; }
-    if (player.hand.length > handCardsCount + 1) { console.error('Попытка взять карту если карт больше ' + handCardsCount); return; }
+    if (player.hand.length > handCardsCount + 1) {
+      debugLog(`РУКА: `, player.hand)
+      throw new Error('Попытка взять карту если карт больше ' + handCardsCount)
+      return;
+    }
 
     //Удаляем карту из колоды сверху и даем её игроку
 	let grabbedCard = this.getFirstCard();

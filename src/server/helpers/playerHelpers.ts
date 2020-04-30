@@ -12,12 +12,12 @@ const processDeathByOverinfection = (player:Player) => {
 		if (game.turnContext.defensePlayer === player) {
 			//game.turnContext.defensePlayer = nextPlayer;
 			nextPlayer.changeTurnState(ETurnState.inDefenseTrade)
-
 		} else if (game.turnContext.offensePlayer === player) {
-
 			game.turnContext = null;
 			game.changeTurn(nextPlayer.id)
+
 		}
+		return;
 	}
 	if (!game.turnContext) {
 		game.changeTurn(nextPlayer.id)

@@ -1,4 +1,4 @@
-import {clone, each, filter, find, uniqueId, map} from "lodash";
+import {clone, each, filter, find, map, uniqueId} from "lodash";
 import {Player} from "server/models/Player";
 import {gameServer} from 'server/server/GameServer';
 import {
@@ -174,29 +174,21 @@ export class Game {
     this.discardedDeck.push(card)
   }
   changeTurn(playerId: string) {
-    debugLog('NEXT PL. D', playerId)
     if (!this.gameInProcess) return;
-    this.resetGameState()
-    debugLog('NEXT PL. D2', playerId)
-    this.turnPlayerId = playerId;
     const player = this.players[playerId];
-    debugLog(`change turn player id ${playerId}`)
     if (!player) {
       debugLog(this.players)
     }
-    if (player.state === EPlayerState.door || player.turnState === ETurnState.dead) {
+    this.resetGameState()
+    this.turnPlayerId = playerId;
+    debugLog(`change turn player id ${playerId}`)
+
+    if (!player.isAlive()) {
       //Дверь и мертвец не может ходить
       const nextPlayer = player.getNextAlivePlayer();
       return this.changeTurn(nextPlayer.id)
     }
     this.addLog(`Ходит игрок ${player.nickname}!`);
-
-    //if (player.id !== this.turnPlayerId) { console.error('Попытка взять карту не в свой ход'); return; }
-    if (player.hand.length > handCardsCount + 1) {
-      debugLog(`РУКА: `, player.hand)
-      throw new Error('Попытка взять карту если карт больше ' + handCardsCount)
-      return;
-    }
 
     //Удаляем карту из колоды сверху и даем её игроку
 	let grabbedCard = this.getFirstCard();
@@ -207,10 +199,7 @@ export class Game {
 
     // Добавляем поднятую карту игроку на руку
     player.getCard(grabbedCard);
-    // Меняем статус игрока
-    each(this.players, player => {
-      player.changeTurnState(ETurnState.idle);
-    });
+
     player.changeTurnState(ETurnState.inCardAction);
     this.addLog(`Игрок ${player.nickname} взял карту и ходит...`);
     this.updateGame();

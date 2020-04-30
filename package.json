@@ -13,6 +13,7 @@
     "@types/react-dom": "^16.9.0",
     "chroma-js": "^2.1.0",
     "classnames": "^2.2.6",
+    "cli-color": "^2.0.0",
     "express": "^4.17.1",
     "jest": "25.4.0",
     "lodash-move": "^1.1.1",

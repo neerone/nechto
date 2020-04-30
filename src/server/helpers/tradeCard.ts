@@ -9,6 +9,7 @@ import {filter} from 'lodash';
 import {debugLog} from 'server/helpers/util';
 
 export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Player, cardUniqueId: string}) => {
+
   const tradingCard = player.getCardByUniqueId(cardUniqueId);
   if (tradingCard.type !== ECardType.event) {
     throw new Error(`Попытка обменяться НЕ картой эвента ${JSON.stringify(tradingCard)}`);
@@ -18,6 +19,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
     throw new Error('Торговля произошла без контекста trade');
   }
   const isOffenseTrade = player.turnState === ETurnState.inOffenseTrade;
+
   let playerToTrade: Player = context.defensePlayer;
 
   if (game.turnContext && game.turnContext.type === ETurnContextType.trade && game.turnContext.defensePlayer === player && game.turnContext.offensePlayer === player) {
@@ -25,11 +27,11 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
     return
   }
   if (isOffenseTrade) {
+    debugLog('МЫ ПОПАЛИ В ТРЕЙД КАРД!!!!!', isOffenseTrade)
     //remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
     player.hand = filter(player.hand, (card) => card !== tradingCard);
-    playerToTrade.changeTurnState(ETurnState.inDefenseTrade);
-
     player.changeTurnState(ETurnState.idle);
+
     game.addLog(`Игрок ${player.nickname} передает карту для обмена игроку ${playerToTrade.nickname}`);
     game.turnContext = {
       type: ETurnContextType.trade,
@@ -38,6 +40,7 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
       offenseCard: tradingCard,
       defenseCard: null,
     };
+    playerToTrade.changeTurnState(ETurnState.inDefenseTrade);
     return;
   }
 

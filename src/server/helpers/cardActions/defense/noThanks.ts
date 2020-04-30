@@ -16,8 +16,6 @@ export const noThanksAct = ({card, game, player} : {card:ICardEvent, game: Game,
 	player.discardCard(card.uniqueId);
 	game.addLog(`${player.nickname}: используя карту Страх отказывается от обмена с игроком ${context.offensePlayer.nickname}`);
 	game.grabEventCardFromDeck({player});
-	const offensePlayer = context.offensePlayer;
-	offensePlayer.getCard(context.offenseCard);
     game.notifyAllPlayersExeptPlayer(formatPlayerNotification({
       player: player,
       notification: {
@@ -26,5 +24,6 @@ export const noThanksAct = ({card, game, player} : {card:ICardEvent, game: Game,
 		text: `${player.nickname}: отказывается от обмена`,
       },
     }), player);
-	game.endTurn(offensePlayer.id);
+	const offensePlayer = context.offensePlayer;
+	offensePlayer.interruptTrade();
 };

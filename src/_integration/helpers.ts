@@ -25,7 +25,7 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 	comparingDeck = concat([], clone(comparingDeck), clone(game.deck), clone(game.discardedDeck));
 
 	if (comparingDeck.length !== initialDeck.length) {
-		console.error(`CARDS: ${comparingDeck.length}, BUT SHOULD BE: ${initialDeck.length}`, ' players ', playersCount)
+		debugLog(`CARDS: ${comparingDeck.length}, BUT SHOULD BE: ${initialDeck.length}`, ' players ', playersCount)
 		let diff = difference(comparingDeck, initialDeck);
 		if (diff.length === 0) {
 			diff = difference(initialDeck, comparingDeck);

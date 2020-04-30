@@ -9,7 +9,7 @@ import {getCardActions} from 'server/formatters/formatCardActions';
 import INotificationAction from 'shared/interfaces/notification';
 import {processTurnContext} from 'server/helpers/playerHelpers';
 import {ENotificationAction} from 'shared/enum/notifications';
-import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
+import {ETurnContextType} from 'shared/enum/turnContextType';
 
 export class Player {
 	id = null;
@@ -74,9 +74,19 @@ export class Player {
 		}
 	}
 
+	interruptTrade = () => {
+		if (!this.game.turnContext || this.game.turnContext.type !== ETurnContextType.trade || this.game.turnContext.offensePlayer !== this) {
+			throw new Error(`Интеррупт произошел вне контекста trade у игрока ${this.nickname}`)
+			return;
+		}
+		this.getCard(this.game.turnContext.offenseCard);
+		this.game.endTurn(this.id);
+	}
+
 	changeTurnState = (newTurnState: ETurnState) => {
 		if (!this.game.gameInProcess) return;
 		if (this.state === EPlayerState.door) return;
+		if (this.turnState === newTurnState) return;
 		debugLog(`Игрок ${this.nickname} теперь ${newTurnState}`)
 		this.turnState = newTurnState
 		this.processTurnState(newTurnState);

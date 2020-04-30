@@ -25,24 +25,31 @@ export const missAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
 	const context = game.turnContext;
 	player.discardCard(card.uniqueId);
 	const nextPlayer = getMissNextPlayer(game, player)
+	const offensePlayer = game.turnContext.offensePlayer;
 	if (nextPlayer === null) {
-		const offensePlayer = game.turnContext.offensePlayer;
-		const offenseCard = game.turnContext.offenseCard;
-		offensePlayer.getCard(offenseCard)
+		//const offenseCard = game.turnContext.offenseCard;
+		offensePlayer.interruptTrade();
+		//offensePlayer.getCard(offenseCard)
+		//game.endTurn(offensePlayer.id);
+
 		game.addLog(`Игрок ${player.nickname} использовал карту "мимо", но т.к. целью стал игрок ${offensePlayer.nickname} ничего не происходит и ход передается дальше.`);
 		game.grabEventCardFromDeck({player});
-		game.endTurn(offensePlayer.id);
 
 		return
 	}
-	nextPlayer.changeTurnState(ETurnState.inDefenseTrade);
-	game.turnContext.defensePlayer = nextPlayer;
-
-
-
 	game.addLog(`${player.nickname} использует карту "Мимо" и отказывается от обмена с игроком ${context.offensePlayer.nickname}. Вместо него меняется ${nextPlayer.nickname}`);
 	game.grabEventCardFromDeck({player});
 	player.changeTurnState(ETurnState.idle);
+
+
+	nextPlayer.changeTurnState(ETurnState.inDefenseTrade);
+	if (!nextPlayer.isAlive()) {
+		game.addLog(`Мимо прерывается, т.к цель ${nextPlayer.nickname} мертв`);
+		offensePlayer.interruptTrade();
+		return
+	}
+
+	game.turnContext.defensePlayer = nextPlayer;
 
 
 

@@ -25,6 +25,7 @@ import {ETurnContextType} from 'shared/enum/turnContextType';
 import {chainReactionTrade} from 'server/helpers/cardActions/panic/chainReaction';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {checkAllDeckCards} from '_integration/helpers';
+import clc from 'cli-color';
 
 enum EGameState {
   lobby = "lobby",
@@ -121,7 +122,7 @@ export class Game {
 
   addLog(log: string, force = false) {
     if (this.gameInProcess || force) {
-      debugLog(log)
+      debugLog(clc.yellowBright(log))
       this.gameLog.push(log)
     }
   }

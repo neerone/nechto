@@ -10,21 +10,18 @@ const processDeathByOverinfection = (player:Player) => {
 	game.killPlayer(player);
 	if (game.turnContext && game.turnContext.type === ETurnContextType.trade) {
 		if (game.turnContext.defensePlayer === player) {
-			game.turnContext.defensePlayer = nextPlayer;
+			//game.turnContext.defensePlayer = nextPlayer;
 			nextPlayer.changeTurnState(ETurnState.inDefenseTrade)
-		}
-		if (game.turnContext.offensePlayer === player) {
+
+		} else if (game.turnContext.offensePlayer === player) {
+
 			game.turnContext = null;
 			game.changeTurn(nextPlayer.id)
 		}
 	}
 	if (!game.turnContext) {
-		game.turnContext = null;
 		game.changeTurn(nextPlayer.id)
 	}
-
-
-
 }
 
 const processOffenseTrade = (player) => {
@@ -54,7 +51,7 @@ const processOffenseTrade = (player) => {
 		return
     }
 
-    if (player.game.turnContext === null) {
+    if (!player.game.turnContext) {
 	    player.game.turnContext = {
 	      type: ETurnContextType.trade,
 	      defensePlayer: playerToTrade,
@@ -65,11 +62,19 @@ const processOffenseTrade = (player) => {
     return;
 }
 
-const processDefenseTrade = (player) => {
+const processDefenseTrade = (player:Player) => {
 	const game = player.game;
-	if (game.turnContext.type === ETurnContextType.trade) {
-	    player.game.turnContext.defensePlayer = player;
+
+	if (!game.turnContext || game.turnContext.type !== ETurnContextType.trade) {
+		throw new Error(`Игрок ${player.nickname} получил inDefenseTrade вне контекста торговли`)
+		return;
 	}
+
+	if (game.turnContext.offensePlayer === player) {
+		return player.interruptTrade();
+	}
+	game.turnContext.defensePlayer = player;
+
 }
 
 export const processTurnContext = ({player, turnState}: {player:Player, turnState: ETurnState}) => {

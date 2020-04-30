@@ -2,7 +2,7 @@ import {getPanic} from 'shared/constant/cards';
 import {EPanicID} from 'shared/enum/cards';
 import {createMockGameServer} from '_integration/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
-import {checkAllDeckCards} from '_integration/helpers';
+import {checkAllDeckCardsTestEdition} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ENotificationAction} from 'shared/enum/notifications';
 import { filter } from 'lodash';
@@ -27,7 +27,7 @@ describe('threeFour test',  () => {
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		expect(game.turnContext.type).toBe(ETurnContextType.trade);
 		//Так как мы зафейкали дверь мы не можем оценить количество карт
-		//expect(checkAllDeckCards(game, false)).toBe(true);
+		//expect(checkAllDeckCardsTestEdition(game, false)).toBe(true);
 
 	});
 

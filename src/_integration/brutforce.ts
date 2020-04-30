@@ -3,7 +3,7 @@ import {Game} from 'server/models/Game';
 import {Player} from 'server/models/Player';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {GameServer} from 'server/server/GameServer';
-import {shuffle} from 'server/helpers/util';
+import {clearDebugCache, debugCache, debugLog, shuffle} from 'server/helpers/util';
 import {INotificationActionSelectCard} from 'shared/interfaces/notification';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {getCardActions} from 'server/formatters/formatCardActions';
@@ -23,7 +23,7 @@ let getFirstPlayableCardId = (game, player) => {
 	const playableCards = map(player.hand, card => {
 		return {uniqueId: card.uniqueId, menu: getCardActions(game, player, card), type: card.id};
 	})
-	console.log(player.nickname, playableCards)
+	debugLog(player.nickname, playableCards)
 	const sortPlayableCards = sortBy(playableCards, ({uniqueId,menu}) => {
 		return menu.length
 	});
@@ -73,7 +73,7 @@ const botTradeCardLogic = (gameServer: GameServer, player: Player, game: Game) =
 	const currentAction = getRandomItemFromArray(cardActions);
 
 	checkLastAction(player, cardActions);
-	console.log(`${player.nickname}-${player.turnState} торгует ${preferredCard.id} ${preferredCard.uniqueId}`, cardActions, currentAction, game.turnContext && game.turnContext.type, `players count: ${game.playersList.map(pId=> game.players[pId].nickname)}`)
+	debugLog(`${player.nickname}-${player.turnState} торгует ${preferredCard.id} ${preferredCard.uniqueId}`, cardActions, currentAction, game.turnContext && game.turnContext.type, `players count: ${game.playersList.map(pId=> game.players[pId].nickname)}`)
 
 	return gameServer.playerAction({
 		player,
@@ -153,16 +153,20 @@ const startBrutforce = () => {
 					try {
 						const iterated = botAct(gameServer, player, game)
 						if (!actioniterated) actioniterated = iterated;
-						counter++;
 					} catch(e) {
+						//each(game.gameLog, log => {console.log(log)})
+						each(debugCache, log => {console.log(...log)})
 						printBruteforceReport(counter, game);
 						throw e;
 					}
 				})
 
 				if (!actioniterated) {
+					clearDebugCache();
 					stop = true;
-					printBruteforceReport(counter, game);
+					counter++;
+					console.log(`PLAYERS INFO over ${counter} iterations - ${game.gameLog[game.gameLog.length-1]}`)
+					//printBruteforceReport(counter, game);
 				}
 			}
 		}

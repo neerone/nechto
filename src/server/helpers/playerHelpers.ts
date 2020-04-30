@@ -1,6 +1,7 @@
 import {Player} from 'server/models/Player';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ETurnContextType} from 'shared/enum/turnContextType';
+import {debugLog} from 'server/helpers/util';
 
 const processDeathByOverinfection = (player:Player) => {
 	const game = player.game;
@@ -11,7 +12,6 @@ const processDeathByOverinfection = (player:Player) => {
 		if (game.turnContext.defensePlayer === player) {
 			game.turnContext.defensePlayer = nextPlayer;
 			nextPlayer.changeTurnState(ETurnState.inDefenseTrade)
-			console.log('NEXT PLAYER IN DEFENSE TRADE')
 		}
 		if (game.turnContext.offensePlayer === player) {
 			game.turnContext = null;
@@ -34,7 +34,7 @@ const processOffenseTrade = (player) => {
 		playerToTrade = context.defensePlayer
 	} else {
 		playerToTrade = player.getNextPlayer();
-		console.log('PLAYER',player.nickname, 'PLAYER TO TRADE', playerToTrade.nickname, player.game.turnContext && player.game.turnContext.type);
+		debugLog('PLAYER',player.nickname, 'PLAYER TO TRADE', playerToTrade.nickname, player.game.turnContext && player.game.turnContext.type);
 	}
 
 

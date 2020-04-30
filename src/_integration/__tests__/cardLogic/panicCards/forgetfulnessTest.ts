@@ -5,7 +5,7 @@ import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {each, isEqual, find, findLast} from 'lodash';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import {ETurnContextType} from 'shared/enum/turnContextType';
-import {checkAllDeckCards} from '_integration/helpers';
+import {checkAllDeckCardsTestEdition} from '_integration/helpers';
 import {notifyPlayerDiscardCards} from 'server/helpers/cardActions/panic/forgetfulness';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
@@ -74,7 +74,7 @@ describe('forgetfulness test',  () => {
 		expect(offensePlayer.turnState).toBe(ETurnState.inOffenseTrade);
 		expect(game.turnContext.type).toBe(ETurnContextType.trade)
 
-		expect(checkAllDeckCards(game, false)).toBe(true);
+		//expect(checkAllDeckCardsTestEdition(game, false)).toBe(true);
 
 	});
 

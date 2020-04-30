@@ -3,7 +3,7 @@ import {EEventID} from 'shared/enum/cards';
 import {createMockGameServer} from '_integration/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {EPlayerActionType} from 'shared/enum/playerActions';
-import {checkAllDeckCards} from '_integration/helpers';
+import {checkAllDeckCardsTestEdition} from '_integration/helpers';
 import {testPlayerAction} from '_integration/testPlayerActionsDecisions';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 
@@ -72,7 +72,7 @@ describe('axe test',  () => {
 
 
 		//т.к теперь ходит нирон, у него 5 карт  на руке
-		expect(checkAllDeckCards(game, false)).toBe(true);
+		//expect(checkAllDeckCardsTestEdition(game, false)).toBe(true);
 		console.log("OK2")
 	});
 
@@ -112,7 +112,7 @@ describe('axe test',  () => {
 		expect(offensePlayer.hand.length).toBe(4);
 		expect(offensePlayer.quarantine).toBe(0);
 
-		expect(checkAllDeckCards(game, false)).toBe(true);
+		//expect(checkAllDeckCardsTestEdition(game, false)).toBe(true);
 		console.log("OK3")
 	});
 

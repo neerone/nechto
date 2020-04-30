@@ -4,6 +4,7 @@ import socketIO from "socket.io";
 import { registerHandlers } from "server/handlers/handlers";
 import { gameServer } from "server/server/GameServer";
 import {mockGameProcess} from '_integration/mockGameProcess';
+import {debugLog} from 'server/helpers/util';
 
 const port: number = 30;
 
@@ -34,7 +35,7 @@ class App {
 
   public Start() {
     this.server.listen(this.port);
-    console.log(`Server listening on port ${this.port}.`);
+    debugLog(`Server listening on port ${this.port}.`);
   }
 }
 

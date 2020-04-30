@@ -9,7 +9,7 @@ import {
   formatUpdateGameEvent,
 } from 'server/formatters/formatOutgoingEvents';
 import {gameStarter} from 'server/helpers/gameStarter';
-import {shuffle} from 'server/helpers/util';
+import {debugLog, shuffle} from 'server/helpers/util';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {handCardsCount, thingCard} from 'shared/constant/cards';
 import {EPlayerActionType} from 'shared/enum/playerActions';
@@ -121,7 +121,7 @@ export class Game {
 
   addLog(log: string, force = false) {
     if (this.gameInProcess || force) {
-      console.info(log)
+      debugLog(log)
       this.gameLog.push(log)
     }
   }
@@ -138,7 +138,7 @@ export class Game {
 
   start = () => {
     const players = this.players;
-    console.log('============================================================');
+    debugLog('============================================================');
     this.addLog('Игра началась');
     gameStarter(this);
     this.changeTurn(this.playersList[0]);
@@ -164,22 +164,22 @@ export class Game {
     })
   };
   discardedDeckPush(card) {
-    console.log('DISCARDED CARD', card)
+    debugLog('DISCARDED CARD', card)
     if (!card) {
       throw new Error('Попытка задискардить undefined')
     }
     this.discardedDeck.push(card)
   }
   changeTurn(playerId: string) {
-    console.log('NEXT PL. D', playerId)
+    debugLog('NEXT PL. D', playerId)
     if (!this.gameInProcess) return;
     this.resetGameState()
-    console.log('NEXT PL. D2', playerId)
+    debugLog('NEXT PL. D2', playerId)
     this.turnPlayerId = playerId;
     const player = this.players[playerId];
-    console.log(`change turn player id ${playerId}`)
+    debugLog(`change turn player id ${playerId}`)
     if (!player) {
-      console.log(this.players)
+      debugLog(this.players)
     }
     if (player.state === EPlayerState.door || player.turnState === ETurnState.dead) {
       //Дверь и мертвец не может ходить
@@ -215,8 +215,8 @@ export class Game {
     const endTurnPlayer = this.players[playerId];
     endTurnPlayer.changeTurnState(ETurnState.idle);
     const nextPlayer = endTurnPlayer.getNextAlivePlayer();
-    console.log(`Игрок ${endTurnPlayer.nickname} заканчивает ход`, map(endTurnPlayer.hand, card=> card.id))
-    console.log(`След. игрок ${nextPlayer.nickname}`)
+    debugLog(`Игрок ${endTurnPlayer.nickname} заканчивает ход`, map(endTurnPlayer.hand, card=> card.id))
+    debugLog(`След. игрок ${nextPlayer.nickname}`)
     checkAllDeckCards(this, !gameServer.isMock);
     this.changeTurn(nextPlayer.id);
   }
@@ -304,7 +304,7 @@ export class Game {
 
   grabEventCardFromDeck({player}: {player: Player}) {
     const eventCard = this.pickFirstEventCard();
-    console.log(`Игрок ${player.nickname} взял карту ${eventCard.id}`)
+    debugLog(`Игрок ${player.nickname} взял карту ${eventCard.id}`)
     player.getCard(eventCard);
   }
 
@@ -324,11 +324,11 @@ export class Game {
     if (!this.gameInProcess) return;
     if (cardUniqueId) {
       const card = find(player.hand, {uniqueId: cardUniqueId})
-      console.log(`Player ${player.nickname} igraet ${actionType} kartoi ${cardUniqueId} - ${card && card.id}`);
+      debugLog(`Player ${player.nickname} igraet ${actionType} kartoi ${cardUniqueId} - ${card && card.id}`);
     }
     if (selectedPlayerId) {
       const selectedPlayer = this.players[selectedPlayerId]
-      console.log(`Player ${player.nickname} выбирает игрока ${selectedPlayer.nickname}`);
+      debugLog(`Player ${player.nickname} выбирает игрока ${selectedPlayer.nickname}`);
     }
     switch (actionType) {
       case EPlayerActionType.cardDiscard:
@@ -356,7 +356,7 @@ export class Game {
         this.updateGame();
         return;
       case EPlayerActionType.actionDecision:
-        console.log(`Player ${player.nickname} выбирает action ${action}`)
+        debugLog(`Player ${player.nickname} выбирает action ${action}`)
         playerActionDecision({game: this, player, action});
         this.updateGame();
         return;

@@ -21,3 +21,15 @@ export function shuffle<T extends any[]>(array: T): T {
 
   return array;
 }
+
+const silent = true;
+export let debugCache = [];
+export function clearDebugCache() {
+  debugCache = [];
+}
+export function debugLog(...log) {
+  debugCache.push([...log]);
+  if (!silent) {
+    console.log(...log)
+  }
+}

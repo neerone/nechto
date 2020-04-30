@@ -8,6 +8,7 @@ import {ETurnState} from 'shared/enum/player';
 
 import {EEventID} from 'shared/enum/cards';
 import {find} from 'lodash';
+import {debugLog} from 'server/helpers/util';
 
 export const positionswapAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
 	game.turnContext = {
@@ -67,7 +68,7 @@ export const positionswapFinish = ({game, player, action}: {game:Game, player:Pl
 	if (game.turnContext.type !== ETurnContextType.positionswap) {
 		throw new Error('Смена места произошла без контекста positionswap');
 	}
-	console.log('position swap finish!!')
+	debugLog('position swap finish!!')
 	const {offensePlayer, defensePlayer} = game.turnContext;
 	game.turnContext = null;
 

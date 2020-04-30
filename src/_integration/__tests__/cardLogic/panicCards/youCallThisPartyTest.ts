@@ -2,7 +2,7 @@ import {getPanic} from 'shared/constant/cards';
 import {EPanicID} from 'shared/enum/cards';
 import {createMockGameServer} from '_integration/createGameServer';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
-import {checkAllDeckCards} from '_integration/helpers';
+import {checkAllDeckCardsTestEdition} from '_integration/helpers';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ENotificationAction} from 'shared/enum/notifications';
 import { filter, each, clone } from 'lodash';
@@ -41,7 +41,7 @@ describe('youcallthis party test',  () => {
 		expect(game.playersList).toStrictEqual([quarantined.id, offensePlayer.id, EPlayer.id, DPlayer.id])
 
 		//Так как мы зафейкали дверь мы не можем оценить количество карт
-		//expect(checkAllDeckCards(game, false)).toBe(true);
+		//expect(checkAllDeckCardsTestEdition(game, false)).toBe(true);
 
 	});
 

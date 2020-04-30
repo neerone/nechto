@@ -97,21 +97,4 @@ export const gameStarter = (game: Game) => {
 		game.players[playerId].color = `linear-gradient(${color}, ${secondColor})`
 	});
 
-
-	//if (gameServer.isMock) {
-	//	let neerone = find(game.players, {nickname: 'хост'});
-	//	if (!neerone) neerone = game.players[0];
-	//	//neerone.quarantine = 3;
-	//	neerone.hand.splice(0,4);
-	//	neerone.getCard(getCard(EEventID.axe));
-	//	neerone.getCard(getCard(EEventID.fear));
-	//	neerone.getCard(getCard(EEventID.lookaround));
-	//	neerone.getCard(getCard(EEventID.analysis));
-//
-	//	game.deck.splice(0,1, getPanic(EPanicID.chainReaction));
-	//	//console.log(neerone);
-	//	//game.turnPlayerId = neerone.id;
-	//	//game.players['player_1']
-	//}
-
 };

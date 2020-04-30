@@ -5,6 +5,7 @@ import {formatPlayerNotification} from 'server/formatters/formatOutgoingEvents';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {ETurnContextType} from 'shared/enum/turnContextType';
 import {filter, find} from 'lodash';
+import {debugLog} from 'server/helpers/util';
 
 export const getPlayerByStep = ({game, currentPlayer, isNext, step}: {game:Game, currentPlayer:Player, step: number, isNext: boolean}) => {
 	const nextPlayer = game.getPlayerByPosition({playerId: currentPlayer.id,isNext})
@@ -49,7 +50,7 @@ export const oneTwoAct = ({game, player}: {game:Game, player:Player}) => {
 
 
 export const oneTwoPlayerSelect = ({game, selectedPlayerId, player}: {game:Game, player: Player, selectedPlayerId: string}) => {
-	console.log('SELECTED PLAYER ID', selectedPlayerId)
+	debugLog('SELECTED PLAYER ID', selectedPlayerId)
 	const selectedPlayer = find(game.players, {id:selectedPlayerId});
 	game.addLog(`Игрок ${player.nickname} меняется местами с ${selectedPlayer.nickname}`);
 	game.swapPlayers(selectedPlayerId, player.id);

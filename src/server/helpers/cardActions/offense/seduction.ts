@@ -7,6 +7,7 @@ import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
 
 import {each} from 'lodash';
+import {debugLog} from 'server/helpers/util';
 
 export const seductionAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
 	player.discardCard(card.uniqueId);
@@ -51,7 +52,7 @@ export const seductionTradeFinish = ({game} : {game: Game}) => {
 	if (game.turnContext.type !== ETurnContextType.trade) {
 		throw new Error('Завершение обмена seduction');
 	}
-	console.log('SEDUCTION FINISH');
+	debugLog('SEDUCTION FINISH');
 	each(game.players, (player: Player) => {
 		player.changeTurnState(ETurnState.idle);
 	});

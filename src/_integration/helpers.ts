@@ -7,6 +7,7 @@ import {EPlayerState} from 'shared/enum/player';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {Player} from 'server/models/Player';
 import {initialDeck} from 'server/helpers/gameStarter';
+import {debugLog} from 'server/helpers/util';
 
 export const checkAllDeckCards = (game: Game, withPanics = true) => {
 
@@ -29,24 +30,28 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 		if (diff.length === 0) {
 			diff = difference(initialDeck, comparingDeck);
 		}
-		console.log(comparingDeck, initialDeck);
-		console.log('DECK DIFFERENCE', diff)
+		debugLog(comparingDeck, initialDeck);
+		debugLog('DECK DIFFERENCE', diff)
 
 		//each(diff, (diffCard) => {
 		//	const foundCards =  initialDeck.filter(c => c.id === diffCard.id);
-		//	console.log('FUUNDED SIMILAR CARDS', foundCards)
+		//	debugLog('FUUNDED SIMILAR CARDS', foundCards)
 		//})
 
 		throw new Error('Incorrect cards')
 	} else {
-		console.log('CARDS IS FINE', initialDeck.length, ' players ', playersCount)
+		debugLog('CARDS IS FINE', initialDeck.length, ' players ', playersCount)
 	}
 
 
 
 	return comparingDeck.length !== initialDeck.length
 
-/*	const cardsOnHands = reduce(game.players, (acc, player) => {
+};
+
+export const checkAllDeckCardsTestEdition = (game: Game, withPanics = true) => {
+
+	const cardsOnHands = reduce(game.players, (acc, player) => {
 		if (player.state ===EPlayerState.door) return acc;
 		return concat(acc, player.hand);
 	}, [])
@@ -84,14 +89,15 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 		console.error(`CARDS: ${fullCardsLength}, BUT SHOULD BE: ${cardsShouldBe}`, ' players ', playersCount)
 		throw new Error('Incorrect cards')
 	} else {
-		console.log('CARDS IS FINE', cardsShouldBe, ' players ', playersCount)
+		debugLog('CARDS IS FINE', cardsShouldBe, ' players ', playersCount)
 	}
-	return cardsShouldBe === fullCardsLength;*/
+	return cardsShouldBe === fullCardsLength;
 };
+
 
 export const printPlayersStatuses = game => {
 	each(game.players, pl => {
-		console.log(pl.nickname, pl.turnState);
+		debugLog(pl.nickname, pl.turnState);
 	})
 }
 
@@ -99,7 +105,7 @@ export const printPlayersStatuses = game => {
 export const printNotifications = player => {
 	each(player.socket.spy.mock.calls, ([type, event]) => {
 		if (type !== 'notification') return;
-		console.log(event);
+		debugLog(event);
 	})
 }
 

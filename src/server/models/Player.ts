@@ -3,7 +3,7 @@ import {find, findIndex} from 'lodash';
 import {Game} from 'server/models/Game';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ICardEvent} from 'shared/interfaces/cards';
-import {shuffle} from 'server/helpers/util';
+import {debugLog, shuffle} from 'server/helpers/util';
 import {EEventID} from 'shared/enum/cards';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import INotificationAction from 'shared/interfaces/notification';
@@ -77,7 +77,7 @@ export class Player {
 	changeTurnState = (newTurnState: ETurnState) => {
 		if (!this.game.gameInProcess) return;
 		if (this.state === EPlayerState.door) return;
-		console.log(`Игрок ${this.nickname} теперь ${newTurnState}`)
+		debugLog(`Игрок ${this.nickname} теперь ${newTurnState}`)
 		this.turnState = newTurnState
 		this.processTurnState(newTurnState);
 		processTurnContext({player:this, turnState: newTurnState});
@@ -103,18 +103,17 @@ export class Player {
 
 	getCard(card: ICardEvent) {
 		this.hand.push(card);
-		console.log(`Игрок ${this.nickname} получил карту ${card.id}`)
+		debugLog(`Игрок ${this.nickname} получил карту ${card.id}`)
 		//this.checkOverInfect();
 	}
 
 	discardCard(cardUniqueId: string) {
 		const game = this.game;
 		if (!game.gameInProcess) return;
-		console.log('CARD UNIQUE ID', cardUniqueId)
 		const card = this.getCardByUniqueId(cardUniqueId);
 
 		const discardCardIndex = findIndex(this.hand, (card) => card.uniqueId === cardUniqueId);
-		console.log(`Игрок ${this.nickname} убрал в колоду ${card.id}`)
+		debugLog(`Игрок ${this.nickname} убрал в колоду ${card.id}`)
 		this.game.discardedDeckPush(card);
 		this.hand.splice(discardCardIndex, 1);
 		//this.checkOverInfect();
@@ -210,7 +209,7 @@ export class Player {
 
 	getNextPlayer = () => {
 		if (!this.game) {
-			console.log('GAME Не задан у игрока', this.nickname)
+			debugLog('GAME Не задан у игрока', this.nickname)
 			throw new Error()
 		}
 		return this.game.getPlayerByPosition({playerId: this.id, isNext:true});

@@ -6,6 +6,7 @@ import {ETurnState} from 'shared/enum/player';
 import {find, findLast} from 'lodash';
 import {getCardActions} from 'server/formatters/formatCardActions';
 import {ENotificationAction} from 'shared/enum/notifications';
+import {debugLog} from 'server/helpers/util';
 
 interface IActionPayload  {
 	player:Player,
@@ -33,7 +34,7 @@ export const isPlayerCanDiscardCard = (game: Game, player: Player, cardUniqueId:
 	switch (player.turnState) {
 		case ETurnState.inCardAction:
 			if (!actAction) {
-				console.log('CARD ACTIONS WAS', cardActions, player.turnState, selectedCard.id)
+				debugLog('CARD ACTIONS WAS', cardActions, player.turnState, selectedCard.id)
 			}
 			return !!actAction;
 		default:
@@ -55,7 +56,7 @@ export const isPlayerCanActCard = (game: Game, player: Player, cardUniqueId: str
 		case ETurnState.inCardAction:
 		case ETurnState.inDefenseTrade:
 			if (!actAction) {
-				console.log('CARD ACTIONS WAS', cardActions, player.turnState, selectedCard.id)
+				debugLog('CARD ACTIONS WAS', cardActions, player.turnState, selectedCard.id)
 			}
 			return !!actAction;
 		default:
@@ -76,11 +77,11 @@ export const isPlayerCanTradeCard = (game: Game, player: Player, cardUniqueId: s
 		case ETurnState.inOffenseTrade:
 			if (!player.currentAction || (player.currentAction.type !== ENotificationAction.defenseTradeCard
 				&& player.currentAction.type !== ENotificationAction.offenseTradeCard)) {
-				console.log('CARD ACTIONS WAS', cardActions, player.nickname, player.turnState, selectedCard.id)
+				debugLog('CARD ACTIONS WAS', cardActions, player.nickname, player.turnState, selectedCard.id)
 				return false;
 			}
 			if (!actAction) {
-				console.log('CARD ACTIONS WAS', cardActions, player.turnState, selectedCard.id)
+				debugLog('CARD ACTIONS WAS', cardActions, player.turnState, selectedCard.id)
 			}
 			return !!actAction;
 		default:
@@ -97,7 +98,7 @@ export const isPlayerCanSelectPlayer = (game, player, selectedPlayerId) => {
 
 	const event = player.currentAction;
 	if (!player.currentAction || player.currentAction.type !== ENotificationAction.playerSelect) {
-		console.log('CARD ACTIONS WAS', event, player.nickname, player.turnState, selectedPlayerId)
+		debugLog('CARD ACTIONS WAS', event, player.nickname, player.turnState, selectedPlayerId)
 		return false;
 	}
 	if (!event.playersToSelect.includes(selectedPlayerId)) {

@@ -27,7 +27,6 @@ export const tradeCard = ({game, player, cardUniqueId}: {game: Game, player: Pla
     return
   }
   if (isOffenseTrade) {
-    debugLog('МЫ ПОПАЛИ В ТРЕЙД КАРД!!!!!', isOffenseTrade)
     //remove(player.hand, (card) => { return card.uniqueId === cardUniqueId});
     player.hand = filter(player.hand, (card) => card !== tradingCard);
     player.changeTurnState(ETurnState.idle);

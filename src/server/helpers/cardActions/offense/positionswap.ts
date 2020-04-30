@@ -68,7 +68,6 @@ export const positionswapFinish = ({game, player, action}: {game:Game, player:Pl
 	if (game.turnContext.type !== ETurnContextType.positionswap) {
 		throw new Error('Смена места произошла без контекста positionswap');
 	}
-	debugLog('position swap finish!!')
 	const {offensePlayer, defensePlayer} = game.turnContext;
 	game.turnContext = null;
 

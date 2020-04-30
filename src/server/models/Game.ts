@@ -224,8 +224,8 @@ export class Game {
     const nextPlayer = endTurnPlayer.getNextAlivePlayer();
     debugLog(`Игрок ${endTurnPlayer.nickname} заканчивает ход`, map(endTurnPlayer.hand, card=> card.id))
     debugLog(`След. игрок ${nextPlayer.nickname}`)
-    checkAllDeckCards(this, !gameServer.isMock);
     this.changeTurn(nextPlayer.id);
+    checkAllDeckCards(this, !gameServer.isMock);
   }
 
 
@@ -363,7 +363,6 @@ export class Game {
         this.updateGame();
         return;
       case EPlayerActionType.actionDecision:
-        debugLog(`Player ${player.nickname} выбирает action ${action}`)
         playerActionDecision({game: this, player, action});
         this.updateGame();
         return;

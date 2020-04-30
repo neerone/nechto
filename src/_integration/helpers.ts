@@ -1,9 +1,9 @@
 import {Game} from 'server/models/Game';
-import {concat, each, reduce, filter, clone, difference} from 'lodash';
-import {fullDeckObject, getCard} from 'shared/constant/cards';
+import {clone, concat, difference, each, filter, reduce} from 'lodash';
+import {fullDeckObject, getCard, handCardsCount} from 'shared/constant/cards';
 import {ICardAny} from 'shared/interfaces/cards';
 import {ECardType} from 'shared/enum/cards';
-import {EPlayerState} from 'shared/enum/player';
+import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {Player} from 'server/models/Player';
 import {initialDeck} from 'server/helpers/gameStarter';
@@ -43,7 +43,14 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 		debugLog('CARDS IS FINE', initialDeck.length, ' players ', playersCount)
 	}
 
+	each(activePlayers, pl => {
+		const playerHandLength = pl.hand.length;
+		if (playerHandLength > handCardsCount && pl.turnState !== ETurnState.inCardAction && pl.turnState !== ETurnState.inCardActionProgress) {
+			debugLog(`Аномальное количество карт у игрока ${pl.nickname} (${pl.turnState}) - ${playerHandLength} `, pl.hand);
+			throw new Error('Player hand anomaly')
+		}
 
+	})
 
 	return comparingDeck.length !== initialDeck.length
 

@@ -7,18 +7,13 @@ const processDeathByOverinfection = (player:Player) => {
 	const game = player.game;
 	const nextPlayer = player.getNextAlivePlayer();
 	game.addLog(`Какое несчастье. ${player.nickname} умер от перезаражения. Вместо него теперь играет ${nextPlayer.nickname}`)
-	debugLog(`Состояние игры ${game.turnContext && game.turnContext.type}. Стейт некста ${nextPlayer.turnState}`)
-	try {
-		game.killPlayer(player);
-	} catch (e) {
-		throw e;
-	}
-	debugLog('TEEEEST')
+	game.killPlayer(player);
 	debugLog(`Состояние игры ${game.turnContext && game.turnContext.type}. Стейт некста ${nextPlayer.turnState}`)
 	if (game.turnContext && game.turnContext.type === ETurnContextType.trade) {
 		if (game.turnContext.defensePlayer === player) {
 			//game.turnContext.defensePlayer = nextPlayer;
-			nextPlayer.changeTurnState(ETurnState.inDefenseTrade)
+			//nextPlayer.changeTurnState(ETurnState.inDefenseTrade)
+			game.turnContext.offensePlayer.interruptTrade();
 		} else if (game.turnContext.offensePlayer === player) {
 			game.turnContext = null;
 			game.changeTurn(nextPlayer.id)

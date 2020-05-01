@@ -7,7 +7,14 @@ const processDeathByOverinfection = (player:Player) => {
 	const game = player.game;
 	const nextPlayer = player.getNextAlivePlayer();
 	game.addLog(`Какое несчастье. ${player.nickname} умер от перезаражения. Вместо него теперь играет ${nextPlayer.nickname}`)
-	game.killPlayer(player);
+	debugLog(`Состояние игры ${game.turnContext && game.turnContext.type}. Стейт некста ${nextPlayer.turnState}`)
+	try {
+		game.killPlayer(player);
+	} catch (e) {
+		throw e;
+	}
+	debugLog('TEEEEST')
+	debugLog(`Состояние игры ${game.turnContext && game.turnContext.type}. Стейт некста ${nextPlayer.turnState}`)
 	if (game.turnContext && game.turnContext.type === ETurnContextType.trade) {
 		if (game.turnContext.defensePlayer === player) {
 			//game.turnContext.defensePlayer = nextPlayer;
@@ -71,17 +78,23 @@ const processDefenseTrade = (player:Player) => {
 	}
 
 	if (game.turnContext.offensePlayer === player) {
+		game.addLog(`Игрок ${player.nickname} не может меняться картой сам с собой. Торговля отменяется.`)
 		return player.interruptTrade();
 	}
+	if (player.quarantine > 0) {
+		game.addLog(`Игрок ${player.nickname} не может меняться картой, т.к он на карантине. Торговля отменяется.`)
+		return game.turnContext.offensePlayer.interruptTrade();
+	}
+
 	game.turnContext.defensePlayer = player;
+
 
 }
 
 export const processTurnContext = ({player, turnState}: {player:Player, turnState: ETurnState}) => {
 	if (!player.isAlive()) return;
 
-	const isOverInfected = player.isOverInfected();
-	if (isOverInfected && (turnState === ETurnState.inOffenseTrade || turnState === ETurnState.inDefenseTrade)) {
+	if (player.isOverInfected() && (turnState === ETurnState.inOffenseTrade || turnState === ETurnState.inDefenseTrade)) {
 		return processDeathByOverinfection(player);
 	}
 	switch (turnState) {

@@ -84,11 +84,12 @@ export class Player {
 	}
 
 	changeTurnState = (newTurnState: ETurnState) => {
+		debugLog(`Игрок ${this.nickname} пытается стать ${newTurnState}, а был ${this.turnState}`)
 		if (!this.game.gameInProcess) return;
 		if (this.state === EPlayerState.door) return;
 		if (this.turnState === newTurnState) return;
-		debugLog(`Игрок ${this.nickname} теперь ${newTurnState}`)
 		this.turnState = newTurnState
+		debugLog(`Игрок ${this.nickname} теперь ${newTurnState}`)
 		this.processTurnState(newTurnState);
 		processTurnContext({player:this, turnState: newTurnState});
 	};

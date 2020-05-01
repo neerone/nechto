@@ -11,7 +11,7 @@ import {
 import {gameStarter} from 'server/helpers/gameStarter';
 import {debugLog, shuffle} from 'server/helpers/util';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
-import {handCardsCount, thingCard} from 'shared/constant/cards';
+import {thingCard} from 'shared/constant/cards';
 import {EPlayerActionType} from 'shared/enum/playerActions';
 import INotificationAction from 'shared/interfaces/notification';
 import {ICardAny, ICardEvent, ICardPanic} from 'shared/interfaces/cards';
@@ -84,6 +84,14 @@ export class Game {
     each(discardCardIds, cardUniqueId => {
         player.discardCard(cardUniqueId)
     });
+    //Если он до этого торговал в offense trade и в стейте застряла его карта - дискардим карту
+    if (this.turnContext && this.turnContext.type === ETurnContextType.trade && this.turnContext.offensePlayer === player) {
+      const undiscardedCard = this.turnContext.offenseCard;
+      if (undiscardedCard) {
+        this.discardedDeckPush(undiscardedCard);
+      }
+    }
+
     player.changeTurnState(ETurnState.dead)
     this.playersList = this.playersList.filter(pId => pId !== player.id);
     const alivePlayers = filter(clone(this.playersList), pId => this.players[pId].isAlive());

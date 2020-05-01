@@ -29,11 +29,6 @@ export const notifyPlayerDiscardCards = ({game, player}: {game:Game, player:Play
 
 export const forgetfullnessAct = ({game, player}: {game:Game, player:Player}) => {
 	game.addLog('Паника! Забывчивость: Игрок меняет три карты с руки на три из колоды');
-	each(game.players, player => {
-		if (player.isAlive()) {
-			player.changeTurnState(ETurnState.idle)
-		}
-	});
 	player.changeTurnState(ETurnState.inCardActionProgress);
 
 

@@ -30,7 +30,7 @@ export const checkAllDeckCards = (game: Game, withPanics = true) => {
 		if (diff.length === 0) {
 			diff = difference(initialDeck, comparingDeck);
 		}
-		debugLog(comparingDeck, initialDeck);
+		//debugLog(comparingDeck, initialDeck);
 		debugLog('DECK DIFFERENCE', diff)
 
 		//each(diff, (diffCard) => {

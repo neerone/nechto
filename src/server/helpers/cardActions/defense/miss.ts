@@ -44,12 +44,12 @@ export const missAct = ({card, game, player} : {card:ICardEvent, game: Game, pla
 
 	nextPlayer.changeTurnState(ETurnState.inDefenseTrade);
 	if (!nextPlayer.isAlive()) {
-		game.addLog(`Мимо прерывается, т.к цель ${nextPlayer.nickname} мертв`);
+		game.addLog(`Мимо прерывается, т.к цель ${nextPlayer.nickname} не живой`);
 		offensePlayer.interruptTrade();
 		return
 	}
-
-	game.turnContext.defensePlayer = nextPlayer;
+	//game.addLog('Ошибка here')
+	//game.turnContext.defensePlayer = nextPlayer;
 
 
 

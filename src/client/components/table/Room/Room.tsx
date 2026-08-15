@@ -606,6 +606,7 @@ const Room = observer(({controller, children} : IRoomProps) => {
 					ry={surface.ry}
 					thickness={tableThickness(playersCount)}
 					lift={tableLift(playersCount)}
+					isClockwise={controller.isClockwise}
 				/>
 			</Container>
 			{/* Всё, что лежит на столешнице: колода и сработавшая паника (см. Table).

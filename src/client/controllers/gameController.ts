@@ -86,6 +86,12 @@ export default class GameController {
 	// Чей сейчас ход. Стол наводит на него прицел (см. TurnReticle); по одному
 	// turnState этого не понять — в обмене не в idle оба его участника.
 	@observable turnPlayerId: string | null = null;
+	// Куда идёт очередь хода. По кругу рассадки это направление роста индекса в
+	// playersList, а на экране — по часовой (см. roomPlayerAngle): места
+	// отсчитываются от нижнего через левое к верхнему. «Око за око» его
+	// переворачивает, и стол показывает это стрелками на столешнице (см.
+	// TableSurface).
+	@observable isClockwise: boolean = true;
 	@observable gameLog: IGameLogEntry[] = [];
 	// Лог свёрнут по умолчанию: он перекрывает стол, а самое важное (текущее
 	// действие) дублируется крупным индикатором.
@@ -533,7 +539,7 @@ export default class GameController {
 	// Одним действием: без него mobx отдаёт реакциям каждое присваивание по
 	// отдельности, и компонент успевает отрисоваться с новым контекстом хода, но
 	// ещё старой рукой и логом — а анимация обмена сверяет ровно их между собой.
-	@action updateGame = ({tradeContext, cardEffects, cardDraws, panicCard, players, playersList, turnPlayerId, deck, gameLog, currentAction, state, currentPlayer, hand, handActions, hostPlayerId, isPlayerCanCancel}: IGameUpdatePayload) => {
+	@action updateGame = ({tradeContext, cardEffects, cardDraws, panicCard, players, playersList, turnPlayerId, isClockwise, deck, gameLog, currentAction, state, currentPlayer, hand, handActions, hostPlayerId, isPlayerCanCancel}: IGameUpdatePayload) => {
 		this.updatePlayers(players);
 		this.markCardMoves({cardDraws, viewerId: currentPlayer.id, newHand: hand});
 		this.updateHand(hand);
@@ -542,6 +548,7 @@ export default class GameController {
 		this.syncSeating(playersList);
 		this.playersList = playersList;
 		this.turnPlayerId = turnPlayerId;
+		this.isClockwise = isClockwise ?? true;
 		this.deck = deck;
 		this.isPlayerCanCancel = isPlayerCanCancel;
 		this.currentPlayerId = currentPlayer.id;

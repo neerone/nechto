@@ -33,6 +33,7 @@ export interface IGameUpdatePayload {
 	players: IPlayersMap;
 	playersList: string[];
 	turnPlayerId: string | null;
+	isClockwise: boolean;
 	deck: IDeckPayload;
 	gameLog: IGameLogEntry[];
 	currentAction: INotificationAction | null;

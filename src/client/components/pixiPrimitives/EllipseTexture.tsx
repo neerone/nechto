@@ -36,6 +36,12 @@ interface EllipseTextureProps {
 	// рисуется столешница: это круг, увиденный из-за края стола, и его рисунок
 	// обязан сжаться вместе с ним (см. tableSquash), а не поехать краями за него.
 	stretch?: boolean;
+	// Отразить картинку по горизонтали. Зеркалим саму заливку, а не объект:
+	// объект пришлось бы разворачивать вместе со всем, что на нём лежит, а
+	// отражать надо ровно рисунок. Так столешница переворачивает нарисованные на
+	// ней стрелки хода (см. TableSurface): у зеркального круга направление
+	// вращения меняется на противоположное.
+	flipX?: boolean;
 }
 
 const wholeTexture: IFocus = {x: 0, y: 0, width: 1, height: 1};
@@ -49,14 +55,15 @@ export const behavior = {
 		oldProps: EllipseTextureProps | undefined,
 		newProps: EllipseTextureProps,
 	) {
-		const { rx, ry, texture, focus = wholeTexture, stretch = false } = newProps;
+		const { rx, ry, texture, focus = wholeTexture, stretch = false, flipX = false } = newProps;
 		// Заливка текстурой заново собирает геометрию, а карты статусов висят на
 		// кружках всё время партии: пока размер и картинка те же, перерисовывать
 		// нечего (стол пересчитывается на любое обновление).
 		const oldFocus = oldProps && (oldProps.focus ?? wholeTexture);
 		if (oldProps
 			&& oldProps.rx === rx && oldProps.ry === ry && oldProps.texture === texture
-			&& oldFocus === focus && (oldProps.stretch ?? false) === stretch) {
+			&& oldFocus === focus && (oldProps.stretch ?? false) === stretch
+			&& (oldProps.flipX ?? false) === flipX) {
 			this.applyDisplayObjectProps(oldProps, newProps);
 			return;
 		}
@@ -72,7 +79,9 @@ export const behavior = {
 		// стороне), если вписываем: тогда она заполняет эллипс, не перекашиваясь.
 		const byWidth = (rx * 2) / (width * focus.width);
 		const byHeight = (ry * 2) / (height * focus.height);
-		const scaleX = stretch ? byWidth : Math.max(byWidth, byHeight);
+		// Отражение — это отрицательный масштаб по X; сдвиг считается от него же,
+		// поэтому середина кадра остаётся в середине эллипса и у зеркальной заливки.
+		const scaleX = (stretch ? byWidth : Math.max(byWidth, byHeight)) * (flipX ? -1 : 1);
 		const scaleY = stretch ? byHeight : Math.max(byWidth, byHeight);
 		// И сдвиг такой, чтобы середина кадра пришлась на середину эллипса.
 		const matrix = new PIXI.Matrix()

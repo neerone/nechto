@@ -35,6 +35,13 @@ const rimColor = 0x131103;
 // Столешница — картинка: круглый клёпаный люк, увиденный сверху (см.
 // resources.tableTop). Растягиваем её под эллипс, а не вписываем: это тот же
 // круг, только в проекции стола, и рисунок обязан сжаться вместе с ним.
+//
+// На люке вырезаны стрелки очерёдности хода, и нарисованы они по часовой — так
+// же, как идёт по экрану сама рассадка (см. roomPlayerAngle). Против часовой её
+// разворачивает «Око за око», и тогда столешницу мы отражаем по горизонтали: у
+// зеркального круга стрелки смотрят в другую сторону, а доски, клёпки и свет
+// остаются теми же — картинка сама по себе почти симметрична, и подмены не
+// видно.
 const topTexture = getPixiTexture(resources.tableTop);
 // Цвет под ней — на то время, пока картинка не догрузилась: пустой дырой посреди
 // стола это выглядеть не должно.
@@ -65,9 +72,12 @@ interface ITableSurfaceProps {
 	thickness: number;
 	// Высота стола: на столько столешница поднята над полом (см. tableLift).
 	lift: number;
+	// Идёт ли очередь хода по часовой стрелке. От неё зависит только одно:
+	// в какую сторону смотрят вырезанные на столешнице стрелки.
+	isClockwise?: boolean;
 }
 
-const TableSurface = ({rx, ry, thickness, lift}: ITableSurfaceProps) => {
+const TableSurface = ({rx, ry, thickness, lift, isClockwise = true}: ITableSurfaceProps) => {
 	if (rx <= 0 || ry <= 0) return null;
 	const rim = Math.min(rimMax, Math.max(rimMin, ry * rimShare));
 	return (
@@ -93,7 +103,7 @@ const TableSurface = ({rx, ry, thickness, lift}: ITableSurfaceProps) => {
 				{/* Кант — столешница чуть больше того, что залито её цветом. */}
 				<Ellipse rx={rx} ry={ry} color={rimColor}/>
 				<Ellipse rx={rx - rim} ry={ry - rim} color={topColor}/>
-				<EllipseTexture rx={rx - rim} ry={ry - rim} texture={topTexture} stretch={true}/>
+				<EllipseTexture rx={rx - rim} ry={ry - rim} texture={topTexture} stretch={true} flipX={!isClockwise}/>
 			</Container>
 		</Container>
 	);

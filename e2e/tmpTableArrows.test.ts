@@ -18,14 +18,28 @@ test.describe.serial('стрелки на столе', () => {
 
 	test('снимок стола в обе стороны', async () => {
 		const page = session.page('Alice');
-		await page.setViewportSize({width: 1280, height: 900});
 
 		await session.arrange({players: NICKS, turn: 'Alice', clockwise: true});
-		await page.waitForTimeout(1500);
+		await page.waitForTimeout(2000);
 		await page.screenshot({path: `${SHOTS}/table-clockwise.png`});
 
+		const seating = await page.evaluate(() => {
+			const gc = (window as unknown as {__nechto: {
+				playersList: string[];
+				players: Record<string, {nickname: string} | null>;
+				isClockwise: boolean;
+				isFirstPersonTable: boolean;
+			}}).__nechto;
+			return {
+				order: gc.playersList.map((id) => gc.players[id]?.nickname ?? id),
+				isClockwise: gc.isClockwise,
+				firstPerson: gc.isFirstPersonTable,
+			};
+		});
+		console.log('SEATING', JSON.stringify(seating));
+
 		await session.arrange({players: NICKS, turn: 'Alice', clockwise: false});
-		await page.waitForTimeout(1500);
+		await page.waitForTimeout(2000);
 		await page.screenshot({path: `${SHOTS}/table-counter.png`});
 	});
 });

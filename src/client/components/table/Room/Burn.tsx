@@ -267,6 +267,7 @@ const BurningPlayer = ({burn: {seq, playerId, x, y, fromX, fromY}, controller, b
 						isThing={player.isThing}
 						isInfected={player.isInfected}
 						quarantine={player.quarantine}
+						avatar={player.avatar}
 					/>
 					<BadgeShade badgeWidth={size} badgeHeight={size * badgeAspect}/>
 					<Text

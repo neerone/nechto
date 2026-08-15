@@ -64,10 +64,11 @@ const isAnimatedStyle = (style: CardStyle): style is AnimatedCardStyle =>
 	typeof (style.width as OpaqueInterpolation<number>)?.interpolate === 'function';
 
 // resources is an object literal whose card-image entries are all `string` (the only
-// non-string entries, `playerBadges` and `avatars`, are never looked up here).
+// non-string entries — `playerBadges`, `avatars` and `infectedAvatars` — are never
+// looked up here).
 // We view it through a string index signature so a card image can be looked up by an
 // arbitrary `id`, yielding `string | undefined` under noUncheckedIndexedAccess.
-const {playerBadges: _playerBadges, avatars: _avatars, ...cardImages} = resources;
+const {playerBadges: _playerBadges, avatars: _avatars, infectedAvatars: _infectedAvatars, ...cardImages} = resources;
 const cardResources: Record<string, string | undefined> = cardImages;
 
 const Card = observer(({id, menu, badge, onCardClick, onCardOver, onCardOut, hoverPad = 0, canBeUsed, squash = 1, style}: ICardProps) => {

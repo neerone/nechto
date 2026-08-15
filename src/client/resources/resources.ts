@@ -45,6 +45,10 @@ import deckCounterBg from "client/resources/images/deckCounterBg.png";
 // «подписывают» выбранные карты в окне множественного выбора (см. FingerStamp
 // в HandComponent).
 import fingerPrint from "client/resources/images/fingerPrint.png";
+// Нечто во весь рост: им залит кружок игрока, про которого известно, что он
+// нечто (см. StatusSkin). Отдельная картинка, а не иллюстрация с карты «Нечто»:
+// эта нарисована сразу под кружок и берётся целиком, без кадрирования.
+import thingAvatar from "client/resources/images/thing_avatar.jpg";
 
 import playerBadge1 from "client/resources/images/playerBadges/1.png";
 import playerBadge2 from "client/resources/images/playerBadges/2.png";
@@ -71,6 +75,19 @@ import avatar5 from "client/resources/images/avatars/5.jpg";
 import avatar6 from "client/resources/images/avatars/6.jpg";
 import avatar7 from "client/resources/images/avatars/7.jpg";
 import avatar8 from "client/resources/images/avatars/8.jpg";
+
+// Те же лица, но заражённые: щупальца по щеке и зелёные глаза. Ими закрывается
+// кружок игрока, про которого известно, что он заражён (см. StatusSkin), — по
+// номеру его же аватарки, так что человек за столом остаётся узнаваемым. Кадры
+// те же, поэтому лицо не прыгает в момент, когда о заражении узнали.
+import infectedAvatar1 from "client/resources/images/avatars/infected/1.jpg";
+import infectedAvatar2 from "client/resources/images/avatars/infected/2.jpg";
+import infectedAvatar3 from "client/resources/images/avatars/infected/3.jpg";
+import infectedAvatar4 from "client/resources/images/avatars/infected/4.jpg";
+import infectedAvatar5 from "client/resources/images/avatars/infected/5.jpg";
+import infectedAvatar6 from "client/resources/images/avatars/infected/6.jpg";
+import infectedAvatar7 from "client/resources/images/avatars/infected/7.jpg";
+import infectedAvatar8 from "client/resources/images/avatars/infected/8.jpg";
 
 import cardAct from "client/resources/images/buttons/act.png";
 import cardDiscard from "client/resources/images/buttons/discard.png";
@@ -126,6 +143,7 @@ const resources = {
 	fingerPrint,
 	noise,
 	tableTop,
+	thingAvatar,
 
 	cardAct,
 	cardDiscard,
@@ -158,6 +176,13 @@ const resources = {
 
 	// Порядок важен: сервер присылает номер аватарки в этом списке.
 	avatars: [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6, avatar7, avatar8],
+
+	// Заражённые лица идут тем же порядком: номер у игрока один, и по нему
+	// берётся то чистое лицо, то заражённое.
+	infectedAvatars: [
+		infectedAvatar1, infectedAvatar2, infectedAvatar3, infectedAvatar4,
+		infectedAvatar5, infectedAvatar6, infectedAvatar7, infectedAvatar8,
+	],
 };
 
 export {resources};

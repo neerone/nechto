@@ -126,15 +126,22 @@ const youPlateColor = 0x14110C;
 const youPlatePadX = 7;
 const youPlatePadY = 3;
 const youPlateRadiusShare = 0.5;
+// Насколько подпись опущена от середины кружка — в долях его высоты. По центру
+// она ложилась ровно на лицо: под кружком теперь лицо игрока (а у кого-то ещё и
+// карта статуса), и подпись закрывала как раз то, по чему игрока и узнают. Вниз
+// её при этом уводим чуть-чуть: у самого края эллипс сужается, и подложка
+// длинного ника выходит за кружок, а сама подпись перестаёт читаться как часть
+// игрока и повисает под ним.
+const nicknameDrop = 0.1;
 
 // Ник на подложке. Подложку меряем по самим буквам, а не по кружку: ники бывают
 // от одной буквы до четырёх (см. formatNickname), и подложка на глаз то жала бы
 // длинный, то болталась вокруг короткого.
-const PlatedNickname = ({text, style}: {text: string, style: PIXI.TextStyle}) => {
+const PlatedNickname = ({text, style, y}: {text: string, style: PIXI.TextStyle, y: number}) => {
 	const {width, height} = PIXI.TextMetrics.measureText(text, style);
 	const plateHeight = height + youPlatePadY * 2;
 	return (
-		<Container>
+		<Container y={y}>
 			<Plate
 				plateWidth={width + youPlatePadX * 2}
 				plateHeight={plateHeight}
@@ -158,34 +165,51 @@ const PlatedNickname = ({text, style}: {text: string, style: PIXI.TextStyle}) =>
  * только её иллюстрацию — доли размеров картинки, а не пиксели: карты могут
  * перерисовать в другом разрешении.
  *
- * Кадры подобраны так, чтобы головы на всех кружках выходили примерно одного
- * размера: нечто нарисовано во всю карту, а лицо на «Заражении» — небольшим
- * пятном посреди волос, и одинаковыми долями карты они дали бы кружки с
- * несопоставимым зумом.
+ * Кадр «Карантина» подобран так, чтобы голова на кружке выходила примерно того
+ * же размера, что и лицо игрока под ней.
+ *
+ * У роли и заражения карт нет: они нарисованы сразу под кружок (см.
+ * resources.thingAvatar и resources.infectedAvatars) и берутся целиком —
+ * кадрировать нечего, картинки уже собраны как надо.
  */
+const wholePicture = {x: 0, y: 0, width: 1, height: 1};
 const statusSkins = {
-	thing: {texture: getPixiTexture(resources.thing), focus: {x: 0, y: 0.16, width: 1, height: 0.84}},
-	infected: {texture: getPixiTexture(resources.infect), focus: {x: 0.2, y: 0.32, width: 0.6, height: 0.49}},
+	thing: {texture: getPixiTexture(resources.thingAvatar), focus: wholePicture},
 	quarantine: {texture: getPixiTexture(resources.quarantine), focus: {x: 0.09, y: 0.27, width: 0.68, height: 0.58}},
 };
+
+// Заражённое лицо — то же самое лицо игрока, только со щупальцами: по кружку
+// видно и что человек заражён, и кто он. Скины собраны заранее и лежат готовыми:
+// EllipseTexture перерисовывает заливку, когда ей приходит другой focus, а на
+// новом объекте на каждый рендер она перерисовывалась бы всё время.
+const infectedSkins = map(resources.infectedAvatars, (image) => ({
+	texture: getPixiTexture(image),
+	focus: wholePicture,
+}));
 
 interface IStatusArgs {
 	isConnected: boolean;
 	isThing: boolean;
 	isInfected: boolean;
 	quarantine: number;
+	// Номер лица игрока (см. avatarTextureOf): по нему берётся и заражённое.
+	avatar: string;
 }
 
 /**
- * Какую карту натянуть на кружок. Роль важнее карантина: карантин пройдёт через
- * три хода, а нечто останется нечто — и знающему о роли важнее видеть именно её.
+ * Что натянуть на кружок. Роль важнее карантина: карантин пройдёт через три
+ * хода, а нечто останется нечто — и знающему о роли важнее видеть именно её.
  * Отключившегося не закрываем ничем: то, что человека нет за столом, важнее
  * всего остального, что можно о нём сказать.
+ *
+ * Заражённое лицо — единственный статус, у которого своя картинка на каждого:
+ * без номера лица (до старта партии его ещё нет) показывать нечего, и кружок
+ * остаётся чистым.
  */
-const statusSkinOf = ({isConnected, isThing, isInfected, quarantine}: IStatusArgs) => {
+const statusSkinOf = ({isConnected, isThing, isInfected, quarantine, avatar}: IStatusArgs) => {
 	if (!isConnected) return null;
 	if (isThing) return statusSkins.thing;
-	if (isInfected) return statusSkins.infected;
+	if (isInfected) return avatar === '' ? null : (infectedSkins[Number(avatar) % infectedSkins.length] ?? null);
 	if (quarantine > 0) return statusSkins.quarantine;
 	return null;
 };
@@ -319,10 +343,9 @@ interface IBadgeBodyProps {
 const noop = () => {};
 
 /**
- * Само тело кружка — то, на что ложатся карта статуса и сфера. Роли здесь нет:
- * нечто и заражённого показывает натянутая карта (см. StatusSkin) — та же, что
- * игрок держит в руке, а не отдельно нарисованный круглый бейдж, живущий своей
- * жизнью.
+ * Само тело кружка — то, на что ложатся картинка статуса и сфера. Роли здесь
+ * нет: нечто и заражённого показывает натянутая картинка (см. StatusSkin), а не
+ * круглый бейдж поверх кружка, живущий своей жизнью.
  *
  * Наружу — потому что горящий игрок (см. Burn) сгорает ровно тем же кружком,
  * каким сидел за столом.
@@ -483,6 +506,7 @@ const PlayerBadge = ({
 						isThing={isThing}
 						isInfected={isInfected}
 						quarantine={quarantine}
+						avatar={avatar}
 					/>
 					<BadgeShade badgeWidth={bodyWidth} badgeHeight={style.height}/>
 					{/* Ник — на подложке у всех: под ним теперь лицо игрока (а у кого-то
@@ -490,7 +514,11 @@ const PlayerBadge = ({
 					    Ровного кружка, по которому они читались сами по себе, больше нет.
 					    Свой при этом жирный и золотой: за абсолютным столом себя надо
 					    находить взглядом. */}
-					<PlatedNickname text={nick} style={isYou ? youNicknameStyle : nicknameStyle}/>
+					<PlatedNickname
+						text={nick}
+						style={isYou ? youNicknameStyle : nicknameStyle}
+						y={style.height * nicknameDrop}
+					/>
 					<Quarantine
 						quarantine={quarantine}
 						badgeWidth={style.width}

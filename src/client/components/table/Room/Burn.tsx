@@ -269,18 +269,18 @@ const BurningPlayer = ({burn: {seq, playerId, x, y, fromX, fromY}, controller, b
 						avatar={player.avatar}
 					/>
 					<BadgeShade badgeWidth={size} badgeHeight={size * badgeAspect}/>
-					<Text
-						text={player.isYou ? 'ТЫ' : (formatNickname(player.nickname) ?? '')}
-						anchor={0.5}
-						style={{fontFamily: 'Arial', fontSize: 14, fill: 0xFFFFFF, align: 'center'}}
-					/>
-					{/* Цепи последними — тем же слоем, что и за столом (см. PlayerBadge):
-					    горит тот же кружок, каким игрок сидел. */}
+					{/* Порядок тот же, что и за столом (см. PlayerBadge): цепи поверх
+					    кружка, ник поверх цепей — горит тот же кружок, каким игрок сидел. */}
 					<QuarantineSkin
 						quarantine={player.quarantine}
 						isConnected={player.isConnected}
 						badgeWidth={size}
 						badgeHeight={size * badgeAspect}
+					/>
+					<Text
+						text={player.isYou ? 'ТЫ' : (formatNickname(player.nickname) ?? '')}
+						anchor={0.5}
+						style={{fontFamily: 'Arial', fontSize: 14, fill: 0xFFFFFF, align: 'center'}}
 					/>
 				</AnimatedPixi.Dissolve>
 			)}

@@ -1,8 +1,7 @@
 import React from 'react';
-import {map, range} from 'lodash';
+import {map} from 'lodash';
 import * as PIXI from 'pixi.js';
 import {Container, Sprite, Text} from 'react-pixi-fiber';
-import Circle from 'client/components/pixiPrimitives/Circle';
 import Ellipse from 'client/components/pixiPrimitives/Ellipse';
 import EllipseTexture from 'client/components/pixiPrimitives/EllipseTexture';
 import Plate from 'client/components/pixiPrimitives/Plate';
@@ -52,65 +51,6 @@ export const formatNickname = (nickname: string | null): string | null => {
 	if (!nickname) return null;
 	return nickname.substring(0,4).toUpperCase()
 };
-
-// Точки отсчитывают оставшиеся ходы карантина. Нажатие по ним показывает саму
-// карту «Карантин»: по жёлтым точкам не догадаться, что именно на игрока сыграли.
-// Сами точки крошечные, поэтому область нажатия растягиваем на всю ширину бейджа
-// и делаем не тоньше пальца.
-const quarantineHitHeight = 30;
-// Точки сидят на «лбу» кружка — в долях его полувысоты вверх от середины. Ниже
-// им мешают подпись с пометкой, выше они сползают с самого кружка.
-const quarantineDotsLift = 0.58;
-
-interface IQuarantineProps {
-	quarantine: number;
-	// Габариты кружка: он вытянут по вертикали (см. badgeAspect), поэтому точки
-	// разложены по его ширине, а опущены — по его высоте.
-	badgeWidth: number;
-	badgeHeight: number;
-	isInteractive: boolean;
-}
-
-const Quarantine = ({quarantine, badgeWidth, badgeHeight, isInteractive}: IQuarantineProps) => {
-	const r = (badgeWidth / 2) * 0.05;
-	const yOffset = -(badgeHeight / 2) * quarantineDotsLift;
-	const xOffset = r * 4;
-	if (!quarantine) return null;
-	const hitWidth = Math.max(badgeWidth / 2, r * 4 * quarantine);
-	const hitArea = new PIXI.Rectangle(-hitWidth / 2, yOffset - quarantineHitHeight / 2, hitWidth, quarantineHitHeight);
-	// Плашка под точками: на «лбу» под ними теперь и лицо игрока, и цепи карантина
-	// (см. QuarantineSkin), и жёлтое по этой пестроте не читается.
-	//
-	// Длина у неё всегда во весь карантин, а не по оставшимся точкам: это шкала,
-	// и убывать должны только точки на ней. Иначе с каждым ходом карантинного
-	// плашка сама укорачивалась бы — и то, сколько ему осталось, приходилось бы
-	// считать точки, а не видеть.
-	const scale = Math.max(quarantine, quarantineTurns);
-	const left = -xOffset - r;
-	const right = (scale - 1) * r * 4 - xOffset + r;
-	return (
-		<Container
-			interactive={isInteractive}
-			buttonMode={isInteractive}
-			hitArea={hitArea}
-			pointerdown={(event: PIXI.interaction.InteractionEvent) => isInteractive
-				? toggleCardHintFor(EEventID.quarantine, event)
-				: null}
-		>
-			<Container x={(left + right) / 2} y={yOffset}>
-				<Plate
-					plateWidth={right - left + r * 3}
-					plateHeight={r * 5}
-					borderRadius={r * 2.5}
-					color={youPlateColor}
-				/>
-			</Container>
-			{ map(range(quarantine), (_q, index) => {
-				return <Circle key={index} xCoord={(index * r * 4) - xOffset } yCoord={yOffset} color={0xFFFF00} r={r}/>
-			})}
-		</Container>
-	);
-}
 
 // Подпись на кружке. У всех она белая по тёмной подложке, а свой ник — жирный и
 // золотой: за абсолютным столом (см. roomPlayerOrder) сидишь ты где угодно, а не
@@ -219,30 +159,51 @@ export const StatusSkin = ({badgeWidth, badgeHeight, ...status}: IStatusArgs & {
 // ни был закрыт: карантин не отменяет ни роли, ни заражения, а накладывается на
 // них. Раньше он был таким же скином, как они, и просто их вытеснял — по кружку
 // заражённого в карантине нельзя было сказать, что он заражён.
-const quarantineChainsTexture = getPixiTexture(resources.quarantineChains);
-// Крест с замком нарисован под пропорции кружка (см. badgeAspect), поэтому
-// просто уменьшаем его до кружка, а не заливаем по эллипсу, как остальные
-// картинки: заливка срезала бы ему углы с пластинами — то, чем цепи и держатся.
 //
-// Доля — ровно та, при которой в эллипс попадают и сами пластины: они сидят по
-// углам картинки, а угол прямоугольника от эллипса дальше всего. Больше — и
-// крепления начинают срезаться краем кружка, меньше — цепи болтаются в нём, ни
-// на чём не держась.
-const quarantineChainsShare = 0.75;
+// Замков на картинке столько, сколько игроку осталось ходов в карантине: он и
+// есть счётчик, отдельных точек под ним больше нет. Отсюда и порядок в списке —
+// по индексу «сколько ходов осталось минус один».
+const quarantineChainsTextures = [
+	getPixiTexture(resources.quarantineChains1),
+	getPixiTexture(resources.quarantineChains2),
+	getPixiTexture(resources.quarantineChains3),
+];
+// Цепи нарисованы под пропорции кружка (см. badgeAspect), поэтому просто
+// уменьшаем их до кружка, а не заливаем по эллипсу, как остальные картинки:
+// заливка срезала бы им края с креплениями — то, чем цепи и держатся.
+//
+// Цепи крупнее самого кружка и подняты к его макушке: крепления прибиты по
+// верхнему краю яйца, а не спрятаны внутрь, и крайние из них свешиваются за
+// бока. Так карантин виден со всего стола — цепями заперт весь игрок целиком, а
+// не нарисован значок у него на груди.
+const quarantineChainsShare = 1.05;
+// Подъём — в долях высоты кружка вверх от его середины.
+const quarantineChainsLift = 0.1;
 
-export const QuarantineSkin = ({quarantine, isConnected, badgeWidth, badgeHeight}: {
+export const QuarantineSkin = ({quarantine, isConnected, badgeWidth, badgeHeight, isInteractive = false}: {
 	quarantine: number;
 	isConnected: boolean;
 	badgeWidth: number;
 	badgeHeight: number;
+	isInteractive?: boolean;
 }) => {
 	if (!isConnected || quarantine <= 0) return null;
+	// Ходов может прийти и больше, чем нарисовано замков (карантин продлевают
+	// повторной картой): сверх нарисованного показываем самую «полную» картинку.
+	const texture = quarantineChainsTextures[Math.min(quarantine, quarantineTurns) - 1];
+	if (!texture) return null;
 	return (
 		<Sprite
-			texture={quarantineChainsTexture}
+			texture={texture}
 			anchor={0.5}
+			y={-badgeHeight * quarantineChainsLift}
 			width={badgeWidth * quarantineChainsShare}
 			height={badgeHeight * quarantineChainsShare}
+			interactive={isInteractive}
+			buttonMode={isInteractive}
+			pointerdown={(event: PIXI.interaction.InteractionEvent) => isInteractive
+				? toggleCardHintFor(EEventID.quarantine, event)
+				: null}
 		/>
 	);
 };
@@ -528,31 +489,31 @@ const PlayerBadge = ({
 						avatar={avatar}
 					/>
 					<BadgeShade badgeWidth={bodyWidth} badgeHeight={style.height}/>
-					{/* Ник — на подложке у всех: под ним теперь лицо игрока (а у кого-то
-					    ещё и карта статуса поверх), и по картинке белые буквы теряются.
-					    Ровного кружка, по которому они читались сами по себе, больше нет.
-					    Свой при этом жирный и золотой: за абсолютным столом себя надо
-					    находить взглядом. */}
-					<PlatedNickname
-						text={nick}
-						style={isYou ? youNicknameStyle : nicknameStyle}
-						y={style.height * nicknameDrop}
-					/>
-					{/* Цепи — поверх всего кружка разом: и лица со статусом, и светотени,
-					    и ника. Карантинного заперли снаружи, поверх того, кем он на этом
-					    столе был, — поэтому и цепи лежат последними. Выше них только
-					    точки, которыми считают оставшиеся ходы. */}
+					{/* Цепи — поверх всего кружка разом: и лица со статусом, и светотени.
+					    Карантинного заперли снаружи, поверх того, кем он на этом столе
+					    был, — поэтому цепи и ложатся на всё это сверху.
+
+					    Нажатие по ним показывает саму карту «Карантин»: по цепям не
+					    догадаться, что именно на игрока сыграли. Когда игрока выбирают
+					    целью, цепи нажатий не берут — выбор важнее подсказки, и кружок
+					    должен нажиматься весь одинаково. */}
 					<QuarantineSkin
 						quarantine={quarantine}
 						isConnected={isConnected}
 						badgeWidth={bodyWidth}
 						badgeHeight={style.height}
-					/>
-					<Quarantine
-						quarantine={quarantine}
-						badgeWidth={style.width}
-						badgeHeight={style.height}
 						isInteractive={!canBeSelected}
+					/>
+					{/* Ник — на подложке у всех: под ним теперь лицо игрока (а у кого-то
+					    ещё и картинка статуса с цепями поверх), и по этой пестроте белые
+					    буквы теряются. Ровного кружка, по которому они читались сами по
+					    себе, больше нет. Кладётся ник последним: как бы игрока ни закрыли,
+					    прочесть, кто это, надо в любом случае. Свой при этом жирный и
+					    золотой: за абсолютным столом себя надо находить взглядом. */}
+					<PlatedNickname
+						text={nick}
+						style={isYou ? youNicknameStyle : nicknameStyle}
+						y={style.height * nicknameDrop}
 					/>
 					{/* Роль игрока — это сам бейдж: отдельных значков нечто/заражения нет.
 					    Своя пометка сидит на макушке кружка и наполовину торчит за него:

@@ -1,14 +1,16 @@
 import React from 'react';
-import {map} from 'lodash';
+import {map, times} from 'lodash';
 import * as PIXI from 'pixi.js';
 import {Container, Sprite, Text} from 'react-pixi-fiber';
+import {useSpring} from 'react-spring/universal';
+import type {OpaqueInterpolation} from 'react-spring/universal';
 import Ellipse from 'client/components/pixiPrimitives/Ellipse';
 import EllipseTexture from 'client/components/pixiPrimitives/EllipseTexture';
 import Plate from 'client/components/pixiPrimitives/Plate';
 import {tableSquash} from 'client/helpers/roomHelpers';
 import {sphereShadeTexture} from 'client/helpers/sphereShade';
 import {resources} from 'client/resources/resources';
-import {getPixiTexture} from 'client/components/table/pixiInjected';
+import {AnimatedPixi, getPixiTexture} from 'client/components/table/pixiInjected';
 import {toggleCardHintFor} from 'client/components/hint/canvasHint';
 import {tradeColor} from 'client/helpers/cardVisuals';
 import {EPlayerMark} from 'shared/enum/playerMarks';
@@ -392,6 +394,300 @@ export const BadgeBody = ({
 	);
 };
 
+/**
+ * Статус игрока, который видно по яйцу: кем он закрыт и заперт ли он.
+ *
+ * Заражение и роль здесь ровно те, что дошли до этого зрителя: сервер шлёт их
+ * только знающим (см. formatPlayer), поэтому и переворачивается яйцо только у
+ * тех, кому есть что увидеть, — у заражённого и у нечто, а не у всего стола.
+ */
+interface IEggStatus {
+	isConnected: boolean;
+	isThing: boolean;
+	isInfected: boolean;
+	quarantine: number;
+}
+
+/**
+ * Считается ли смена статуса переворотом. Роль и заражение — всегда: их меняют
+ * один раз за партию, и это событие. Карантин — когда его вешают (или вешают
+ * поверх, продлевая) и когда он спадает: цепи появились или их больше нет.
+ *
+ * А вот как карантин тикает (три хода, два, один), переворотом не считаем: там
+ * не меняется статус, а идёт счётчик на тех же цепях (см. QuarantineSkin), и
+ * крутить из-за него яйцо каждый ход — то же самое, что крутить его на каждой
+ * секунде таймера.
+ */
+const isStatusTurn = (was: IEggStatus, now: IEggStatus): boolean =>
+	was.isThing !== now.isThing
+	|| was.isInfected !== now.isInfected
+	|| now.quarantine > was.quarantine
+	|| (was.quarantine > 0 && now.quarantine === 0);
+
+/**
+ * Сколько длится переворот. Столько же, сколько у карты паники (см. PanicCard):
+ * на столе это одно и то же движение, и разъезжаться им незачем.
+ */
+const eggTurnMs = 560;
+
+// Толщина яйца в долях его ширины, из скольких слоёв она сложена, насколько
+// у́же полюс экватора и до чего темнеет нутро.
+//
+// Толщина небольшая: на ней держится только объём, а не сама картинка. Стоит
+// развести слои пошире — и в повороте видно уже не выпуклое яйцо, а стопку
+// отдельных картинок, разъезжающихся веером.
+const eggThickness = 0.2;
+const eggCoreCount = 5;
+const eggTaper = 0.55;
+const eggDarkness = 0.5;
+// Полутолщина одного слоя — в долях полуширины яйца. Слой не бесконечно тонкий
+// блин, а пластинка: встав ребром, он остаётся виден полоской, и соседние
+// пластинки смыкаются в сплошной бок. Берём её равной шагу между слоями —
+// тогда они перекрываются, и в боку нет щелей.
+const eggSlice = eggThickness / (eggCoreCount - 1) / 0.5;
+// Насколько яйцо вытягивается в середине поворота. Тот же приём, что у паники:
+// без него поворот читается схлопыванием картинки, а не движением.
+const eggBulge = 0.05;
+
+/**
+ * Слои, из которых сложено яйцо, — от затылка к лицу (в этом же порядке они и
+ * рисуются: дальние сначала).
+ *
+ * Широкий и тёмный посередине, узкие и светлые по полюсам: посередине смотришь
+ * в глубь яйца, а у полюсов — почти в его поверхность. Стопка симметрична, и
+ * поэтому в середине переворота, когда яйцо стоит ребром, обе его стороны
+ * выглядят одинаково — момент подмены одной другой не виден.
+ */
+const eggLayers = times(eggCoreCount, (index) => {
+	// Глубина слоя в долях полутолщины: −1 — затылок, 0 — экватор, +1 — лицо.
+	const level = -1 + (2 * index) / (eggCoreCount - 1);
+	return {
+		depth: (eggThickness / 2) * level,
+		size: Math.sqrt(1 - level * level * eggTaper),
+		dark: eggDarkness * Math.sqrt(Math.max(0, 1 - level * level)),
+	};
+});
+
+interface IEggProps {
+	status: IEggStatus;
+	color: string;
+	avatar: string;
+	nick: string;
+	isYou: boolean;
+	badgeWidth: number;
+	badgeHeight: number;
+	isInteractive: boolean;
+	pointerdown: (event: PIXI.interaction.InteractionEvent) => void;
+	isQuarantineInteractive: boolean;
+}
+
+/**
+ * Поверхность яйца — всё, что на игроке нарисовано: он сам, его статус,
+ * светотень, цепи и подпись. Ровно то, что и стояло на столе до переворота, —
+ * само по себе, без всякой стопки, это и есть обычный кружок игрока.
+ */
+const EggSurface = ({
+	status: {isConnected, isThing, isInfected, quarantine},
+	color,
+	avatar,
+	nick,
+	isYou,
+	badgeWidth,
+	badgeHeight,
+	isInteractive,
+	pointerdown,
+	isQuarantineInteractive,
+}: IEggProps) => (
+	<React.Fragment>
+		{/* Кружок игрока — эллипс, а не круг: он стоит за столом, который мы
+		    видим из-за его края, и вытянут по вертикали (см. badgeAspect). */}
+		<BadgeBody
+			isDoor={false}
+			isConnected={isConnected}
+			color={color}
+			avatar={avatar}
+			badgeWidth={badgeWidth}
+			badgeHeight={badgeHeight}
+			isInteractive={isInteractive}
+			pointerdown={pointerdown}
+		/>
+		<StatusSkin
+			badgeWidth={badgeWidth}
+			badgeHeight={badgeHeight}
+			isConnected={isConnected}
+			isThing={isThing}
+			isInfected={isInfected}
+			avatar={avatar}
+		/>
+		<BadgeShade badgeWidth={badgeWidth} badgeHeight={badgeHeight}/>
+		{/* Цепи — поверх всего кружка разом: и лица со статусом, и светотени.
+		    Карантинного заперли снаружи, поверх того, кем он на этом столе
+		    был, — поэтому цепи и ложатся на всё это сверху.
+
+		    Нажатие по ним показывает саму карту «Карантин»: по цепям не
+		    догадаться, что именно на игрока сыграли. Когда игрока выбирают
+		    целью, цепи нажатий не берут — выбор важнее подсказки, и кружок
+		    должен нажиматься весь одинаково. */}
+		<QuarantineSkin
+			quarantine={quarantine}
+			isConnected={isConnected}
+			badgeWidth={badgeWidth}
+			badgeHeight={badgeHeight}
+			isInteractive={isQuarantineInteractive}
+		/>
+		{/* Ник — на подложке у всех: под ним теперь лицо игрока (а у кого-то
+		    ещё и картинка статуса с цепями поверх), и по этой пестроте белые
+		    буквы теряются. Ровного кружка, по которому они читались сами по
+		    себе, больше нет. Кладётся ник последним: как бы игрока ни закрыли,
+		    прочесть, кто это, надо в любом случае. Свой при этом жирный и
+		    золотой: за абсолютным столом себя надо находить взглядом. */}
+		<PlatedNickname
+			text={nick}
+			style={isYou ? youNicknameStyle : nicknameStyle}
+			y={badgeHeight * nicknameDrop}
+		/>
+	</React.Fragment>
+);
+
+/**
+ * Слой в глубине яйца: то же лицо со статусом, но приглушённое темнотой и без
+ * всего, что лежит на поверхности, — светотень, цепи и подпись нарисованы
+ * снаружи, а не внутри. Нажатий такие слои не берут: игрок на столе один, и
+ * нажимается у него поверхность.
+ */
+const EggCore = ({status: {isConnected, isThing, isInfected}, color, avatar, badgeWidth, badgeHeight, dark}: IEggProps & {dark: number}) => (
+	<React.Fragment>
+		<BadgeBody
+			isDoor={false}
+			isConnected={isConnected}
+			color={color}
+			avatar={avatar}
+			badgeWidth={badgeWidth}
+			badgeHeight={badgeHeight}
+		/>
+		<StatusSkin
+			badgeWidth={badgeWidth}
+			badgeHeight={badgeHeight}
+			isConnected={isConnected}
+			isThing={isThing}
+			isInfected={isInfected}
+			avatar={avatar}
+		/>
+		<Ellipse rx={badgeWidth / 2} ry={badgeHeight / 2} color={0x000000} alpha={dark}/>
+	</React.Fragment>
+);
+
+/**
+ * Одна сторона переворота — целое яйцо со своим статусом, повёрнутое на
+ * пол-оборота вокруг вертикальной оси.
+ *
+ * Точка на глубине z, повёрнутая на угол, уезжает вбок на z·sin — на этом и
+ * держится объём: слои разъезжаются тем сильнее, чем яйцо ближе к ребру, и
+ * дальние выглядывают из-за поверхности сбоку. Сама поверхность при этом
+ * сжимается по ширине как cos — она плоская, и на ребре её не видно вовсе;
+ * толщину на ребре держат слои.
+ *
+ * Уходящая сторона поворачивается «от нас», приходящая — тем же поворотом, но
+ * с изнанки, поэтому её слои разъезжаются в другую сторону: это одно и то же
+ * яйцо, продолжающее крутиться.
+ */
+interface IEggSideProps extends IEggProps {
+	turn: OpaqueInterpolation<number>;
+	// Сторона, которая уходит: её видно, пока яйцо не встало ребром.
+	isLeaving: boolean;
+}
+
+const EggSide = ({turn, isLeaving, ...egg}: IEggSideProps) => {
+	const {badgeWidth} = egg;
+	const side = isLeaving ? 1 : -1;
+	const shiftOf = (depth: number) => turn.interpolate((value: number) =>
+		side * depth * badgeWidth * Math.sin(Math.PI * value));
+	return (
+		<AnimatedPixi.Container
+			visible={turn.interpolate((value: number) => (value < 0.5) === isLeaving)}
+			scale={turn.interpolate((value: number): [number, number] =>
+				[1, 1 + eggBulge * Math.sin(Math.PI * value)])}
+		>
+			{map(eggLayers, ({depth, size, dark}, index) => (
+				<AnimatedPixi.Container
+					key={index}
+					x={shiftOf(depth)}
+					scale={turn.interpolate((value: number): [number, number] => {
+						const flat = Math.abs(Math.cos(Math.PI * value));
+						const edge = Math.abs(Math.sin(Math.PI * value));
+						return [Math.sqrt(size * size * flat * flat + eggSlice * eggSlice * edge * edge), size];
+					})}
+				>
+					<EggCore {...egg} dark={dark}/>
+				</AnimatedPixi.Container>
+			))}
+			<AnimatedPixi.Container
+				x={shiftOf(eggThickness / 2)}
+				scale={turn.interpolate((value: number): [number, number] =>
+					[Math.abs(Math.cos(Math.PI * value)), 1])}
+			>
+				<EggSurface {...egg}/>
+			</AnimatedPixi.Container>
+		</AnimatedPixi.Container>
+	);
+};
+
+// Сам переворот: монтируется на каждую смену статуса заново (см. Egg), поэтому
+// крутится ровно один раз — от старой стороны к новой.
+const EggTurn = ({was, ...egg}: IEggProps & {was: IEggStatus}) => {
+	// Пол-оборота: 0 — к столу повёрнут старый статус, 1 — новый.
+	const {turn} = useSpring<{turn: number}>({
+		turn: 1,
+		from: {turn: 0},
+		config: {duration: eggTurnMs},
+	});
+	return (
+		<React.Fragment>
+			<EggSide {...egg} turn={turn} isLeaving={true} status={was}/>
+			<EggSide {...egg} turn={turn} isLeaving={false}/>
+		</React.Fragment>
+	);
+};
+
+/**
+ * Яйцо игрока. Пока статус тот же — это просто его поверхность, слой в слой как
+ * было; сменился — она поворачивается на новую.
+ *
+ * Смену ловим прямо в рендере, а не эффектом: эффект отработает уже после того,
+ * как новый статус нарисован, и переворот начнётся с кадра, на котором его
+ * нечем начинать — новое лицо на столе уже стоит.
+ */
+const Egg = ({status, ...egg}: IEggProps) => {
+	// Статус, с которым яйцо стоит на столе сейчас.
+	const shown = React.useRef(status);
+	// Идущий переворот: с какого статуса и какой он по счёту. Номером он
+	// монтируется заново — каждая смена крутится своим оборотом с нуля.
+	const turns = React.useRef(0);
+	const turning = React.useRef<{seq: number, was: IEggStatus} | null>(null);
+	const [, redraw] = React.useReducer((tick: number) => tick + 1, 0);
+
+	if (isStatusTurn(shown.current, status)) {
+		turns.current += 1;
+		turning.current = {seq: turns.current, was: shown.current};
+	}
+	shown.current = status;
+
+	const seq = turning.current ? turning.current.seq : 0;
+	React.useEffect(() => {
+		if (!seq) return;
+		// Открутив своё, стопка слоёв со стола уходит: держать её ради яйца,
+		// которое снова стоит к столу лицом, незачем.
+		const timer = setTimeout(() => {
+			turning.current = null;
+			redraw();
+		}, eggTurnMs);
+		return () => clearTimeout(timer);
+	}, [seq]);
+
+	if (!turning.current) return <EggSurface {...egg} status={status}/>;
+	return <EggTurn key={seq} {...egg} status={status} was={turning.current.was}/>;
+};
+
 const getMarkTexture = (mark: EPlayerMark | undefined): PIXI.Texture | undefined => {
 	switch (mark) {
 		case EPlayerMark.question:
@@ -466,54 +762,36 @@ const PlayerBadge = ({
 				/>
 			)}
 
-			{/* Кружок игрока — эллипс, а не круг: он стоит за столом, который мы
-			    видим из-за его края, и вытянут по вертикали (см. badgeAspect). */}
-			<BadgeBody
-				isDoor={isDoor}
-				isConnected={isConnected}
-				color={color}
-				avatar={avatar}
-				badgeWidth={bodyWidth}
-				badgeHeight={style.height}
-				isInteractive={canBeSelected || isDoor}
-				pointerdown={onBadgePointerDown}
-			/>
-			{!isDoor && (
+			{/* Дверь — не игрок, а лежащая на месте соседей карта: ей и вертеться
+			    нечем, статуса у неё нет. */}
+			{isDoor ? (
+				<BadgeBody
+					isDoor={true}
+					isConnected={isConnected}
+					color={color}
+					avatar={avatar}
+					badgeWidth={bodyWidth}
+					badgeHeight={style.height}
+					isInteractive={true}
+					pointerdown={onBadgePointerDown}
+				/>
+			) : (
 				<React.Fragment>
-					<StatusSkin
-						badgeWidth={bodyWidth}
-						badgeHeight={style.height}
-						isConnected={isConnected}
-						isThing={isThing}
-						isInfected={isInfected}
+					{/* Кружок игрока — эллипс, а не круг: он стоит за столом, который мы
+					    видим из-за его края, и вытянут по вертикали (см. badgeAspect).
+					    Сменившийся статус он показывает не подменой картинки, а
+					    поворотом — см. Egg. */}
+					<Egg
+						status={{isConnected, isThing, isInfected, quarantine}}
+						color={color}
 						avatar={avatar}
-					/>
-					<BadgeShade badgeWidth={bodyWidth} badgeHeight={style.height}/>
-					{/* Цепи — поверх всего кружка разом: и лица со статусом, и светотени.
-					    Карантинного заперли снаружи, поверх того, кем он на этом столе
-					    был, — поэтому цепи и ложатся на всё это сверху.
-
-					    Нажатие по ним показывает саму карту «Карантин»: по цепям не
-					    догадаться, что именно на игрока сыграли. Когда игрока выбирают
-					    целью, цепи нажатий не берут — выбор важнее подсказки, и кружок
-					    должен нажиматься весь одинаково. */}
-					<QuarantineSkin
-						quarantine={quarantine}
-						isConnected={isConnected}
+						nick={nick}
+						isYou={isYou}
 						badgeWidth={bodyWidth}
 						badgeHeight={style.height}
-						isInteractive={!canBeSelected}
-					/>
-					{/* Ник — на подложке у всех: под ним теперь лицо игрока (а у кого-то
-					    ещё и картинка статуса с цепями поверх), и по этой пестроте белые
-					    буквы теряются. Ровного кружка, по которому они читались сами по
-					    себе, больше нет. Кладётся ник последним: как бы игрока ни закрыли,
-					    прочесть, кто это, надо в любом случае. Свой при этом жирный и
-					    золотой: за абсолютным столом себя надо находить взглядом. */}
-					<PlatedNickname
-						text={nick}
-						style={isYou ? youNicknameStyle : nicknameStyle}
-						y={style.height * nicknameDrop}
+						isInteractive={canBeSelected}
+						pointerdown={onBadgePointerDown}
+						isQuarantineInteractive={!canBeSelected}
 					/>
 					{/* Роль игрока — это сам бейдж: отдельных значков нечто/заражения нет.
 					    Своя пометка сидит на макушке кружка и наполовину торчит за него:

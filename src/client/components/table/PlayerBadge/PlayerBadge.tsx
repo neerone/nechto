@@ -78,8 +78,8 @@ const Quarantine = ({quarantine, badgeWidth, badgeHeight, isInteractive}: IQuara
 	if (!quarantine) return null;
 	const hitWidth = Math.max(badgeWidth / 2, r * 4 * quarantine);
 	const hitArea = new PIXI.Rectangle(-hitWidth / 2, yOffset - quarantineHitHeight / 2, hitWidth, quarantineHitHeight);
-	// Плашка под точками: на «лбу» под ними теперь сама карта карантина (см.
-	// QuarantineSkin), и жёлтое по её пёстрой картинке не читается.
+	// Плашка под точками: на «лбу» под ними теперь и лицо игрока, и цепи карантина
+	// (см. QuarantineSkin), и жёлтое по этой пестроте не читается.
 	//
 	// Длина у неё всегда во весь карантин, а не по оставшимся точкам: это шкала,
 	// и убывать должны только точки на ней. Иначе с каждым ходом карантинного
@@ -154,28 +154,19 @@ const PlatedNickname = ({text, style, y}: {text: string, style: PIXI.TextStyle, 
 };
 
 /**
- * Статус игрока виден по самому кружку: на него натянута та карта, которой его
- * таким сделали. Раньше карантинный кружок просто гас до сорока процентов (и
- * читался как отключившийся), а роль показывали отдельно нарисованные круглые
- * бейджи — те же карты, но перерисованные заново и живущие своей жизнью.
+ * Статус игрока виден по самому кружку: на него натянуто то, чем его сделали.
+ * Раньше карантинный кружок просто гас до сорока процентов (и читался как
+ * отключившийся), а роль показывали отдельно нарисованные круглые бейджи — те же
+ * карты, но перерисованные заново и живущие своей жизнью.
  *
- * Карта вписана ровно в эллипс (см. EllipseTexture), поэтому она лежит НА
- * игроке, а не прямоугольной наклейкой поверх стола вокруг него. В кадр берём не
- * всю карту с заголовком и правилами (в кружок они всё равно не читаются), а
- * только её иллюстрацию — доли размеров картинки, а не пиксели: карты могут
- * перерисовать в другом разрешении.
- *
- * Кадр «Карантина» подобран так, чтобы голова на кружке выходила примерно того
- * же размера, что и лицо игрока под ней.
- *
- * У роли и заражения карт нет: они нарисованы сразу под кружок (см.
- * resources.thingAvatar и resources.infectedAvatars) и берутся целиком —
- * кадрировать нечего, картинки уже собраны как надо.
+ * Картинка вписана ровно в эллипс (см. EllipseTexture), поэтому она лежит НА
+ * игроке, а не прямоугольной наклейкой поверх стола вокруг него. Рисованы они
+ * сразу под кружок (см. resources.thingAvatar и resources.infectedAvatars) и
+ * берутся целиком — кадрировать нечего, картинки уже собраны как надо.
  */
 const wholePicture = {x: 0, y: 0, width: 1, height: 1};
 const statusSkins = {
 	thing: {texture: getPixiTexture(resources.thingAvatar), focus: wholePicture},
-	quarantine: {texture: getPixiTexture(resources.quarantine), focus: {x: 0.09, y: 0.27, width: 0.68, height: 0.58}},
 };
 
 // Заражённое лицо — то же самое лицо игрока, только со щупальцами: по кружку
@@ -191,26 +182,23 @@ interface IStatusArgs {
 	isConnected: boolean;
 	isThing: boolean;
 	isInfected: boolean;
-	quarantine: number;
 	// Номер лица игрока (см. avatarTextureOf): по нему берётся и заражённое.
 	avatar: string;
 }
 
 /**
- * Что натянуть на кружок. Роль важнее карантина: карантин пройдёт через три
- * хода, а нечто останется нечто — и знающему о роли важнее видеть именно её.
- * Отключившегося не закрываем ничем: то, что человека нет за столом, важнее
- * всего остального, что можно о нём сказать.
+ * Кем игрок закрыт. Роль важнее заражения: заражённое нечто всё равно нечто, и
+ * знающему о роли важнее видеть именно её. Отключившегося не закрываем ничем:
+ * то, что человека нет за столом, важнее всего остального, что можно о нём
+ * сказать.
  *
- * Заражённое лицо — единственный статус, у которого своя картинка на каждого:
- * без номера лица (до старта партии его ещё нет) показывать нечего, и кружок
- * остаётся чистым.
+ * Заражённое лицо — своё на каждого: без номера лица (до старта партии его ещё
+ * нет) показывать нечего, и кружок остаётся чистым.
  */
-const statusSkinOf = ({isConnected, isThing, isInfected, quarantine, avatar}: IStatusArgs) => {
+const statusSkinOf = ({isConnected, isThing, isInfected, avatar}: IStatusArgs) => {
 	if (!isConnected) return null;
 	if (isThing) return statusSkins.thing;
 	if (isInfected) return avatar === '' ? null : (infectedSkins[Number(avatar) % infectedSkins.length] ?? null);
-	if (quarantine > 0) return statusSkins.quarantine;
 	return null;
 };
 
@@ -223,6 +211,38 @@ export const StatusSkin = ({badgeWidth, badgeHeight, ...status}: IStatusArgs & {
 			ry={badgeHeight / 2}
 			texture={skin.texture}
 			focus={skin.focus}
+		/>
+	);
+};
+
+// Цепи карантина — с прозрачным фоном, поэтому ложатся ПОВЕРХ кружка, кем бы он
+// ни был закрыт: карантин не отменяет ни роли, ни заражения, а накладывается на
+// них. Раньше он был таким же скином, как они, и просто их вытеснял — по кружку
+// заражённого в карантине нельзя было сказать, что он заражён.
+const quarantineChainsTexture = getPixiTexture(resources.quarantineChains);
+// Крест с замком нарисован под пропорции кружка (см. badgeAspect), поэтому
+// просто уменьшаем его до кружка, а не заливаем по эллипсу, как остальные
+// картинки: заливка срезала бы ему углы с пластинами — то, чем цепи и держатся.
+//
+// Доля — ровно та, при которой в эллипс попадают и сами пластины: они сидят по
+// углам картинки, а угол прямоугольника от эллипса дальше всего. Больше — и
+// крепления начинают срезаться краем кружка, меньше — цепи болтаются в нём, ни
+// на чём не держась.
+const quarantineChainsShare = 0.75;
+
+export const QuarantineSkin = ({quarantine, isConnected, badgeWidth, badgeHeight}: {
+	quarantine: number;
+	isConnected: boolean;
+	badgeWidth: number;
+	badgeHeight: number;
+}) => {
+	if (!isConnected || quarantine <= 0) return null;
+	return (
+		<Sprite
+			texture={quarantineChainsTexture}
+			anchor={0.5}
+			width={badgeWidth * quarantineChainsShare}
+			height={badgeHeight * quarantineChainsShare}
 		/>
 	);
 };
@@ -505,7 +525,6 @@ const PlayerBadge = ({
 						isConnected={isConnected}
 						isThing={isThing}
 						isInfected={isInfected}
-						quarantine={quarantine}
 						avatar={avatar}
 					/>
 					<BadgeShade badgeWidth={bodyWidth} badgeHeight={style.height}/>
@@ -518,6 +537,16 @@ const PlayerBadge = ({
 						text={nick}
 						style={isYou ? youNicknameStyle : nicknameStyle}
 						y={style.height * nicknameDrop}
+					/>
+					{/* Цепи — поверх всего кружка разом: и лица со статусом, и светотени,
+					    и ника. Карантинного заперли снаружи, поверх того, кем он на этом
+					    столе был, — поэтому и цепи лежат последними. Выше них только
+					    точки, которыми считают оставшиеся ходы. */}
+					<QuarantineSkin
+						quarantine={quarantine}
+						isConnected={isConnected}
+						badgeWidth={bodyWidth}
+						badgeHeight={style.height}
 					/>
 					<Quarantine
 						quarantine={quarantine}

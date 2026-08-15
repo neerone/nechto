@@ -4,7 +4,7 @@ import * as PIXI from 'pixi.js';
 import {Text} from 'react-pixi-fiber';
 import {useSpring} from 'react-spring/universal';
 import {AnimatedPixi} from 'client/components/table/pixiInjected';
-import {BadgeBody, BadgeShade, formatNickname, StatusSkin} from 'client/components/table/PlayerBadge/PlayerBadge';
+import {BadgeBody, BadgeShade, formatNickname, QuarantineSkin, StatusSkin} from 'client/components/table/PlayerBadge/PlayerBadge';
 import {EEventID} from 'shared/enum/cards';
 import {playFlamethrower} from 'client/helpers/sounds';
 import GameController from 'client/controllers/gameController';
@@ -266,7 +266,6 @@ const BurningPlayer = ({burn: {seq, playerId, x, y, fromX, fromY}, controller, b
 						isConnected={player.isConnected}
 						isThing={player.isThing}
 						isInfected={player.isInfected}
-						quarantine={player.quarantine}
 						avatar={player.avatar}
 					/>
 					<BadgeShade badgeWidth={size} badgeHeight={size * badgeAspect}/>
@@ -274,6 +273,14 @@ const BurningPlayer = ({burn: {seq, playerId, x, y, fromX, fromY}, controller, b
 						text={player.isYou ? 'ТЫ' : (formatNickname(player.nickname) ?? '')}
 						anchor={0.5}
 						style={{fontFamily: 'Arial', fontSize: 14, fill: 0xFFFFFF, align: 'center'}}
+					/>
+					{/* Цепи последними — тем же слоем, что и за столом (см. PlayerBadge):
+					    горит тот же кружок, каким игрок сидел. */}
+					<QuarantineSkin
+						quarantine={player.quarantine}
+						isConnected={player.isConnected}
+						badgeWidth={size}
+						badgeHeight={size * badgeAspect}
 					/>
 				</AnimatedPixi.Dissolve>
 			)}

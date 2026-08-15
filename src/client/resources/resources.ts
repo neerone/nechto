@@ -45,6 +45,10 @@ import deckCounterBg from "client/resources/images/deckCounterBg.png";
 // «подписывают» выбранные карты в окне множественного выбора (см. FingerStamp
 // в HandComponent).
 import fingerPrint from "client/resources/images/fingerPrint.png";
+// Цепи карантина крест-накрест с замком: ложатся ПОВЕРХ кружка, кто бы под ними
+// ни был (см. QuarantineSkin), поэтому фон прозрачный, а не картинка во всю
+// площадь кружка.
+import quarantineChains from "client/resources/images/quarantine_chains.png";
 // Нечто во весь рост: им залит кружок игрока, про которого известно, что он
 // нечто (см. StatusSkin). Отдельная картинка, а не иллюстрация с карты «Нечто»:
 // эта нарисована сразу под кружок и берётся целиком, без кадрирования.
@@ -144,6 +148,7 @@ const resources = {
 	noise,
 	tableTop,
 	thingAvatar,
+	quarantineChains,
 
 	cardAct,
 	cardDiscard,

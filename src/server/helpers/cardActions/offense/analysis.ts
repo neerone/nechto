@@ -7,6 +7,7 @@ import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
 import {EEventID} from 'shared/enum/cards';
 import {EGameLogType} from 'shared/enum/gameLogType';
+import {cardLogName} from 'shared/constant/cardNames';
 import {startCardsView} from 'server/helpers/cardActions/cardsView';
 
 
@@ -36,9 +37,12 @@ export const analysisSelect = ({game, player, selectedPlayerId} : {game: Game, p
 	game.turnContext = null;
 	const selectedPlayer = game.players[selectedPlayerId];
 	if (!selectedPlayer) return;
-	game.addLog(`Игрок ${player.nickname} играет карту Анализ на игрока ${selectedPlayer.nickname}`, EGameLogType.card)
-
-	game.addLog(`Игрок ${player.nickname} анализирует ${selectedPlayer.nickname}`, EGameLogType.card);
+	// Одной строкой: карта и тот, кого ей смотрят. Разбор чужой руки виден только
+	// самому смотрящему (см. startCardsView), в логе после этого сказать нечего.
+	game.addLog(
+		`Игрок ${player.nickname} играет ${cardLogName(EEventID.analysis)} на игрока ${selectedPlayer.nickname}`,
+		EGameLogType.card,
+	);
 	game.addCardEffect({cardId: EEventID.analysis, player, target: selectedPlayer});
 	// Ход стоит, пока игрок смотрит руку соседа: остальные видят на столе, кто
 	// кого разглядывает (см. startCardsView).

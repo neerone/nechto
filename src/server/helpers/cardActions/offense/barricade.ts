@@ -8,6 +8,7 @@ import {ICardEvent} from 'shared/interfaces/cards';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import {EEventID} from 'shared/enum/cards';
 import {EGameLogType} from 'shared/enum/gameLogType';
+import {cardLogName} from 'shared/constant/cardNames';
 
 export const barricadeAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
 	if (!card.uniqueId) return;
@@ -60,7 +61,10 @@ export const barricadeSelect = ({game, player, selectedPlayerId} : {game: Game, 
 
 	const selectedPlayer = game.players[selectedPlayerId];
 	if (!selectedPlayer) return;
-	game.addLog(`Игрок ${player.nickname} забарикадировался от  ${selectedPlayer.nickname}`, EGameLogType.card);
+	game.addLog(
+		`Игрок ${player.nickname} картой ${cardLogName(EEventID.barricade)} забарикадировался от игрока ${selectedPlayer.nickname}`,
+		EGameLogType.card,
+	);
 	game.addCardEffect({cardId: EEventID.barricade, player, target: selectedPlayer});
 	player.changeTurnState(ETurnState.inOffenseTrade)
 };

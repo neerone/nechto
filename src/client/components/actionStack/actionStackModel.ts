@@ -92,13 +92,14 @@ const PANIC_IDS = new Set<string>(values(EPanicID));
 // колоды: разыгранную карту сервер называет в начале строки, а всё, что дальше,
 // — уже последствия («Bob играет «Виски»: вот мои карты: …»).
 //
-// Колода и решает, верить ли названию вообще: «Паника: все карты "Заколоченная
-// дверь" сбрасываются» называет карту событий, значит саму панику («Три,
-// четыре») она не называет — такая карточка остаётся со знаком типа.
+// Тип строки при этом не ограничение, а только выбор колоды: карту называют и
+// защита («используя карту Страх»), и карантин («теперь на карантине»), и даже
+// отказ от обмена («не меняется из-за заколоченной двери») — всем им картинка
+// идёт больше, чем общий знак типа. А колода решает, верить ли названию вообще:
+// «Паника: все карты "Заколоченная дверь" сбрасываются» называет карту событий,
+// значит саму панику («Три, четыре») строка не называет.
 export const getEntryCardId = (entry: IGameLogEntry): string | undefined => {
-	const type = getActionType(entry);
-	if (type !== EGameLogType.card && type !== EGameLogType.panic) return undefined;
-	const isPanic = type === EGameLogType.panic;
+	const isPanic = getActionType(entry) === EGameLogType.panic;
 	return find(
 		compact(map(splitCardMentions(entry.text), 'cardId')),
 		(cardId) => PANIC_IDS.has(cardId) === isPanic,

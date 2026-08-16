@@ -88,9 +88,18 @@ describe('картинка карты на карточке стека', () => {
 		))).toBe('whiskey');
 	});
 
-	test('обмены и смерти картинок не получают', () => {
+	test('тип строки не мешает: карту показывает и защита, и карантин, и отказ', () => {
+		expect(getEntryCardId(entry(EGameLogType.quarantine, 'Игрок Alice теперь на карантине'))).toBe('quarantine');
+		expect(getEntryCardId(entry(EGameLogType.defense, 'Bob: используя карту Страх отказывается от обмена')))
+			.toBe('fear');
+		expect(getEntryCardId(entry(EGameLogType.trade, 'Игрок Bob не меняется из-за заколоченной двери')))
+			.toBe('barricade');
+	});
+
+	test('строка без названия карты остаётся знаком типа', () => {
 		expect(getEntryCardId(entry(EGameLogType.trade, 'Игроки Bob и Alice меняются картами'))).toBeUndefined();
-		expect(getEntryCardId(entry(EGameLogType.quarantine, 'Игрок Alice теперь на карантине'))).toBeUndefined();
+		expect(getEntryCardId(entry(EGameLogType.deck, 'Игрок Bob берет карту из колоды'))).toBeUndefined();
+		expect(getEntryCardId(entry(EGameLogType.death, 'Игрок Bob был заживо сожжен игроком Alice'))).toBeUndefined();
 	});
 });
 

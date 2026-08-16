@@ -21,7 +21,7 @@ import type {
 } from 'client/controllers/socketTypes';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {ETurnContextType} from 'shared/enum/turnContextType';
-import {playDiscard, playGameEnd, playMove, playPanic, startMusic, startPilotFlame, stopMusic, stopPilotFlame} from 'client/helpers/sounds';
+import {playDiscard, playGameEnd, playMove, playPanic, playQuarantineOver, startMusic, startPilotFlame, stopMusic, stopPilotFlame} from 'client/helpers/sounds';
 import type {IGameLogEntry} from 'shared/interfaces/gameLog';
 
 // Вид стола — настройка игрока, а не игры: её спрашивают один раз и помнят.
@@ -539,6 +539,9 @@ export default class GameController {
 	// отдельности, и компонент успевает отрисоваться с новым контекстом хода, но
 	// ещё старой рукой и логом — а анимация обмена сверяет ровно их между собой.
 	@action updateGame = ({tradeContext, cardEffects, cardDraws, panicCard, players, playersList, turnPlayerId, isClockwise, deck, gameLog, currentAction, state, currentPlayer, hand, handActions, hostPlayerId, isPlayerCanCancel}: IGameUpdatePayload) => {
+		// Строго до updatePlayers: сверяется с прошлым обновлением, а оно живёт как
+		// раз в this.players, пока их не перезаписали.
+		this.syncQuarantine(players, cardEffects);
 		this.updatePlayers(players);
 		this.markCardMoves({cardDraws, viewerId: currentPlayer.id, newHand: hand});
 		this.updateHand(hand);
@@ -588,6 +591,41 @@ export default class GameController {
 		if (difference(seated, playersList).length) return;
 		if (every(playersList, (playerId, index) => playerId === seated[index])) return;
 		playMove();
+	};
+
+	/**
+	 * С карантина спал замок — его вскрывают отмычкой (см. playQuarantineOver).
+	 *
+	 * Признак — счётчик ходов, который убавился, а не дошёл до нуля. Замков на цепях
+	 * ровно столько, сколько ходов осталось (см. QuarantineSkin), и каждый ход с
+	 * игрока сходит один из них — звучать должен каждый, а не только последний.
+	 * Растущий счётчик (карантин повесили или продлили) сюда не попадает: это звук
+	 * самой карты.
+	 *
+	 * Своей карты у события нет, и взять звук больше неоткуда: счётчик тикает сам
+	 * (сервер убавляет его на взятии карты), а разом обнуляют его паники «Старые
+	 * верёвки» и «И это вы называете вечеринкой?». За столом во всех случаях
+	 * происходит одно и то же — с игрока падают цепи, — и звучать это должно
+	 * одинаково.
+	 *
+	 * Одного звука хватает на сколько угодно освободившихся: паника снимает карантин
+	 * со всего стола, и хор одинаковых отмычек — это не «освободились все», а каша.
+	 *
+	 * Топор — исключение: им замок не вскрывают, а разрубают, и звучит он своим
+	 * ударом (см. cardSounds). Свежее его применение в этом же обновлении отмычку и
+	 * отменяет. Номер применения тут только читаем: подводит его черту takeBurnStarted
+	 * в конце того же обновления, и сдвинуть её раньше значило бы проглядеть костёр.
+	 */
+	syncQuarantine = (players: IPlayersMap, cardEffects: IFormatCardEffect[]) => {
+		const seen = this.lastCardEffectSeq;
+		const isAxe = some(cardEffects, ({seq, cardId}) =>
+			cardId === EEventID.axe && (seen === null || seq > seen));
+		if (isAxe) return;
+		const isLockOff = some(players, (player, playerId) => {
+			const was = this.players[playerId]?.quarantine ?? 0;
+			return !!player && was > 0 && player.quarantine < was;
+		});
+		if (isLockOff) playQuarantineOver();
 	};
 
 	// Огнемёт на изготове: пока кто-то за столом выбирает, кого сжечь, у ствола

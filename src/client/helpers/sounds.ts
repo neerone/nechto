@@ -10,6 +10,7 @@ import whiskeyAudio from 'client/resources/sound/whiskey.mp3';
 import negativeAudio from 'client/resources/sound/negative.mp3';
 import axeAudio from 'client/resources/sound/axe.mp3';
 import quarantineAudio from 'client/resources/sound/quarantine.mp3';
+import quarantineOverAudio from 'client/resources/sound/quarantineOver.mp3';
 import seductionAudio from 'client/resources/sound/seduction.mp3';
 import moveAudio from 'client/resources/sound/move.mp3';
 import paperAudio from 'client/resources/sound/paper.mp3';
@@ -173,9 +174,29 @@ export const playSuspicion = createSound(suspicionAudio, 0.8, 1600);
 export const playAnalysis = createSound(analysisAudio, 1, 2000);
 export const playWhiskey = createSound(whiskeyAudio, 0.85, 800);
 
-// «Топор» — удар. «Карантин» — застёгивают молнию.
+// «Топор» — удар.
 export const playAxe = createSound(axeAudio, 0.7, 1400);
-export const playQuarantine = createSound(quarantineAudio, 1, 1000);
+
+/**
+ * «Карантин»: цепи звенят, и следом щёлкает замок. Собран из живых записей — см.
+ * scripts/cutQuarantineSounds.
+ *
+ * Сборка громкая (−15.3 дБ по самому громкому отрезку в 300 мс), так что долей
+ * её приходится опускать до общего уровня карт. Throttle во всю длину звука:
+ * запирают одного игрока, и два звона внахлёст дают только кашу.
+ */
+export const playQuarantine = createSound(quarantineAudio, 0.75, 1400);
+
+/**
+ * С карантина спал замок: его вскрывают отмычкой, дужка отскакивает, цепи
+ * сползают. Звучит на каждый убавившийся ход карантина (см.
+ * gameController.syncQuarantine), а не только на последний: замков на цепях
+ * столько, сколько ходов осталось, и каждый ход сходит один из них.
+ *
+ * На пару децибел тише самого карантина: заковали при всех и с размаху, а
+ * отпустило само собой.
+ */
+export const playQuarantineOver = createSound(quarantineOverAudio, 0.85, 1400);
 // «Соблазн».
 export const playSeduction = createSound(seductionAudio, 0.65, 1100);
 

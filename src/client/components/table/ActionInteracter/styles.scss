@@ -44,9 +44,9 @@
 		// процентах: на низком экране проценты увели бы бейдж прямо под стек.
 		&.big {
 			top: calc(5px + 76px + 5px);
-			font-size: 20px;
+			font-size: 15px;
 			font-weight: bold;
-			padding: 8px 20px;
+			padding: 3px 20px;
 			text-align: center;
 			animation: interaction-badge-pulse 1.6s ease-in-out infinite;
 		}

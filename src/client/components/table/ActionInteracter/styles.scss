@@ -18,6 +18,10 @@
 		height: 100%;
 		background: rgba(0, 0, 0, 0.63);
 		display: flex;
+		// Колонкой: у конца игры над кнопками стоят ещё две шеренги (см.
+		// GameEndTeams), а у обычной развилки в колонке одно только меню — оно и
+		// остаётся ровно посередине, как было.
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 
@@ -49,3 +53,128 @@
 	}
 }
 
+// Финальный экран: две шеренги, победители над проигравшими. Стоят они над
+// кнопками выхода, и на низком экране им может не хватить места — тогда
+// прокручивается весь блок целиком, а кнопки остаются на виду.
+.gameEndTeams {
+	width: calc(100% - 20px);
+	max-width: 520px;
+	max-height: 62vh;
+	overflow-y: auto;
+	margin-bottom: 14px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+
+	// Чем всё кончилось, словами. То же самое написано плашкой требования в стеке
+	// действий, но она мелкая и висит с краю: развязку читают здесь.
+	.gameEndText {
+		color: wheat;
+		font-size: 14px;
+		line-height: 1.3;
+		text-align: center;
+		text-shadow: 0 2px 4px black;
+	}
+
+	.endTeam {
+		width: 100%;
+		padding: 8px 6px 10px;
+		border-radius: 10px;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: rgba(0, 0, 0, 0.45);
+
+		// Победители светятся тем же лаймом, каким горит плашка «сейчас твой ход»:
+		// это единственный яркий цвет в игре, и он же значит «вот это главное».
+		&.isWinner {
+			border-color: #a4c40d99;
+			box-shadow: 0 0 18px 2px #a4c40d33;
+		}
+	}
+
+	.endTeamTitle {
+		margin-bottom: 8px;
+		color: #cfd6c2;
+		font-size: 11px;
+		letter-spacing: 2px;
+		text-align: center;
+		text-transform: uppercase;
+	}
+	.isWinner .endTeamTitle {
+		color: #d7ff5e;
+	}
+
+	// Имя команды — приписка к заголовку, а не второй заголовок: главное здесь
+	// «победители/проигравшие», а «люди/нечто» только уточняет.
+	.endTeamSide {
+		margin-left: 8px;
+		opacity: 0.65;
+		&::before {
+			content: '· ';
+		}
+	}
+
+	.endTeamRow {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 10px;
+	}
+
+	.endPlayer {
+		width: 58px;
+	}
+
+	// Лицо вписано в тот же вытянутый овал, каким игрок сидел за столом (см.
+	// badgeAspect = 1.26): шеренга собрана из тех же кружков, а не из новых
+	// круглых аватарок.
+	.endPlayerFace {
+		position: relative;
+		width: 58px;
+		height: 73px;
+		border-radius: 50%;
+		overflow: hidden;
+		background: rgba(255, 255, 255, 0.07);
+		box-shadow: 0 3px 6px black;
+	}
+
+	.endPlayerImage {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.endPlayerNick {
+		margin-top: 4px;
+		color: wheat;
+		font-size: 11px;
+		text-align: center;
+		text-shadow: 0 2px 3px black;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	// Выбывший стоит в своей шеренге, но погашенным: он её часть, просто его
+	// партия кончилась раньше. Гасим само лицо и ник — череп поверх лица остаётся
+	// в цвете, иначе выбывший неотличим от отключившегося.
+	.endPlayer.isDead {
+		.endPlayerImage {
+			filter: grayscale(0.85) brightness(0.55);
+		}
+		.endPlayerNick {
+			opacity: 0.5;
+		}
+	}
+
+	.endPlayerSkull {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: 26px;
+		line-height: 1;
+		text-shadow: 0 2px 4px black;
+	}
+}

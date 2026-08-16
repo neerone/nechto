@@ -196,7 +196,12 @@ export const applyE2ESetup = (gameServer: GameServer, game: Game, raw: IE2ESetup
 	});
 	each(infected, (nick) => {
 		const p = playerByNick(game, nick);
-		if (p) p.isInfected = true;
+		if (!p) return;
+		// Очередь заражения ведём и здесь: финальная шеренга строит по ней
+		// заражённых (см. Game.infectPlayer), и заражённые «из коробки» должны в
+		// ней стоять в том порядке, в каком их перечислил сценарий.
+		if (!p.isInfected) p.infectedSeq = ++game.infectionSeq;
+		p.isInfected = true;
 	});
 	each(quarantine, (count, nick) => {
 		const p = playerByNick(game, nick);

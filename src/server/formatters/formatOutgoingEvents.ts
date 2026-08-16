@@ -1,7 +1,7 @@
 import {EServerEventType} from 'shared/enum/enumServerEvents';
 import {Player} from 'server/models/Player';
 import {Game} from 'server/models/Game';
-import {find, map, mapValues, reduce, filter} from 'lodash';
+import {find, map, mapValues, reduce, filter, sortBy} from 'lodash';
 import {GameServer} from 'server/server/GameServer';
 import INotificationAction from 'shared/interfaces/notification';
 import {formatHand} from 'server/formatters/formatHand';
@@ -154,6 +154,33 @@ const formatPlayer = (game: Game, viewer: Player) => (player: Player) => {
 
 const formatPlayers = (game: Game, viewer: Player) => {
 	return mapValues(game.players, formatPlayer(game, viewer))
+};
+
+// Финальные шеренги: команда Нечто и команда людей, каждая целиком — с теми, кто
+// до конца не дожил (клиент их затеняет). Роли здесь настоящие: партия доиграна,
+// и прятать их больше не от кого, а без этого весь экран и не собрать —
+// formatPlayer до последнего кадра стола отдаёт их пустыми.
+//
+// Внутри команды порядок не случайный, иначе шеренга ничего не рассказывает:
+// Нечто стоит впереди своих заражённых, а те — в порядке заражения (см.
+// Player.infectedSeq). Люди стоят так, как сидели за столом.
+export const formatGameEndTeams = (game: Game) => {
+	const formatOne = (player: Player) => ({
+		id: player.id,
+		nickname: player.nickname,
+		avatar: player.avatar,
+		isThing: player.isThing,
+		isInfected: player.isInfected && !player.isThing,
+		isAlive: player.isAlive(),
+	});
+	// Двери — не игроки, а лежащие на столе карты: в шеренгах им делать нечего.
+	const seated = filter(game.players, (player) => !!player && player.state !== EPlayerState.door);
+	const thingTeam = map(
+		sortBy(filter(seated, (player) => player.isThing || player.isInfected), (player) => player.isThing ? -1 : player.infectedSeq),
+		formatOne,
+	);
+	const humanTeam = map(filter(seated, (player) => !player.isThing && !player.isInfected), formatOne);
+	return {thingTeam, humanTeam};
 };
 
 /*export const formatPlayerConnectionSuccessEvent = ({player, game, players}: {player: Player, game: Game, players: { [key:string]: Player } }) => {

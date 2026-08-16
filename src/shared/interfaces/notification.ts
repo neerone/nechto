@@ -8,6 +8,21 @@ interface INotificationActionCommon {
 interface INotificationActionInfo {
 	type: ENotificationAction.info
 }
+// Игрок в финальной шеренге. Роли здесь настоящие: партия доиграна, и прятать их
+// больше не от кого (пока игра идёт, их скрывает formatPlayer).
+export interface IGameEndPlayer {
+	id: string
+	nickname: string
+	// Номер лица (см. resources.avatars). У заражённого по тому же номеру берётся
+	// заражённое лицо, у Нечто лицо своё.
+	avatar: string
+	isThing: boolean
+	isInfected: boolean
+	// Дожил ли до конца партии: мертвецы стоят в шеренге своей команды, но
+	// затенёнными.
+	isAlive: boolean
+}
+
 interface INotificationActionGameEnd {
 	type: ENotificationAction.gameEnd
 	menu : {text: string, action: string}[]
@@ -15,6 +30,10 @@ interface INotificationActionGameEnd {
 	// игрока, и переписать её должно быть можно, не сломав ничего, что от исхода
 	// зависит (сейчас — звук развязки, см. releaseGameEnd).
 	isThingWin: boolean
+	// Две шеренги финального экрана. Кто в какой — решает сервер: только он знает
+	// роли, и только он знает, в каком порядке заражали заражённых.
+	winners: IGameEndPlayer[]
+	losers: IGameEndPlayer[]
 }
 export interface INotificationActionDecision {
 	type: ENotificationAction.actionDecision,

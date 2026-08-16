@@ -6,6 +6,7 @@ import type INotificationAction from 'shared/interfaces/notification';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {map} from 'lodash';
 import cn from 'classnames';
+import GameEndTeams from './GameEndTeams';
 
 
 interface IActionInteracterProps {
@@ -27,6 +28,11 @@ const renderAction = (action: INotificationAction, controller: GameController) =
 	const seconds = action.type === ENotificationAction.actionDecision ? action.seconds : undefined;
 	return (
 		<div className={"menu-wrapper"}>
+			{/* Конец игры — не просто две кнопки: под ними стол раскрывает карты и
+			    показывает, кто с кем был всю партию (см. GameEndTeams). */}
+			{action.type === ENotificationAction.gameEnd
+				? <GameEndTeams text={action.text} winners={action.winners} losers={action.losers}/>
+				: null}
 			<div className={"centeredNotificationRow column"}>
 				{map(action.menu, ({text, action}) => {
 					const isCountingDown = secondsLeft !== null && !!seconds && action === defaultAction;

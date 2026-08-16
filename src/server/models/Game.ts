@@ -3,6 +3,7 @@ import {Player} from "server/models/Player";
 import {gameServer} from 'server/server/GameServer';
 import {
   formatCommonError,
+  formatGameEndTeams,
   formatPlayerNotification,
   formatStartGameEvent,
   formatUpdateGameEvent,
@@ -82,6 +83,9 @@ export class Game {
   // игра успевает разослать хоть одно обновление, поэтому карту снимаем не
   // раньше, чем она уехала клиентам хотя бы раз.
   isPanicCardSent: boolean = false;
+  // Счётчик очереди заражённых: каждому заражённому достаётся следующий номер
+  // (см. infectPlayer). По нему они и стоят в финальной шеренге.
+  infectionSeq: number = 0;
   gameInProcess:boolean = true;
   // Every game runs on its own seeded RNG so the whole game is reproducible from
   // this one number (logged as the first game-log line). A bug report's log is
@@ -267,12 +271,20 @@ export class Game {
     const isThingWin = lastMessage !== thingLostMessage;
     const conditionText = isThingWin ? 'справился' : 'не справился';
 
+    // Шеренги финального экрана. Победившая и проигравшая — уже разложенные:
+    // клиенту остаётся только их нарисовать, гадать об исходе ему не нужно.
+    const {thingTeam, humanTeam} = formatGameEndTeams(this);
+    const winners = isThingWin ? thingTeam : humanTeam;
+    const losers = isThingWin ? humanTeam : thingTeam;
+
     if (thingPlayer) {
       this.notifyAllPlayers(formatPlayerNotification({
         player: thingPlayer,
         notification: {
           type: ENotificationAction.gameEnd,
           isThingWin,
+          winners,
+          losers,
           menu: [{
             action: 'exit',
             text: 'Выход',
@@ -422,6 +434,9 @@ export class Game {
     // Роль пишем ДО заражения: иначе цель уже «заражённая» и по событию не
     // видно, что момент заражения — именно этот.
     this.analytics.infection({target: notificationPlayer, source, via});
+    // Номер в очереди заражённых — только за первым заражением: «Заражение!»
+    // может прилететь и тому, кто уже заражён, и очередь от этого не меняется.
+    if (!notificationPlayer.isInfected) notificationPlayer.infectedSeq = ++this.infectionSeq;
     notificationPlayer.isInfected = true;
 
     const cleanPlayerId = find(this.playersList, (pId) => {

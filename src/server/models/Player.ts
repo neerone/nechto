@@ -36,6 +36,10 @@ export class Player {
 	isYou: boolean = false;
 	hand: ICardEvent[] = [];
 	isInfected: boolean = false;
+	// Каким по счёту игрока заразили (см. Game.infectPlayer). 0 — не заражён либо
+	// заражён не по ходу партии (Нечто с самой раздачи). По этому номеру заражённые
+	// выстраиваются в финальной шеренге — в том порядке, в каком их и заражали.
+	infectedSeq: number = 0;
 	isThing: boolean = false;
 	quarantine: number = 0;
 	// True for the turn-cycle in which a quarantine was just applied, so the

@@ -53,7 +53,7 @@ export const askDecision = ({asker, decider, text, menu}: {
 
 	if (!fallback) return;
 	decider.notify(formatSoundNotification());
-	// Отсчёт видят все: стол должен понимать, кого он ждёт (см. ActionTimer).
+	// Отсчёт видят все: стол должен понимать, кого он ждёт (см. TurnTimerRing).
 	decider.game.notifyAllPlayers(formatTimerNotification({
 		text: `${decider.nickname} принимает решение`,
 		seconds: decisionTimeout.seconds,

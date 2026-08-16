@@ -41,10 +41,14 @@ export default class RootController {
 		autorun(() => {
 			const nickname = (this.gameController?.currentPlayer?.nickname || this.launcherController?.nickname || '').trim();
 			const timer = this.timerController;
-			// Таймер тикает и на чужих ходах — берём его, только если отсчёт наш.
-			const isMyTimer = !!timer?.isActive && !!timer.playerId && timer.playerId === this.gameController?.currentPlayerId;
-			if (nickname && isMyTimer) {
-				document.title = `${timer.seconds} сек твой ход ${nickname}`;
+			// Берём СВОЙ отсчёт, а не общий: общий перезапускает каждый, чьего хода
+			// ждут (см. TimerController), и заголовок от этого прыгал. И держим его
+			// ровно до тех пор, пока сервер и правда чего-то от нас хочет: кончилось
+			// это ожидание — кончился и счётчик, даже если чужие таймеры ещё идут.
+			const isMyTurn = !!timer?.isMine && !!this.gameController?.currentAction;
+			if (nickname && isMyTurn) {
+				const left = timer.mySecondsLeft;
+				document.title = left > 0 ? `${left} сек твой ход ${nickname}` : `Твой ход, ${nickname}!`;
 				return;
 			}
 			document.title = nickname ? `${nickname} - Нечто` : 'Игра нечто';
@@ -52,6 +56,10 @@ export default class RootController {
 	}
 
 	start() {
+		// Реконнект приносит сюда новые контроллеры, но секундный интервал старого
+		// таймера сам не умрёт — гасим его, иначе за сессию их накапливается по
+		// одному на каждое переподключение.
+		this.timerController?.clearTimers();
 		this.timerController = new TimerController(this, this);
 		this.gameController = new GameController(this);
 		this.launcherController = new LauncherController(this, this);

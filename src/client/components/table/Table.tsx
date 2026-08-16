@@ -10,7 +10,6 @@ import Notifier from 'client/components/table/notifier/notifier';
 import PanicCard from 'client/components/table/PanicCard/PanicCard';
 import {Helmet} from "react-helmet";
 import ActionInteracter from 'client/components/table/ActionInteracter/ActionInteracter';
-import ActionTimer from 'client/components/table/ActionTimer/ActionTimer';
 import ActionCanceler from 'client/components/table/ActionCanceler/ActionCanceler';
 import TableMenu from 'client/components/table/TableMenu/TableMenu';
 import {StageBoundary} from 'client/components/table/StageBoundary';
@@ -32,7 +31,6 @@ const Table = observer(({controller} : ITableProps) => {
 				<GameLog controller={controller}/>
 				<TableMenu controller={controller}/>
 				<ActionInteracter controller={controller}/>
-				<ActionTimer controller={controller}/>
 				<StageBoundary>
 					<TableStage>
 						{/* Стол рисуется слоями по глубине: сначала дальняя половина

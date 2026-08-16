@@ -23,6 +23,7 @@ import {arrowPath} from 'client/helpers/arrowPath';
 import GameController from 'client/controllers/gameController';
 import PlayerBadge, {badgeBodyWidth, PlayerShadow} from 'client/components/table/PlayerBadge/PlayerBadge';
 import TableSurface from 'client/components/table/Room/TableSurface';
+import TurnTimerRing from 'client/components/table/Room/TurnTimerRing';
 import CardFlights from 'client/components/table/Room/CardFlight';
 import CardDraws from 'client/components/table/Room/CardDraw';
 import CardEffects from 'client/components/table/Room/CardEffect';
@@ -607,6 +608,14 @@ const Room = observer(({controller, children} : IRoomProps) => {
 					thickness={tableThickness(playersCount)}
 					lift={tableLift(playersCount)}
 					isClockwise={controller.isClockwise}
+				/>
+				{/* Шкала хода — на столешнице: она по ней и идёт. Поверх стола, но до
+				    колоды, потому что колода на столе лежит, а шкала на нём нарисована. */}
+				<TurnTimerRing
+					controller={controller}
+					rx={surface.rx}
+					ry={surface.ry}
+					lift={tableLift(playersCount)}
 				/>
 			</Container>
 			{/* Всё, что лежит на столешнице: колода и сработавшая паника (см. Table).

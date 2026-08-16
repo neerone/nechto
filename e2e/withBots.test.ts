@@ -194,16 +194,18 @@ test.describe('Игра с ботами (?withBots=true)', () => {
 	test('на своём ходе в заголовке вкладки тикает таймер', async ({browser}: {browser: Browser}) => {
 		const page = await createBotGame(browser, '?withBots=true&seed=777');
 		try {
-			// Первый ход человека: заголовок = таймер этого хода.
+			// Первый ход человека: заголовок = его собственный отсчёт.
 			await expect(page).toHaveTitle(/^\d+ сек твой ход Me$/, {timeout: 10_000});
-			// И он именно тикает — совпадает с индикатором на столе.
+			const first = Number((await page.title()).match(/^(\d+) сек/)?.[1]);
+			// И он именно тикает, причём ВНИЗ: в заголовке остаток, а не набежавшее
+			// время. Когда остаток дошёл до нуля, цифры уступают место «Твой ход» —
+			// это тоже «меньше», отсчёт своё отработал.
 			await expect
 				.poll(async () => {
-					const title = (await page.title()).match(/^(\d+) сек/)?.[1];
-					const onTable = (await page.locator('.action-timer-wrapper .inner-text').textContent())?.match(/(\d+) сек/)?.[1];
-					return title && title === onTable && Number(title) > 0;
+					const title = await page.title();
+					return Number(title.match(/^(\d+) сек/)?.[1] ?? 0);
 				}, {timeout: 10_000})
-				.toBe(true);
+				.toBeLessThan(first);
 		} finally {
 			await page.context().close();
 		}

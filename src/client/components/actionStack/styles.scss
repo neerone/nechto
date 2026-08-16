@@ -106,6 +106,29 @@ $action-arrive: 520ms;
 	box-shadow: 0 0 8px #00ff7255, 0 4px 10px #000000b0;
 }
 
+// Плашка требования: чего ждут от тебя прямо сейчас. Пока игрок думает, она
+// просто обведена жёлтым — торопить его незачем. Задумался надолго — только
+// тогда начинает пульсировать в полную силу, и не заметить её уже нельзя.
+$action-pending-nudge: 10s;
+
+@keyframes actionPendingPulse {
+	0%, 100% {
+		box-shadow: 0 0 8px var(--action-color), 0 0 18px var(--action-glow), 0 4px 10px #000000b0;
+		filter: brightness(1);
+	}
+	50% {
+		box-shadow: 0 0 16px 3px var(--action-color), 0 0 38px 6px var(--action-glow), 0 4px 10px #000000b0;
+		filter: brightness(1.4);
+	}
+}
+
+// Отсчёт идёт с появления самой плашки: на каждое новое требование она
+// монтируется заново (см. ключ в ActionStack), а с ней заводится и задержка.
+.actionSlot.isPending .actionTile {
+	border-color: var(--action-color);
+	animation: actionPendingPulse 1.4s ease-in-out $action-pending-nudge infinite;
+}
+
 // Текст карты в полсотни пикселей не прочитать, узнаётся она по общему виду —
 // цвету и композиции. Поэтому карта берётся целиком, только чуть крупнее рамки:
 // приблизишь сильнее — половина колоды станет тёмным пятном (у паник середина

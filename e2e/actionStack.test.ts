@@ -123,4 +123,43 @@ test.describe.serial('Стек действий', () => {
 		const boxes = await slots.evaluateAll((nodes) => nodes.map((n) => n.getBoundingClientRect().left));
 		expect(latestBox.x).toBe(Math.max(...boxes));
 	});
+
+	test('чего ждут от игрока — обведённая жёлтым плашка в правом конце его стека', async () => {
+		await session.arrange({
+			players: NICKS,
+			turn: 'Alice',
+			hands: {Alice: ['axe', 'whiskey', 'suspicion', 'analysis'], Bob: fill([], 4)},
+			deck: ['analysis', 'analysis', 'analysis'],
+		});
+		const page = session.page('Alice');
+		await clearNotifications(page);
+
+		// Требование стоит за всей историей — правее любой её карточки, — и забирает
+		// себе подсветку «вот это сейчас»: свежий шаг рядом с ним уже не главный.
+		const pending = page.locator('.actionSlot.isPending');
+		await expect(pending).toHaveCount(1);
+		await expect(page.locator('.actionSlot.isLatest')).toHaveCount(0);
+		const lefts = await page.locator('.actionSlot:not(.isLeaving)')
+			.evaluateAll((nodes) => nodes.map((n) => n.getBoundingClientRect().left));
+		expect((await pending.boundingBox())!.x).toBe(Math.max(...lefts));
+
+		// Знак говорит, чего именно ждут: сейчас — сыграть или сбросить.
+		await expect(pending.locator('.actionIcon')).toHaveText('▶');
+
+		// Наведение раскрывает ровно тот текст, что раньше висел бейджем над столом.
+		await pending.hover();
+		const hint = page.locator('[data-hint-popup] .actionHint');
+		await expect(hint.locator('.actionHintLabel')).toHaveText('Сейчас');
+		await expect(hint.locator('.actionHintText')).toHaveText('Сбрось или сыграй карту');
+		await page.mouse.move(1, page.viewportSize()!.height - 1);
+
+		// Плашка — только тому, чей ход: остальным ждать нечего.
+		await expect(session.page('Bob').locator('.actionSlot.isPending')).toHaveCount(0);
+
+		// Сменилось требование — сменился и знак: сбросил карту, теперь меняйся.
+		await session.discard('Alice', 'analysis');
+		await expect(pending.locator('.actionIcon')).toHaveText('🤝');
+		await pending.hover();
+		await expect(hint.locator('.actionHintText')).toHaveText('Выбери карту для обмена');
+	});
 });

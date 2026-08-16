@@ -1,56 +1,14 @@
-@use '../../../styles/buttons';
-
-@keyframes interaction-badge-pulse {
-	0%, 100% {
-		box-shadow: 0 4px 7px black;
-		filter: brightness(1);
-	}
-	50% {
-		box-shadow: 0 4px 7px black, 0 0 16px 2px #d7ff5e99;
-		filter: brightness(1.25);
-	}
-}
-
-.interaction-badge-wrapper {
+// Меню выбора по ходу. Сам вопрос здесь не пишется: он висит плашкой требования
+// в стеке действий (см. actionStackModel/getPendingEntry), и стек лежит ВЫШЕ
+// этого затемнения.
+.action-menu-wrapper {
 	position: fixed;
 	width:100%;
 	height:0%;
 	display: flex;
 	justify-content: center;
 	z-index: 20;
-	// Бейдж — не кнопка (его не жмут), но выглядит он так же, как кнопки: то же
-	// скругление, градиент и тень. Цвет свой, ярче зелёного: это не действие, а
-	// требование действия.
-	.interaction-badge {
-		@include buttons.button(buttons.$button-lime-top, buttons.$button-lime-bottom, 8px);
-		position: fixed;
-		z-index: 2;
-		top: 22%;
-		// Не во всю ширину: на узком экране бейдж упирался бы в края, и скруглять
-		// было бы нечего.
-		width: calc(100% - 20px);
-		font-size: 14px;
-		display: flex;
-		justify-content: center;
-		padding: 2px 20px;
-		transition: font-size 0.2s ease, padding 0.2s ease, top 0.2s ease;
-		max-width: 500px;
-		cursor: default;
 
-		// Бейдж — единственный индикатор того, чего от тебя ждут, поэтому крупный
-		// и пульсирует. Стоит сразу под полоской стека действий: её собственные
-		// 5px сверху, карточка (52×1.46 в самом крупном виде, см.
-		// actionStackModel) и такой же зазор под ней. В пикселях, а не в
-		// процентах: на низком экране проценты увели бы бейдж прямо под стек.
-		&.big {
-			top: calc(5px + 76px + 5px);
-			font-size: 15px;
-			font-weight: bold;
-			padding: 3px 20px;
-			text-align: center;
-			animation: interaction-badge-pulse 1.6s ease-in-out infinite;
-		}
-	}
 	.menu-wrapper {
 		position: fixed;
 		top:0;
@@ -90,3 +48,4 @@
 		}
 	}
 }
+

@@ -15,9 +15,13 @@ import {
 	getActionIcon,
 	getActionType,
 	getEntryCardId,
+	getPendingColors,
+	getPendingEntry,
+	getPendingIcon,
 	getStackCapacity,
 	getStackEntries,
 	getStackGeometry,
+	PENDING_LABEL,
 	type IStackEntry,
 	type IStackGeometry,
 } from './actionStackModel';
@@ -42,10 +46,14 @@ interface IActionStackProps {
 
 // Стек уходит под канвас, пока висят уведомления: разглядывать историю, когда от
 // тебя ждут решения, всё равно некогда, а окно решения должно быть сверху.
+//
+// Кроме меню выбора: под его затемнением стек лежать не должен — вопрос, на
+// который это меню отвечает, написан на плашке требования в самом стеке (см.
+// getPendingEntry), поэтому там он поднимается ВЫШЕ меню.
 export const getZIndex = (controller: GameController) => {
-	if (controller.currentAction && controller.currentAction.type === ENotificationAction.actionDecision) return 99;
+	if (controller.currentAction && controller.currentAction.type === ENotificationAction.actionDecision) return 100;
 	const firstNotification = controller.notifications.length ? controller.notifications[0] : undefined;
-	if (firstNotification && firstNotification.type === ENotificationAction.gameEnd) return 99;
+	if (firstNotification && firstNotification.type === ENotificationAction.gameEnd) return 100;
 	const cardInPreview = controller.cardInPreview ? controller.hand[controller.cardInPreview] : undefined;
 	if (cardInPreview || controller.notifications.length > 0) return 0;
 	return 99;
@@ -69,12 +77,22 @@ const useElementWidth = (ref: React.RefObject<HTMLElement>) => {
 	return width;
 };
 
+// Знак, цвет и подпись карточки. У требования они свои: это не тип строки лога,
+// а «от тебя ждут действия», и знак говорит какого именно.
+const getTileFace = (item: IStackEntry) => item.pending
+	? {colors: getPendingColors(), icon: getPendingIcon(item.pending), label: PENDING_LABEL}
+	: {
+		colors: getActionColors(getActionType(item.entry)),
+		icon: getActionIcon(item.entry),
+		label: ACTION_LABELS[getActionType(item.entry)],
+	};
+
 const ActionHint = ({item, highlights}: {item: IStackEntry, highlights: INickHighlight[]}) => {
-	const type = getActionType(item.entry);
-	return <span className={'actionHint'} style={getActionColors(type)}>
+	const {colors, icon, label} = getTileFace(item);
+	return <span className={'actionHint'} style={colors}>
 		<span className={'actionHintHead'}>
-			<span className={'actionHintIcon'}>{getActionIcon(item.entry)}</span>
-			<span className={'actionHintLabel'}>{ACTION_LABELS[type]}</span>
+			<span className={'actionHintIcon'}>{icon}</span>
+			<span className={'actionHintLabel'}>{label}</span>
 		</span>
 		<span className={'actionHintText'}>{renderLogText(item.entry.text, highlights)}</span>
 		{map(item.details, (detail, index) => <span key={index} className={'actionHintDetail'}>
@@ -96,19 +114,25 @@ interface IActionTileProps {
 
 const ActionTile = ({item, x, depth, isLeaving, geometry, highlights}: IActionTileProps) => {
 	const entry = item.entry;
-	const type = getActionType(entry);
-	const cardId = getEntryCardId(entry);
+	const isPending = !!item.pending;
+	const {colors, icon} = getTileFace(item);
+	// У требования картинки нет: знак «от тебя ждут хода» важнее той карты, что
+	// текст мимоходом называет, — и он же несёт свечение.
+	const cardId = isPending ? undefined : getEntryCardId(entry);
 	const image = cardId ? cardImages[cardId] : undefined;
 	const actor = getActorHighlight(entry.text, highlights);
 	// Карточки лежат внахлёст, и у нижних видна только левая полоска — иконку
 	// центруем по ней, иначе у половины стека она оказалась бы под соседкой.
 	// Свежую не перекрывает никто, поэтому её знак стоит ровно посередине.
-	const isLatest = depth === 0 && !isLeaving;
-	const sliver = isLatest ? geometry.cardWidth : Math.min(geometry.step, geometry.cardWidth);
+	const isTop = depth === 0 && !isLeaving;
+	// Зелёная подсветка «вот это сейчас» достаётся требованию, когда оно есть:
+	// две светящиеся карточки подряд спорили бы друг с другом.
+	const isLatest = isTop && !isPending;
+	const sliver = isTop ? geometry.cardWidth : Math.min(geometry.step, geometry.cardWidth);
 	return <div
-		className={cn('actionSlot', {isLeaving, isLatest})}
+		className={cn('actionSlot', {isLeaving, isLatest, isPending})}
 		style={{
-			...getActionColors(type),
+			...colors,
 			transform: `translateX(${x}px)`,
 			width: geometry.cardWidth,
 			height: geometry.cardHeight,
@@ -117,7 +141,7 @@ const ActionTile = ({item, x, depth, isLeaving, geometry, highlights}: IActionTi
 			['--action-sliver' as string]: `${sliver}px`,
 			['--action-icon-size' as string]: `${Math.round(Math.min(sliver * 0.62, 22))}px`,
 		}}
-		data-action-type={type}
+		data-action-type={isPending ? 'pending' : getActionType(entry)}
 		data-action-card={cardId || ''}
 	>
 		<HoverHint
@@ -130,7 +154,7 @@ const ActionTile = ({item, x, depth, isLeaving, geometry, highlights}: IActionTi
 				    ничего не добавляет, только загораживает. */}
 				{image
 					? <img className={'actionArt'} src={image} alt={''}/>
-					: <span className={'actionIcon'}>{getActionIcon(entry)}</span>}
+					: <span className={'actionIcon'}>{icon}</span>}
 				{/* Полоска цвета того, кто действовал: в стеке видно «чей» шаг ещё
 				    до подсказки — там ник покрашен тем же цветом. */}
 				{actor ? <span className={'actionActor'} style={{background: actor.color}}/> : null}
@@ -145,6 +169,12 @@ const ActionStack = observer(({controller}: IActionStackProps) => {
 	const capacity = getStackCapacity(controller);
 	const gameLog = controller.gameLog;
 
+	// Требование к игроку стоит последним, за всей историей, и занимает в стеке
+	// свой слот: остальные карточки от него сдвигаются влево ровно так же, как
+	// от любого нового шага.
+	const pending = getPendingEntry(controller);
+	const slots = capacity + (pending ? 1 : 0);
+
 	const entries = getStackEntries(gameLog);
 	const visible: IKeyedItem<IStackEntry>[] = map(
 		entries.slice(Math.max(entries.length - capacity, 0)),
@@ -152,14 +182,21 @@ const ActionStack = observer(({controller}: IActionStackProps) => {
 	);
 	const leaving = useLeavingItems(visible, LEAVE_MS);
 
-	const geometry = getStackGeometry(available, capacity);
+	const geometry = getStackGeometry(available, slots);
 	const highlights = getNickHighlights(controller);
 	// Живые и улетающие — одним списком и в одном порядке: React должен узнавать
 	// карточку по ключу, иначе выбитая перемонтируется и «прилетит» заново.
 	const tiles = sortBy([
-		...map(visible, (item, index) => ({item, depth: visible.length - 1 - index, isLeaving: false})),
-		...map(leaving, (item) => ({item, depth: capacity, isLeaving: true})),
+		...map(visible, (item, index) => ({
+			item,
+			depth: visible.length - 1 - index + (pending ? 1 : 0),
+			isLeaving: false,
+		})),
+		...map(leaving, (item) => ({item, depth: slots, isLeaving: true})),
 	], ({item}) => item.id);
+	// Не через useLeavingItems: требование пропадает выполненным, а не вытесненным
+	// из стека, и уезжать за левый край через всю историю ему незачем.
+	if (pending) tiles.push({item: {id: pending.id, data: pending}, depth: 0, isLeaving: false});
 
 	return <div className={'actionStackWrapper'} style={{zIndex: getZIndex(controller)}}>
 		<div className={'actionStackArea'} ref={areaRef}>
@@ -169,11 +206,14 @@ const ActionStack = observer(({controller}: IActionStackProps) => {
 					style={{width: geometry.trackWidth, height: geometry.cardHeight}}
 				>
 					{map(tiles, ({item, depth, isLeaving}) => <ActionTile
-						key={item.id}
+						// Плашку требования узнаём по типу действия, а не по номеру
+						// строки: на каждое новое требование она перемонтируется и
+						// заново прилетает в стек справа, как обычная карточка.
+						key={item.data.pending ? `pending-${item.data.pending}` : item.id}
 						item={item.data}
 						// Слева направо — от старых к свежим, свежая всегда у правого
 						// края; выбитая продолжает тот же ряд за левым краем.
-						x={(capacity - 1 - depth) * geometry.step}
+						x={(slots - 1 - depth) * geometry.step}
 						depth={depth}
 						isLeaving={isLeaving}
 						geometry={geometry}

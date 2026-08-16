@@ -6,12 +6,16 @@ import type INotificationAction from 'shared/interfaces/notification';
 import {ENotificationAction} from 'shared/enum/notifications';
 import {map} from 'lodash';
 import cn from 'classnames';
-import {getZIndex} from 'client/components/actionStack/ActionStack';
 
 
 interface IActionInteracterProps {
 	controller:  GameController;
 }
+
+// Под стеком действий: сам вопрос написан там, светящейся плашкой требования
+// (см. actionStackModel/getPendingEntry), и затемнение меню его закрывать не
+// должно.
+const MENU_Z_INDEX = 99;
 
 const renderAction = (action: INotificationAction, controller: GameController) => {
 	if (action.type !== ENotificationAction.actionDecision && action.type !== ENotificationAction.gameEnd) return null;
@@ -47,14 +51,11 @@ const ActionInteracter = observer(({controller}: IActionInteracterProps) => {
 	const endGameNotification = (firstNotification && firstNotification.type === ENotificationAction.gameEnd) ? firstNotification : null;
 	const action = endGameNotification ? endGameNotification : controller.currentAction
 	if  (!action) return null;
-	// Стек действий рассказывает, что уже случилось, но не что от тебя хотят —
-	// это только на бейдже, поэтому он крупный и пульсирует.
-	return <div className={"interaction-badge-wrapper"} style={{zIndex: getZIndex(controller)}}>
-		<div className={cn("interaction-badge", "big")}>
-			{action.text}
-		</div>
-		{ renderAction(action, controller) }
-	</div>
+	// Текст требования переехал в стек действий отдельной плашкой — здесь остаётся
+	// только меню выбора, и когда его нет, показывать нечего.
+	const menu = renderAction(action, controller);
+	if (!menu) return null;
+	return <div className={"action-menu-wrapper"} style={{zIndex: MENU_Z_INDEX}}>{menu}</div>
 });
 
 

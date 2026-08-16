@@ -2,6 +2,7 @@ import type {CSSProperties} from 'react';
 import {compact, each, find, map, values} from 'lodash';
 import {EPanicID} from 'shared/enum/cards';
 import {EGameLogType} from 'shared/enum/gameLogType';
+import {ENotificationAction} from 'shared/enum/notifications';
 import {EPlayerState, ETurnState} from 'shared/enum/player';
 import type {IGameLogEntry} from 'shared/interfaces/gameLog';
 import type GameController from 'client/controllers/gameController';
@@ -76,15 +77,41 @@ export const getActionIcon = (entry: IGameLogEntry): string => {
 	return override ? override.icon : (ACTION_ICONS[type] || ACTION_ICONS[EGameLogType.info]);
 };
 
-export const getActionColors = (type: EGameLogType) => {
-	const color = ACTION_COLORS[type] || ACTION_COLORS[EGameLogType.info];
-	return {
-		'--action-color': color,
-		'--action-edge': `${color}8c`,
-		'--action-glow': `${color}55`,
-		'--action-tint': `${color}38`,
-	} as CSSProperties;
+const colorVars = (color: string) => ({
+	'--action-color': color,
+	'--action-edge': `${color}8c`,
+	'--action-glow': `${color}55`,
+	'--action-tint': `${color}38`,
+} as CSSProperties);
+
+export const getActionColors = (type: EGameLogType) =>
+	colorVars(ACTION_COLORS[type] || ACTION_COLORS[EGameLogType.info]);
+
+// Плашка требования — последняя карточка стека: не «что случилось», а «чего
+// ждут от тебя». Раньше это говорил отдельный зелёный бейдж поверх стола (см.
+// ActionInteracter), поэтому и цвет обводки у неё тот же, лаймовый. Пока игрок
+// думает, она просто обведена; засиделся — начинает пульсировать (см. styles).
+export const PENDING_LABEL = 'Сейчас';
+export const getPendingColors = () => colorVars('#d7ff5e');
+
+// Знак на плашке — по тому, чего именно ждут: карту тянуть, карту играть, картой
+// меняться. Словарь свой, не логовый: там знаки говорят «что случилось», а тут
+// «что сделать». Общего с логом только обмен — рукопожатие в стеке и на стрелке
+// между кружками одно и то же.
+const PENDING_ICONS: {[key in ENotificationAction]?: string} = {
+	[ENotificationAction.cardPick]: '🃏',
+	// Ход как таковой: сыграть или сбросить. Знак хода в стеке больше нигде не
+	// встречается — строки «ходит игрок X» из него выкинуты (см. getStackEntries).
+	[ENotificationAction.turnCard]: '▶',
+	[ENotificationAction.offenseTradeCard]: '🤝',
+	[ENotificationAction.defenseTradeCard]: '🤝',
+	[ENotificationAction.playerSelect]: '🎯',
+	[ENotificationAction.selectCards]: '☑',
+	[ENotificationAction.actionDecision]: '❓',
+	[ENotificationAction.gameEnd]: '🏁',
 };
+
+export const getPendingIcon = (type: ENotificationAction): string => PENDING_ICONS[type] || '❗';
 
 const PANIC_IDS = new Set<string>(values(EPanicID));
 
@@ -125,7 +152,28 @@ export interface IStackEntry {
 	entry: IGameLogEntry;
 	// Приклеенные к карточке строки: показываются в подсказке под основной.
 	details: string[];
+	// Не строка лога, а требование к игроку прямо сейчас: чего именно от него ждут
+	// (см. getPendingEntry) — по этому же выбирается знак на плашке.
+	pending?: ENotificationAction;
 }
+
+// Больше любого номера строки лога: карточки рендерятся в порядке id, и
+// требование должно стоять правее всего, что уже случилось.
+const PENDING_ID = Number.MAX_SAFE_INTEGER;
+
+// Чего от игрока ждут прямо сейчас. Конец игры сюда попадает наравне с ходом:
+// у него тоже есть меню, и его текст больше показать негде.
+export const getPendingEntry = (controller: GameController): IStackEntry | null => {
+	const first = controller.notifications.length ? controller.notifications[0] : undefined;
+	const action = first && first.type === ENotificationAction.gameEnd ? first : controller.currentAction;
+	if (!action) return null;
+	return {
+		id: PENDING_ID,
+		entry: {text: action.text, type: EGameLogType.info},
+		details: [],
+		pending: action.type,
+	};
+};
 
 export const getStackEntries = (gameLog: IGameLogEntry[]): IStackEntry[] => {
 	const entries: IStackEntry[] = [];

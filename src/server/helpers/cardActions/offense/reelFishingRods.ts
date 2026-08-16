@@ -6,7 +6,6 @@ import {ETurnContextType} from 'shared/enum/turnContextType';
 import {ICardEvent} from 'shared/interfaces/cards';
 import {ETurnState} from 'shared/enum/player';
 import {EEventID} from 'shared/enum/cards';
-import {EGameLogType} from 'shared/enum/gameLogType';
 
 
 export const reelFishingRodsAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
@@ -28,6 +27,7 @@ export const reelFishingRodsAct = ({card, game, player} : {card:ICardEvent, game
 		text: 'Выбри с кем хочешь поменяться местами'
       },
     }));
-    game.addLog(`Игрок ${player.nickname} сматывает удочки`, EGameLogType.card);
+    // В лог карта попадёт вместе с выбранной целью (см. positionswapSelect):
+    // «сматывает удочки» без того, на кого, — это половина шага.
 };
 

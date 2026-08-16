@@ -10,6 +10,7 @@ import {ETurnState} from 'shared/enum/player';
 import {EEventID} from 'shared/enum/cards';
 import {find} from 'lodash';
 import {EGameLogType} from 'shared/enum/gameLogType';
+import {cardLogName} from 'shared/constant/cardNames';
 
 export const positionswapAct = ({card, game, player} : {card:ICardEvent, game: Game, player: Player}) => {
 	if (!card.uniqueId) return;
@@ -36,6 +37,9 @@ export const positionswapSelect = ({game, player, selectedPlayerId} : {game: Gam
 	if (!game.turnContext || game.turnContext.type !== ETurnContextType.positionswap) {
 		throw new Error('Смена места произошла без контекста positionswap');
 	}
+	// Карту забираем до того, как контекст пересоберётся: местами меняют две
+	// разные карты, и в лог должна попасть та, которой сходили.
+	const playedCardId = game.turnContext.cardId;
 	player.discardCard(game.turnContext.cardUniqueId);
 	const defensePlayer = game.players[selectedPlayerId];
 	if (!defensePlayer) return;
@@ -59,7 +63,13 @@ export const positionswapSelect = ({game, player, selectedPlayerId} : {game: Gam
 		})
 		text = `Игрок ${player.nickname} предлагает поменяться местами, но у тебя есть "Мне и здесь неплохо"`
 	}
-	game.addLog(`Игрок ${player.nickname} предложил смену мест игроку ${defensePlayer.nickname}`, EGameLogType.card);
+	// Карта и её цель — одной строкой: розыгрыш без цели ещё не шаг, цель без
+	// карты не объясняет, чем ходили. То, чем это кончится (обмен местами или
+	// отказ), логируется отдельно — это уже следующий шаг.
+	game.addLog(
+		`Игрок ${player.nickname} играет ${cardLogName(playedCardId)} на игрока ${defensePlayer.nickname}`,
+		EGameLogType.card,
+	);
 	player.changeTurnState(ETurnState.idle)
 	askDecision({asker: player, decider: defensePlayer, text, menu: decisionMenu});
 };

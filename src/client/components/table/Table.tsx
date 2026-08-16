@@ -3,7 +3,7 @@ import './style.scss';
 import {observer} from 'mobx-react-lite';
 import GameController from 'client/controllers/gameController';
 import Deck from 'client/components/table/Deck/Deck';
-import GameLog from 'client/components/gameLog/GameLog';
+import ActionStack from 'client/components/actionStack/ActionStack';
 import Room from 'client/components/table/Room/Room';
 import Hand from 'client/components/table/Hand/Hand';
 import Notifier from 'client/components/table/notifier/notifier';
@@ -28,7 +28,7 @@ const Table = observer(({controller} : ITableProps) => {
 
 		return (
 			<div className={"gameTable"}>
-				<GameLog controller={controller}/>
+				<ActionStack controller={controller}/>
 				<TableMenu controller={controller}/>
 				<ActionInteracter controller={controller}/>
 				<StageBoundary>

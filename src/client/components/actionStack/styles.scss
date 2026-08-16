@@ -1,0 +1,202 @@
+// Стек действий: полоска карточек поверх стола. Никакой панели под ними нет —
+// сквозь стек видно стол, и клики он тоже пропускает, кроме самих карточек.
+
+// Держим в согласии с LEAVE_MS в ActionStack.tsx.
+$action-move: 380ms;
+$action-ease: cubic-bezier(0.22, 0.8, 0.25, 1);
+
+// Карточка не возникает на месте, а прилетает издалека справа, проявляясь на
+// лету: путь заметно длиннее шага стека, поэтому и время у него своё.
+$action-arrive: 520ms;
+
+@keyframes actionTileArrive {
+	from {
+		transform: translateX(240px) scale(0.88);
+		opacity: 0;
+	}
+	55% {
+		opacity: 1;
+	}
+	to {
+		transform: translateX(0) scale(1);
+		opacity: 1;
+	}
+}
+
+.actionStackWrapper {
+	position: absolute;
+	// Под стеком больше ничего не занято: полоска таймера уехала на столешницу
+	// круговой шкалой (см. TurnTimerRing), и сверху нужен только зазор от кромки
+	// экрана.
+	top: 5px;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+	// Стек ничего не перекрывает: ловят указатель только карточки (.actionAnchor).
+	pointer-events: none;
+	padding: 0 8px;
+
+	// На узком экране стек идёт во всю ширину и упёрся бы в кнопку меню стола
+	// (.tableMenuButton висит справа сверху) — оставляем ей место.
+	@media (max-width: 700px) {
+		padding: 0 64px 0 8px;
+	}
+}
+
+// Та же полоса, что у бейджа действия (он тоже 500px по центру), —
+// стек стоит по её левому краю, а не по центру: он растёт вправо по мере того,
+// как игроки ходят, и от неподвижного левого края читается ровнее.
+.actionStackArea {
+	width: 100%;
+	max-width: 500px;
+}
+
+.actionStackTrack {
+	position: relative;
+}
+
+.actionSlot {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transition: transform $action-move $action-ease, opacity $action-move ease;
+
+	// Выбитая карточка доезжает за левый край стека и там гаснет.
+	&.isLeaving {
+		opacity: 0;
+		pointer-events: none;
+	}
+}
+
+// Якорь подсказки (см. HoverHint) — он же слой прилёта: собственного сдвига у
+// него нет, поэтому анимация въезда не спорит ни с местом карточки в стеке
+// (оно на .actionSlot), ни с её наклоном (он на .actionTile).
+.actionAnchor.hoverHint {
+	display: block;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+	pointer-events: auto;
+	animation: actionTileArrive $action-arrive $action-ease both;
+}
+
+.actionTile {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: 6px;
+	overflow: hidden;
+	border: 1px solid var(--action-edge);
+	background:
+		radial-gradient(130% 100% at 25% 0%, var(--action-tint), transparent 72%),
+		linear-gradient(180deg, #1b2119, #090b08);
+	box-shadow: 0 4px 10px #000000b0;
+	transition: filter 0.15s ease;
+}
+
+.actionAnchor:hover .actionTile {
+	filter: brightness(1.25);
+}
+
+// Свежая карточка подсвечена тем же зелёным, что и всё «сейчас» на столе.
+.actionSlot.isLatest .actionTile {
+	border-color: #00ff72aa;
+	box-shadow: 0 0 8px #00ff7255, 0 4px 10px #000000b0;
+}
+
+// Текст карты в полсотни пикселей не прочитать, узнаётся она по общему виду —
+// цвету и композиции. Поэтому карта берётся целиком, только чуть крупнее рамки:
+// приблизишь сильнее — половина колоды станет тёмным пятном (у паник середина
+// это силуэт на цветном фоне).
+.actionArt {
+	position: absolute;
+	top: -14%;
+	left: -14%;
+	width: 128%;
+	height: 128%;
+	object-fit: cover;
+}
+
+// Цвет игрока, который это сделал, — тот же, каким его ник покрашен в подсказке.
+.actionActor {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 3px;
+}
+
+// Иконка центрована не по карточке, а по её видимой полоске: карточки лежат
+// внахлёст, и у всех, кроме свежей, справа видно только соседку.
+.actionIcon {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: var(--action-sliver);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+	font-size: var(--action-icon-size);
+	line-height: 1;
+	color: var(--action-color);
+	text-shadow: 0 1px 3px #000000cc;
+}
+
+.actionHintPopup .actionHint {
+	display: block;
+	max-width: min(320px, 88vw);
+	padding: 8px 10px;
+	border-radius: 8px;
+	border: 1px solid var(--action-edge);
+	background: #0b0d09f2;
+	box-shadow: 0 6px 18px #000000cc, 0 0 12px var(--action-glow);
+	color: white;
+	font-size: 14px;
+	text-align: left;
+	line-height: 1.35;
+}
+
+.actionHintHead {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 4px;
+	color: var(--action-color);
+	font-weight: bold;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.actionHintIcon {
+	font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+	font-size: 14px;
+	line-height: 1;
+}
+
+// Что паника сделала — той же плашкой, что и сама паника: это один шаг, просто
+// сервер пишет его двумя строками.
+.actionHintDetail {
+	display: block;
+	margin-top: 5px;
+	padding-top: 5px;
+	border-top: 1px solid #ffffff26;
+	opacity: 0.85;
+}
+
+.actionHintText,
+.actionHintDetail {
+	display: block;
+
+	.logNick {
+		font-weight: bold;
+
+		&.isYou {
+			text-decoration: underline;
+		}
+	}
+}

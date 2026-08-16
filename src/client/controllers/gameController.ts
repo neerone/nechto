@@ -92,10 +92,9 @@ export default class GameController {
 	// переворачивает, и стол показывает это стрелками на столешнице (см.
 	// TableSurface).
 	@observable isClockwise: boolean = true;
+	// История стола. Показывает её стек действий (см. ActionStack): на круг
+	// стола карточек, каждая — одно законченное действие.
 	@observable gameLog: IGameLogEntry[] = [];
-	// Лог свёрнут по умолчанию: он перекрывает стол, а самое важное (текущее
-	// действие) дублируется крупным индикатором.
-	@observable isGameLogOpen: boolean = false;
 	@observable deck: IDeckPayload = {count: 0, topCardType: ECardType.event};
 	@observable notifications: INotificationAction[] = [];
 	@observable playersToSelect: string[] = [];
@@ -621,10 +620,6 @@ export default class GameController {
 		if (seen === null || latest < seen) return false;
 		return some(cardEffects, ({seq, cardId, targetPlayerId}) =>
 			seq > seen && cardId === EEventID.flamethrower && !!targetPlayerId);
-	};
-
-	toggleGameLog = () => {
-		this.isGameLogOpen = !this.isGameLogOpen;
 	};
 
 	backToLauncher = () => {

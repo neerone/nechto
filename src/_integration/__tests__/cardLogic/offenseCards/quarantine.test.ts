@@ -1,5 +1,5 @@
-import {getCard} from 'shared/constant/cards';
-import {EEventID} from 'shared/enum/cards';
+import {getCard, getPanic} from 'shared/constant/cards';
+import {EEventID, EPanicID} from 'shared/enum/cards';
 import {createMockGameServer} from '_integration/createGameServer';
 import {ETurnState} from 'shared/enum/player';
 import {EPlayerActionType} from 'shared/enum/playerActions';
@@ -122,5 +122,38 @@ describe('quarantine test',  () => {
 		expect(offensePlayer.hand.length).toBe(4);
 		//expect(checkAllDeckCardsTestEdition(game, false)).toBe(true);
 
+	});
+
+	// «Следующие 3 своих хода» — ход, на котором выпала паника, такой же ход
+	// карантина, как и ход с картой события: счетчик обязан вести себя одинаково.
+	// Раньше паника тикала мимо quarantineFresh, и первый замок слетал сразу же,
+	// а несколько паник подряд выпускали игрока из карантина на ход раньше.
+	it('карантин тикает одинаково с паникой и с картой события', () => {
+		const [, game, , nextPlayerMaybe] = createMockGameServer();
+		const nextPlayer = requirePlayer(game, nextPlayerMaybe?.id);
+		nextPlayer.quarantine = 3;
+		nextPlayer.quarantineFresh = true;
+
+		const drawPanic = () => {
+			game.deck.splice(0, 1, getPanic(EPanicID.threeFour));
+			game.changeTurn(nextPlayer.id);
+		};
+
+		// Первый свой ход после розыгрыша карты: счетчик не трогаем, но карантин
+		// уже действует.
+		drawPanic();
+		expect(nextPlayer.quarantine).toBe(3);
+		expect(nextPlayer.quarantineFresh).toBe(false);
+
+		drawPanic();
+		expect(nextPlayer.quarantine).toBe(2);
+
+		// Третий ход — все еще под карантином.
+		drawPanic();
+		expect(nextPlayer.quarantine).toBe(1);
+
+		// Четвертый — вышел.
+		drawPanic();
+		expect(nextPlayer.quarantine).toBe(0);
 	});
 });

@@ -47,6 +47,7 @@ export const axeSelect = ({game, player, selectedPlayerId} : {game: Game, player
 	}
 
 	selectedPlayer.quarantine = 0;
+	selectedPlayer.quarantineFresh = false;
 
 	game.addLog(`Игрок ${player.nickname} играет карту "Топор" на ${selectedPlayer.nickname}`, EGameLogType.card);
 	game.addCardEffect({cardId: EEventID.axe, player, target: selectedPlayer});

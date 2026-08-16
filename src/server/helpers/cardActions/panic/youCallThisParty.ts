@@ -9,6 +9,7 @@ export const youCallThisPartyAct = ({game, player} : {game: Game, player: Player
 		const pl = game.players[pId];
 		if (!pl) return false;
 		pl.quarantine = 0;
+		pl.quarantineFresh = false;
 		return pl.state === EPlayerState.dummy
 	});
 

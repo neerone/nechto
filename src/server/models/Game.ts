@@ -339,16 +339,35 @@ export class Game {
     this.discardedDeck = [];
   };
 
+  // Карантин тикает ровно один раз за свой ход игрока — неважно, взял он карту
+  // события или вытянул панику: по правилам «следующие 3 своих хода» ход
+  // с паникой такой же ход карантина, как и любой другой.
+  //
+  // Первый свой ход после розыгрыша карты счетчик не трогает (quarantineFresh):
+  // «под карантином» здесь значит quarantine > 0, а тик стоит в начале хода —
+  // без этого пропуска из положенных трех ходов игрок отсидел бы два.
+  tickQuarantine = (player: Player) => {
+    if (player.quarantine <= 0) return;
+    if (player.quarantineFresh) {
+      player.quarantineFresh = false;
+      return;
+    }
+    player.quarantine = player.quarantine - 1;
+    if (player.quarantine === 0) {
+      this.addLog(`Игрок ${player.nickname} вышел из карантина`, EGameLogType.quarantine);
+    }
+  };
+
   makePanic = (player: Player, panicCard: ICardPanic) => {
     this.analytics.panic(player, panicCard.id);
     this.discardedDeckPush(panicCard);
     this.panicCard = panicCard;
     this.panicPlayerId = player.id;
     this.isPanicCardSent = false;
+    // Тик — до эффекта: «Старые верёвки» и «И это вы называете вечеринкой?»
+    // снимают карантины совсем, и после них тикать уже нечего.
+    this.tickQuarantine(player);
     panicAction({player, game: this, panicCard});
-    if (player.quarantine > 0) {
-      player.quarantine = player.quarantine - 1;
-    }
     this.updateGame();
   };
   resetGameState = () => {
@@ -524,17 +543,7 @@ export class Game {
     // Карантин тикает ДО перехода в inCardAction: подпись действия ("только
     // топор или сброс") считается по тому же счетчику, что и доступные действия
     // карт, иначе на последнем ходу карантина они разойдутся.
-    if (player.quarantine > 0) {
-      if (player.quarantineFresh) {
-        // Quarantine was applied in this same turn-cycle: skip the first tick.
-        player.quarantineFresh = false;
-      } else {
-        player.quarantine = player.quarantine - 1;
-        if (player.quarantine === 0 ) {
-          this.addLog(`Игрок ${player.nickname} вышел из карантина`, EGameLogType.quarantine);
-        }
-      }
-    }
+    this.tickQuarantine(player);
     player.changeTurnState(ETurnState.inCardAction);
     checkAllDeckCards(this, !gameServer.isMock);
   }

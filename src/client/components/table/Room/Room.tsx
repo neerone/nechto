@@ -23,7 +23,7 @@ import {arrowPath} from 'client/helpers/arrowPath';
 import GameController from 'client/controllers/gameController';
 import PlayerBadge, {badgeBodyWidth, PlayerShadow} from 'client/components/table/PlayerBadge/PlayerBadge';
 import TableSurface from 'client/components/table/Room/TableSurface';
-import TurnTimerRing from 'client/components/table/Room/TurnTimerRing';
+import TurnReticle from 'client/components/table/Room/TurnReticle';
 import CardFlights from 'client/components/table/Room/CardFlight';
 import CardDraws from 'client/components/table/Room/CardDraw';
 import CardEffects from 'client/components/table/Room/CardEffect';
@@ -38,7 +38,6 @@ import {cardAspectRatio} from 'shared/constant/cards';
 import {EPanicID} from 'shared/enum/cards';
 import {Container, Sprite} from 'react-pixi-fiber';
 import Circle from 'client/components/pixiPrimitives/Circle';
-import Reticle from 'client/components/pixiPrimitives/Reticle';
 import {emojiTexture} from 'client/helpers/emojiTexture';
 import {getWindowHeight, getWindowWidth, tableCenterX, tableCenterY} from 'client/helpers/window';
 import type {IPlayersMap} from 'client/controllers/socketTypes';
@@ -260,92 +259,6 @@ const TradeArrow = ({item, target, badgeRadius, isLive}: ITradeArrowProps) => {
 					/>
 				</AnimatedPixi.Container>
 			)}
-		</AnimatedPixi.Container>
-	);
-};
-
-// Прицел на том, чей сейчас ход. Раньше ходящего отмечала зелёная точка на
-// макушке кружка — её на столе было не найти, а на полном столе она к тому же
-// горела сразу у двоих: в обмене не в idle оба его участника. Прицел один, и
-// он наводится ровно на того, чей ход (turnPlayerId).
-const reticleColor = 0x00FF00;
-// Раствор прицела в долях радиуса бейджа: наведённый и в момент наводки.
-const reticleAimedShare = 1.3;
-const reticleWideShare = 2.6;
-// Плечо уголка — в долях самого раствора, чтобы уголки не смыкались в рамку.
-const reticleArmShare = 0.4;
-// Скругление угла — в долях плеча.
-const reticleCornerShare = 0.5;
-// Толщина уголков — в долях радиуса бейджа: на большом экране кружки крупные,
-// и линия в пару пикселей на них теряется. Но прицел — рамка, а не обводка:
-// толстая линия спорит с самим кружком.
-const reticleThicknessShare = 0.03;
-const reticleMinThickness = 1;
-const reticleMaxThickness = 2.5;
-// Сколько прицел сжимается на новой цели. Едет он к ней своей пружиной: как
-// быстро — дело расстояния, а сжимается всегда одинаково.
-const reticleAimMs = 380;
-// Наведённый прицел дышит: чуть разжимается и сжимается обратно. Стоящая на
-// столе рамка выглядит забытой, а дыхание показывает, что ход всё ещё тут.
-const reticleBreathScale = 1.07;
-const reticleBreathMs = 1300;
-
-interface ITurnReticleProps {
-	// Место цели: пока прицел до неё едет, она может и уехать сама.
-	x: number;
-	y: number;
-	badgeRadius: number;
-	// Цель. Меняется — прицел наводится заново.
-	playerId: string;
-}
-
-const TurnReticle = ({x, y, badgeRadius, playerId}: ITurnReticleProps) => {
-	// Переезд к новой цели: своей пружиной, поэтому прицел догоняет и того, кто
-	// сам переехал (смена мест), а не только смену хода. Поля названы не x/y:
-	// react-spring считает такие пружины svg-атрибутами и типизирует их не
-	// числами, а долями оборота.
-	const move = useSpring<{aimX: number, aimY: number}>({aimX: x, aimY: y, config: config.stiff});
-	// Наводка: прицел приходит широко раскрытым и сжимается на цели. Сжимается
-	// он масштабом контейнера, а не собственным раствором: animated() гонит в
-	// примитив ОДНИ анимируемые пропы, и постоянные толщина с цветом до него бы
-	// не доехали — уголки вышли бы нулевой ширины (той же граблей опасается
-	// стрелка обмена, см. TradeArrow).
-	//
-	// Сама наводка — императивной пружиной: перезапускать её надо на смене цели,
-	// а не на каждом рендере стола.
-	const [aim, setAim] = useSpring<{aimScale: number}>(() => ({aimScale: 1, config: {duration: reticleAimMs}}));
-	React.useEffect(() => {
-		setAim({aimScale: 1, from: {aimScale: reticleWideShare / reticleAimedShare}, reset: true});
-	}, [playerId]);
-	// Дыхание — своей пружиной и своим контейнером, поверх наводки: они живут
-	// независимо, и качание не сбивается всякий раз, как ход уходит дальше.
-	// Качает его таймер: зациклить саму пружину в этой версии react-spring
-	// нечем — onRest, переданный в set(), не доходит, а бесконечная цепочка
-	// через async to есть только в рантайме, в типах её нет.
-	const [breath, setBreath] = useSpring<{breathScale: number}>(() => ({breathScale: 1, config: {duration: reticleBreathMs}}));
-	React.useEffect(() => {
-		let isOut = false;
-		const timer = setInterval(() => {
-			isOut = !isOut;
-			setBreath({breathScale: isOut ? reticleBreathScale : 1});
-		}, reticleBreathMs);
-		return () => clearInterval(timer);
-	}, []);
-
-	const spread = badgeRadius * reticleAimedShare;
-	return (
-		<AnimatedPixi.Container x={move.aimX} y={move.aimY}>
-			<AnimatedPixi.Container scale={aim.aimScale}>
-				<AnimatedPixi.Container scale={breath.breathScale}>
-					<Reticle
-						spread={spread}
-						arm={spread * reticleArmShare}
-						cornerRadius={spread * reticleArmShare * reticleCornerShare}
-						thickness={clamp(badgeRadius * reticleThicknessShare, reticleMinThickness, reticleMaxThickness)}
-						color={reticleColor}
-					/>
-				</AnimatedPixi.Container>
-			</AnimatedPixi.Container>
 		</AnimatedPixi.Container>
 	);
 };
@@ -609,14 +522,6 @@ const Room = observer(({controller, children} : IRoomProps) => {
 					lift={tableLift(playersCount)}
 					isClockwise={controller.isClockwise}
 				/>
-				{/* Шкала хода — на столешнице: она по ней и идёт. Поверх стола, но до
-				    колоды, потому что колода на столе лежит, а шкала на нём нарисована. */}
-				<TurnTimerRing
-					controller={controller}
-					rx={surface.rx}
-					ry={surface.ry}
-					lift={tableLift(playersCount)}
-				/>
 			</Container>
 			{/* Всё, что лежит на столешнице: колода и сработавшая паника (см. Table).
 			    Они уже в координатах экрана, поэтому идут без сдвига к центру. */}
@@ -630,6 +535,7 @@ const Room = observer(({controller, children} : IRoomProps) => {
 				    ход уйдёт дальше, и прицел уедет за ним. */}
 				{turnPlayerId && players[turnPlayerId] && !burnedOut.current.has(turnPlayerId) && (
 					<TurnReticle
+						controller={controller}
 						{...positionOf(turnPlayerId)}
 						badgeRadius={badgeRadius}
 						playerId={turnPlayerId}

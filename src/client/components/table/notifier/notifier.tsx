@@ -24,6 +24,11 @@ interface INotifierProps {
 	controller:  GameController;
 }
 
+// Текст рисуется в текстуру размером ровно по замеру строки, поэтому всё, что
+// вылезает за замер, обрезается. Два таких вылета: textBaseline: 'bottom' (pixi
+// ставит строку по ascent, считая базовую линию alphabetic, и при 'bottom' буквы
+// уезжают вверх на descent — срезало верхушки) и размытие тени (в замер входит
+// только dropShadowDistance, не blur — на это и нужен padding).
 const getFontStyle = (fontSize: number, maxWidth: number) => ({
     align: "center",
     dropShadow: true,
@@ -35,8 +40,8 @@ const getFontStyle = (fontSize: number, maxWidth: number) => ({
     letterSpacing: 1,
     lineHeight: 26,
     lineJoin: "round",
+    padding: 6,
     stroke: "#91ff88",
-    textBaseline: "bottom",
     wordWrap: true,
     fontSize: fontSize,
     wordWrapWidth: maxWidth

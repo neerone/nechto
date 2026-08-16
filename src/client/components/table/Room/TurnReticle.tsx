@@ -71,6 +71,12 @@ const trailWidthFalloff = 0.8;
 // читается именно как свет, и заодно смягчает край тонкой линии.
 const glowWidthShare = 3;
 const glowAlphaShare = 0.38;
+// Дойдя до красного, цвет останавливается (см. turnTimerColor), и дальше тревогу
+// набирает свет: следующий круг раздаёт ореолу лишнюю толщину — постепенно, той
+// же стрелкой, кусочек за кусочком, — и на этом рост кончается. Круг, с которого
+// он идёт, — сразу за последним цветным.
+const glowGrowLap = 4;
+const glowWidthMax = 4;
 
 // Шаг разбиения контура: столько точек приходится на плечо уголка и столько же
 // на само скругление. Кусочки выходят примерно по пикселю — крупнее нельзя: по
@@ -254,7 +260,9 @@ const drawTurnReticle = (graphics: ReticleGraphics) => {
 			: fresh;
 		const width = thickness * (1 + (trailWidthHead - 1) * blend * Math.pow(1 - age, trailWidthFalloff));
 		// Сначала ореол, потом сама линия: она должна лечь поверх своего света.
-		graphics.lineStyle(width * glowWidthShare, color, alpha * glowAlphaShare);
+		const glow = glowWidthShare
+			+ (glowWidthMax - glowWidthShare) * clamp(laps - glowGrowLap, 0, 1);
+		graphics.lineStyle(width * glow, color, alpha * glowAlphaShare);
 		graphics.moveTo(from.x, from.y);
 		graphics.lineTo(to.x, to.y);
 		graphics.lineStyle(width, color, alpha);
@@ -343,7 +351,18 @@ interface ITurnReticleProps {
 }
 
 const TurnReticle = observer(({controller, x, y, badgeRadius, playerId}: ITurnReticleProps) => {
-	const {isActive, startedAt} = controller.root.timerController;
+	const {isActive} = controller.root.timerController;
+	// Часы одни на весь ход. Сервер заводит таймер на каждый его этап — взять
+	// карту, сыграть её, обменяться (см. Player.changeTurnState), — и по его
+	// уведомлениям стрелка сбрасывалась бы трижды за ход, всякий раз начиная с
+	// зелёного. Поэтому отмеряем от того мгновения, когда ход перешёл к этому
+	// игроку, и до тех пор, пока он не уйдёт к следующему.
+	const turnOwner = React.useRef('');
+	const turnStartedAt = React.useRef(0);
+	if (turnOwner.current !== playerId) {
+		turnOwner.current = playerId;
+		turnStartedAt.current = Date.now();
+	}
 	// Переезд к новой цели: своей пружиной, поэтому прицел догоняет и того, кто
 	// сам переехал (смена мест), а не только смену хода. Поля названы не x/y:
 	// react-spring считает такие пружины svg-атрибутами и типизирует их не
@@ -385,7 +404,7 @@ const TurnReticle = observer(({controller, x, y, badgeRadius, playerId}: ITurnRe
 						arm={arm}
 						round={arm * reticleCornerShare}
 						thickness={clamp(badgeRadius * reticleThicknessShare, reticleMinThickness, reticleMaxThickness)}
-						startedAt={isActive ? startedAt : 0}
+						startedAt={isActive ? turnStartedAt.current : 0}
 					/>
 				</AnimatedPixi.Container>
 			</AnimatedPixi.Container>

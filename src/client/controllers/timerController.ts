@@ -13,20 +13,18 @@ import {playBell} from 'client/helpers/sounds';
  * реакции и весь стол разом, и тогда уведомления приходят пачкой, одно за
  * другим.
  *
- * Поэтому отсчётов здесь два, и путать их нельзя:
+ * Отсюда всё устройство этого контроллера: чужие уведомления не должны сбивать
+ * мой счёт. Поэтому здесь ведётся только СВОЙ отсчёт — сколько осталось лично
+ * мне, — и трогают его лишь мои уведомления. Пока он был общим, в заголовке
+ * вкладки цифра скакала: чужая смена состояния сбрасывала счёт на ноль, а чужой
+ * playerId выкидывал таймер из заголовка и тут же возвращал.
  *
- * — общий: кого стол ждёт прямо сейчас. Его перезапускает любое уведомление,
- *   чьё бы оно ни было, — по нему бежит стрелка на прицеле хода (см.
- *   TurnReticle), и ей это ровно и нужно: сменился ожидаемый — стрелка пошла
- *   заново;
+ * Часам на прицеле хода (см. TurnReticle) отсюда нужен только признак того, что
+ * партия идёт: свой круг они отмеряют от начала хода игрока, а не от этапов, на
+ * которые его дробит сервер.
  *
- * — свой: сколько осталось лично мне. Его трогают только мои уведомления. Раньше
- *   он был общим с первым, и в заголовке вкладки цифра скакала — чужая смена
- *   состояния сбрасывала мой счёт на ноль, а чужой playerId выкидывал таймер из
- *   заголовка и тут же возвращал.
- *
- * Обе половины живут на отметках времени, а не на счётчике-накопителе: интервал
- * в фоновой вкладке душат, и накопитель там врёт тем сильнее, чем дольше вкладка
+ * Живёт всё это на отметках времени, а не на счётчике-накопителе: интервал в
+ * фоновой вкладке душат, и накопитель там врёт тем сильнее, чем дольше вкладка
  * свёрнута, — а разница часов остаётся честной. Интервал только будит пересчёт.
  */
 export default class TimerController {
@@ -35,14 +33,9 @@ export default class TimerController {
 	parent: RootController;
 	socket: SocketController;
 
+	// Идёт ли отсчёт за столом вообще: до первого уведомления его нет, а с концом
+	// партии он кончается.
 	@observable isActive: boolean = false;
-	// Отпущенные секунды и момент старта общего отсчёта.
-	@observable initSeconds: number = 0;
-	@observable startedAt: number = 0;
-	@observable text: string = '';
-	// Чей ход отсчитывается — уведомление приходит всем, а свой отсчёт мы ведём
-	// только по своим.
-	@observable playerId: string = '';
 
 	// Свой отсчёт: отпущенные мне секунды и момент, когда их отмерили.
 	@observable mineInitSeconds: number = 0;
@@ -80,11 +73,7 @@ export default class TimerController {
 	clearTimers = () => {
 		if (this.timer) clearInterval(this.timer);
 		this.timer = null;
-		this.text = 'Игра завершена';
-		this.initSeconds = 0;
-		this.startedAt = 0;
 		this.isActive = false;
-		this.playerId = '';
 		this.clearMine();
 	};
 
@@ -95,12 +84,8 @@ export default class TimerController {
 		this.mineStartedAt = 0;
 	};
 
-	initTimer = ({text, seconds, playerId}: ITimerPayload) => {
-		this.text = text;
-		this.initSeconds = seconds;
-		this.startedAt = Date.now();
+	initTimer = ({seconds, playerId}: ITimerPayload) => {
 		this.isActive = true;
-		this.playerId = playerId;
 		if (playerId && playerId === this.root.gameController?.currentPlayerId) {
 			this.mineInitSeconds = seconds;
 			this.mineStartedAt = Date.now();

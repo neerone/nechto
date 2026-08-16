@@ -275,11 +275,19 @@ export const roomPointAt = (deg: number, count: number): {x: number, y: number} 
 export const roomPlayerPoint = (playerId: string, playerOrder: string[]): {x: number, y: number} =>
 	roomPointAt(roomPlayerAngle(playerId, playerOrder), playerOrder.length);
 
+// Зазор на боках стола. Место ровно сбоку (0° и 180°) стоит у самой широкой
+// точки столешницы: кружок там наезжает на её кромку, и нарисованный ПЕРЕД
+// столом он выглядит приклеенным к краю, а не сидящим за столом. У самого бока
+// разницы, перед столом человек или за ним, всё равно не видно, поэтому полоса
+// в несколько градусов ниже горизонта отдана дальней половине — сбоку всегда
+// лучше уйти за стол.
+const farSeatGap = 4;
+
 /**
  * Сидит ли место на дальней половине стола — той, что уходит за столешницу.
  * Дальних рисуют ДО стола, ближних — после (см. Room).
  */
-export const isFarSeat = (deg: number): boolean => Math.sin(degToRag(deg)) < 0;
+export const isFarSeat = (deg: number): boolean => Math.sin(degToRag(deg)) < Math.sin(degToRag(farSeatGap));
 
 /**
  * Тот же угол, но «размотанный» рядом с предыдущим: пересаженный игрок должен

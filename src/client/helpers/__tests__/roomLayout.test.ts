@@ -229,6 +229,15 @@ describe('рассадка', () => {
 			expect(isFarSeat(deg)).toBe(y < 0);
 		}
 	});
+
+	test('места на самих боках стола — дальние: у кромки лучше уйти за стол', () => {
+		expect(isFarSeat(0)).toBe(true);
+		expect(isFarSeat(180)).toBe(true);
+		expect(isFarSeat(360)).toBe(true);
+		// Зазор узкий: чуть отойдя от бока вниз, игрок снова стоит перед столом.
+		expect(isFarSeat(20)).toBe(false);
+		expect(isFarSeat(160)).toBe(false);
+	});
 });
 
 describe('ближние места стянуты к нижнему', () => {

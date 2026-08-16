@@ -1,5 +1,5 @@
 import type {CSSProperties} from 'react';
-import {compact, each, find, map, values} from 'lodash';
+import {compact, each, find, map, some, values} from 'lodash';
 import {EPanicID} from 'shared/enum/cards';
 import {EGameLogType} from 'shared/enum/gameLogType';
 import {ENotificationAction} from 'shared/enum/notifications';
@@ -66,9 +66,20 @@ const ICON_OVERRIDES: {type?: EGameLogType, match: string, icon: string}[] = [
 	{match: 'местами', icon: '🔄'},
 ];
 
+// Несостоявшийся шаг: карта в строке названа, но её никто не разыгрывал — она
+// просто стоит и мешает (карантин, заколоченная дверь). Картинка такой карты
+// читалась бы как «её только что сыграли», поэтому у этих строк ни картинки, ни
+// знака своего типа — только знак запрета.
+const BLOCKED_MARKS = ['не меняется', 'не может меняться', 'не может поменяться'];
+const BLOCKED_ICON = '🚫';
+
+const isBlockedStep = (entry: IGameLogEntry): boolean =>
+	some(BLOCKED_MARKS, (mark) => entry.text.includes(mark));
+
 export const getActionType = (entry: IGameLogEntry): EGameLogType => entry.type || EGameLogType.info;
 
 export const getActionIcon = (entry: IGameLogEntry): string => {
+	if (isBlockedStep(entry)) return BLOCKED_ICON;
 	const type = getActionType(entry);
 	const override = find(
 		ICON_OVERRIDES,
@@ -126,6 +137,7 @@ const PANIC_IDS = new Set<string>(values(EPanicID));
 // «Паника: все карты "Заколоченная дверь" сбрасываются» называет карту событий,
 // значит саму панику («Три, четыре») строка не называет.
 export const getEntryCardId = (entry: IGameLogEntry): string | undefined => {
+	if (isBlockedStep(entry)) return undefined;
 	const isPanic = getActionType(entry) === EGameLogType.panic;
 	return find(
 		compact(map(splitCardMentions(entry.text), 'cardId')),

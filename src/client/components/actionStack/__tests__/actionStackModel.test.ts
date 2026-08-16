@@ -88,12 +88,26 @@ describe('картинка карты на карточке стека', () => {
 		))).toBe('whiskey');
 	});
 
-	test('тип строки не мешает: карту показывает и защита, и карантин, и отказ', () => {
+	test('тип строки не мешает: карту показывает и защита, и карантин', () => {
 		expect(getEntryCardId(entry(EGameLogType.quarantine, 'Игрок Alice теперь на карантине'))).toBe('quarantine');
 		expect(getEntryCardId(entry(EGameLogType.defense, 'Bob: используя карту Страх отказывается от обмена')))
 			.toBe('fear');
-		expect(getEntryCardId(entry(EGameLogType.trade, 'Игрок Bob не меняется из-за заколоченной двери')))
-			.toBe('barricade');
+	});
+
+	test('пропуск шага из-за карантина или двери — не розыгрыш карты', () => {
+		// Карта в строке названа, но никто её не играл: она просто стоит и мешает.
+		// Картинка читалась бы как «её только что сыграли».
+		const blocked = [
+			entry(EGameLogType.quarantine, 'Игрок Bob не меняется из-за карантина'),
+			entry(EGameLogType.quarantine, 'Игрок Bob не может меняться картой, т.к он на карантине. Торговля отменяется.'),
+			entry(EGameLogType.trade, 'Игрок Bob не меняется из-за заколоченной двери'),
+		];
+		for (const item of blocked) {
+			expect(getEntryCardId(item)).toBeUndefined();
+			expect(getActionIcon(item)).toBe('🚫');
+		}
+		// А выход из карантина — это про саму карту, её и показываем.
+		expect(getEntryCardId(entry(EGameLogType.quarantine, 'Игрок Bob вышел из карантина'))).toBe('quarantine');
 	});
 
 	test('строка без названия карты остаётся знаком типа', () => {
